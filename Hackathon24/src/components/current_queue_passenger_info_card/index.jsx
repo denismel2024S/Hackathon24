@@ -1,6 +1,6 @@
 import React from "react";
 
-const CurrentQueueInfoCard = ({name, phone, location, destination}) => {
+const CurrentQueuePassengerInfoCard = ({name, phone, location, destination}) => {
     return (
       <div className="card">
       <div className="card-body">
@@ -37,4 +37,4 @@ const CurrentQueueInfoCard = ({name, phone, location, destination}) => {
   );
 };
     
-export default CurrentQueueInfoCard;
+export default CurrentQueuePassengerInfoCard;

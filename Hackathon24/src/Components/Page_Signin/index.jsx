@@ -3,7 +3,11 @@ import React from 'react'
 
 const Page_Signin = () => {
     return (
-        <LoginCard></LoginCard>
+
+        <div classname="container">
+            <LoginCard></LoginCard>
+        </div>
+        
     )
 }
 export default Page_Signin

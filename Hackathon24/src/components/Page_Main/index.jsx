@@ -1,14 +1,16 @@
 import React from "react";
-import Page_Signin from "../Page_Signin";
-
+import Sidebar from "../sidebar";
+import PageSignin from "../Page_Signin";
+import PageDriver from "../Page_Driver";
+import PageRider from "../Page_Rider";
 
 const PageMain = () => {
     return(
         <div classname="container">
-            <Sidebar></Sidebar>
-            <Page_Signin></Page_Signin>
-            <PageDriver></PageDriver>
-            <PageRider></PageRider>
+            <Sidebar/>
+            <PageSignin/>
+            <PageDriver/>
+            <PageRider/>
         </div>
     )
 }

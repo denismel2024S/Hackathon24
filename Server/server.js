@@ -9,7 +9,7 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(cors()) //if client and server are at different urls
-const port = 5433;
+const port = 5432;
 
 // Route to fetch active drivers
 app.get("/api/drivers", async (req, res) => {

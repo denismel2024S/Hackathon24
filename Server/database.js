@@ -6,20 +6,7 @@ const pool = new Pool({
   host: 'localhost',
   database: 'rideshare_app',
   password: 'password',
-  port: 5433,
+  port: 5432,
 });
-
-async function testConnection() {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    console.log('Database connection successful:', result.rows);
-  } catch (error) {
-    console.error('Database connection error:', error.message);
-  } finally {
-    pool.end();
-  }
-}
-
-testConnection();
 
 module.exports = pool;

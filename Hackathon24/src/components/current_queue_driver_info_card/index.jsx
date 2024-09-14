@@ -1,6 +1,6 @@
 import React from "react";
 
-const UserInfoCard = () => {
+const CurrentQueueDriverInfoCard = ({name, queue_position, phone}) => {
     return (
         <div className="card">
       <div className="card-body">
@@ -10,10 +10,9 @@ const UserInfoCard = () => {
           </div>
           <div className="ps-3">
             <div id="driver-info">
-              <h3 className="card-title" id="driver-name">Name</h3>
-              <p><b>Queue Position</b></p>
-              <p id="driver-arrival">Arrival Time</p>
-              <p id="driver-phone">Phone number</p>
+              <h3 className="card-title" id="driver-name">{name}</h3>
+              <p><b>Queue Position: {queue_position}</b></p>
+              <p id="driver-phone">Phone number: {phone}</p>
             </div>
           </div>
         </div>
@@ -22,4 +21,4 @@ const UserInfoCard = () => {
     )
 }
 
-export default UserInfoCard;
+export default CurrentQueueDriverInfoCard;
