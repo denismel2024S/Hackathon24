@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from "react";
-import DriverInfoCard from './driver'
+import DriverInfoCard from "../driver_info_card";
 
 import './index.css'
 

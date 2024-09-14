@@ -7,3 +7,5 @@ const MapCard = () => {
         </div>
     )
 }
+
+export default MapCard;
