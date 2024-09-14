@@ -3,9 +3,7 @@ import React from 'react'
 
 const Page_Signin = () => {
     return (
-        <>
-            <div>Hello from Sign In Component</div>
-        </>
+        <LoginCard></LoginCard>
     )
 }
 export default Page_Signin

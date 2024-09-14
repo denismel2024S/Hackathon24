@@ -6,9 +6,11 @@ import MapCard from "../map_card";
 
 const RiderPage = () => {
     return(
-        <DriverInfoCardContainer></DriverInfoCardContainer>
-        <UserInfoCard></UserInfoCard>
-        <MapCard></MapCard>
+        <div classname="container">
+            <DriverInfoCardContainer></DriverInfoCardContainer>
+            <UserInfoCard></UserInfoCard>
+            <MapCard></MapCard>
+        </div>
     )
 }
 
