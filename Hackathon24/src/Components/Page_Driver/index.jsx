@@ -9,13 +9,24 @@ const Page_Driver = () => {
     useEffect(() => {
         // Fetch passenger data from an API or other source
         const fetchPassengerData = async () => {
-        try {
-            const response = await fetch('/api/passenger'); // Replace with your API endpoint
-            const data = await response.json();
-            setPassenger(data);
-        } catch (error) {
-            console.error('Error fetching passenger data:', error);
-        }
+
+            try {
+                // Mock data for testing
+                const mockData = {
+                    name: "John Doe",
+                    phone: "+1234567890",
+                    location: "123 Elm Street",
+                    destination: "456 Oak Avenue"
+                };
+                // Simulate a delay
+                setTimeout(() => {
+                    setPassenger(mockData);
+                }, 1000); // 1 second delay
+            } catch (error) {
+                console.error('Error fetching passenger data:', error);
+            }
+
+    
         };
 
         fetchPassengerData();
@@ -35,8 +46,8 @@ const Page_Driver = () => {
             />
             <MapCard/>
         </div>
-    )   
-}
+    );   
+};
 
 
 export default Page_Driver;
