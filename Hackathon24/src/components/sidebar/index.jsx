@@ -4,6 +4,7 @@ import './index.css'
 
 const Sidebar = () => {
     return (
+        <>
         <div className = "navBar">
             <ul className = "sideBar">
                 <li className="nav-item">
@@ -19,6 +20,7 @@ const Sidebar = () => {
                 </li>
             </ul>
         </div>
+        </>
         
     )
 }

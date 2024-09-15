@@ -23,6 +23,13 @@ app.get("/api/drivers", async (req, res) => {
     }
   });
 
+app.get("/login", async (req, res) => {
+
+    const query = "INSERT " + req.body();
+
+    
+  });
+
 app.listen(port, () => {
   console.log("Server is listening on port " + port);
 });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CurrentQueuePassengerInfoCard from "../current_queue_passenger_info_card";
-import Map from "../Map"
+import MapCard from "../map_card"
 
 const Page_Driver = () => {
 
@@ -26,14 +26,14 @@ const Page_Driver = () => {
     }
     
     return(
-        <div classname="container">
+        <div className="container">
             <CurrentQueuePassengerInfoCard
             name={passenger.name}
             phone={passenger.phone}
             location={passenger.location}
             destination={passenger.destination}
             />
-            <Map></Map>
+            <MapCard/>
         </div>
     )   
 }

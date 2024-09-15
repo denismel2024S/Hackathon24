@@ -1,13 +1,14 @@
 import './index.css'
 import React from 'react'
+import LoginCard from '../login_card';
 
-const Page_Signin = () => {
+const PageSignin = () => {
     return (
 
-        <div classname="container">
-            <LoginCard></LoginCard>
+        <div className="container">
+            <LoginCard/>
         </div>
-        
-    )
-}
-export default Page_Signin
+
+    );
+};
+export default PageSignin;

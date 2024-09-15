@@ -5,7 +5,7 @@ const pool = new Pool({
   user: 'rideshare_user',
   host: 'localhost',
   database: 'rideshare_app',
-  password: 'password',
+  password: 'alphasigmaphi',
   port: 5432,
 });
 

@@ -22,7 +22,7 @@ const DriverInfoCardContainer = () => {
 
 
     return (
-        <div classname="drivers-container">
+        <div className="drivers-container">
             {drivers.map((driver) => (
                 <DriverInfoCard
                     key={driver.id}

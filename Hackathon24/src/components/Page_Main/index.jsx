@@ -6,13 +6,13 @@ import PageRider from "../Page_Rider";
 
 const PageMain = () => {
     return(
-        <div classname="container">
+        <div className="container">
             <Sidebar/>
             <PageSignin/>
             <PageDriver/>
             <PageRider/>
         </div>
-    )
+    );
 }
 
 export default PageMain;
