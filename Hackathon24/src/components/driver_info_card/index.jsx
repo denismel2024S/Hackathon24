@@ -1,28 +1,35 @@
 import React, { useState } from "react";
-import axios from "axios"; // Ensure you have axios installed or use your preferred method for HTTP requests
 
-const DriverInfoCard = ({ name, queueLength, phone, pickupLocation, destination, driverId }) => {
+const DriverInfoCard = ({ name, queueLength, phone, pickupLocation, destination, driverId, account }) => {
     const [joining, setJoining] = useState(false);
     const [error, setError] = useState(null);
 
-    const handleJoinQueue = async () => {
+    const handleJoinQueue = async (event) => {
+        event.preventDefault(); // Prevent the default form submission
         setJoining(true);
+        const riderId = account.id;
         try {
             // Replace with your backend API endpoint
-            const response = await axios.post('/api/join-queue', {
-                driverId,
-                pickupLocation,
-                destination,
+            const response = await fetch(`http://localhost:5433/api/join-queue/${riderId}/${driverId}`,{
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json', // Set the appropriate content type
+                }
             });
-
-            // Handle success (e.g., update UI or notify user)
-            console.log(response.data.message);
-        } catch (err) {
+            // Check if the response is okay (status in the range 200-299)
+            if (response.ok) {
+                const data = await response.json(); // Parse the JSON response
+                // Handle success (e.g., update UI or notify user)
+                console.log(data.message);
+            } else {
+                const errorData = await response.json();
+                setError(`Failed to join the queue: ${errorData.message}`);
+            }
+            } catch (err) {
             setError('Failed to join the queue. Please try again.');
             console.error(err);
-        } finally {
-            setJoining(false);
         }
+        
     };
 
     return (

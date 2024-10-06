@@ -1,8 +1,11 @@
 import React from "react";
 
 import './index.css'
+import SigninSignoutButton from "../signin_signout_button";
 
 const Sidebar = () => {
+    const loggedIn = true; // test to see if display updates when user is logged in/out
+
     return (
         <>
         <div className = "navBar">
@@ -12,16 +15,12 @@ const Sidebar = () => {
                     <span>Ride Dashboard</span>
                     </a>
                 </li>
-                <li className="nav-item">
-                <a className="nav-link collapsed" href="driver-faq.html">
-                    <i className="bi bi-question-circle"></i>
-                    <span>Sign Out</span>
-                </a>
-                </li>
+                <SigninSignoutButton
+                isLoggedIn={loggedIn}
+                />
             </ul>
         </div>
         </>
-        
     )
 }
 export default Sidebar;

@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import CurrentQueuePassengerInfoCard from "../current_queue_passenger_info_card";
 import MapCard from "../map_card"
+import MapWithDirections from "../map_with_directions";
+import ButtonContainer from "../queue_nav_container";
 
-const Page_Driver = () => {
+const Page_Driver = ({ account }) => {
+
+    // dummy locations for map
+    const pickupLocation = { lat: 37.22404604170506, lng: -80.418091260216 };
+  const destination = { lat: 37.24309222144794, lng:  -80.42563313338609 };
 
     const [passenger, setPassenger] = useState(null);
 
@@ -15,8 +21,8 @@ const Page_Driver = () => {
                 const mockData = {
                     name: "John Doe",
                     phone: "+1234567890",
-                    location: "123 Elm Street",
-                    destination: "456 Oak Avenue"
+                    location: "575 Washington St SW, Blacksburg",
+                    destination: "Kabrich Crescent Blacksburg, VA"
                 };
                 // Simulate a delay
                 setTimeout(() => {
@@ -44,7 +50,8 @@ const Page_Driver = () => {
             location={passenger.location}
             destination={passenger.destination}
             />
-            <MapCard/>
+            <MapWithDirections pickupLocation={pickupLocation} destination={destination} />
+            <ButtonContainer/>
         </div>
     );   
 };

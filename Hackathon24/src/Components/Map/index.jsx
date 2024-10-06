@@ -18,6 +18,7 @@ const Map = () => {
     
       return (
         <div>
+          <MapCard/>
           <h1>User Location Form</h1>
           <LocationForm onSubmit={handleLocationSubmit} />
           <div>
@@ -25,7 +26,6 @@ const Map = () => {
             <p>Pickup: {user.pickup}</p>
             <p>Destination: {user.destination}</p>
           </div>
-          <MapCard/>
         </div>
       );
 };

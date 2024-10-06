@@ -1,0 +1,15 @@
+.rider_map .leaflet-routing-container table{
+    display: none;
+}
+
+.rider_map .leaflet-routing-container h2{
+    display: none;
+}
+
+.rider_map .leaflet-routing-alt {
+    display: none;
+}
+
+.rider_map .leaflet-routing-alt.leaflet-routing-alt-minimized {
+    display: block;
+}

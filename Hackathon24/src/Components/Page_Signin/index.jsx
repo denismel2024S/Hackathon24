@@ -2,11 +2,11 @@ import './index.css'
 import React from 'react'
 import LoginCard from '../login_card';
 
-const PageSignin = () => {
+const PageSignin = ({ onLogin }) => {
     return (
 
         <div className="container">
-            <LoginCard/>
+            <LoginCard onLogin={onLogin}/>
         </div>
 
     );

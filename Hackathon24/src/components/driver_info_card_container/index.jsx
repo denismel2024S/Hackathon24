@@ -3,29 +3,42 @@ import DriverInfoCard from "../driver_info_card";
 
 import './index.css'
 
-const DriverInfoCardContainer = () => {
-    const [drivers, setDrivers] = useState([]);
+function DriverInfoCardContainer({ account }) {
+    // const [drivers, setDrivers] = useState([
+    //     { id: 1, name: "John Doe", queue_length: 5, phone: "123-456-7890" },
+    // ]);
+    const[drivers, setDrivers] = useState([]);
 
-    const mockDrivers = [
-        { id: 1, name: "John Doe", queue_length: 5, phone: "123-456-7890" },
-        { id: 2, name: "Jane Smith", queue_length: 3, phone: "987-654-3210" },
-        { id: 3, name: "Alice Johnson", queue_length: 7, phone: "555-555-5555" }
-    ];
+    // useEffect(() => {
+    //     const fetchDrivers = async () => {
+    //         try {
+    //             //const response = await fetch('http://localhost:5173/api/drivers');
+    //             //const data = await response.json();
+    //             //setDrivers(data);
+    //             fetch('http://localhost:5433/products') // Ensure this matches your Express server's URL
+    //             .then(response => response.json())
+    //             .then(data => setDrivers(data))
+    //         } catch (error) {
+    //             console.error('Error fetching drivers:', error);
+    //             setDrivers([]); // setting it to empty if there are no drivers
+    //         }
+    //     };
 
+    //     fetchDrivers();
+    // }, []);
 
     useEffect(() => {
-        const fetchDrivers = async () => {
-            try {
-                const response = await fetch('http://localhost:5433/api/drivers');
-                const data = await response.json();
-                setDrivers(data);
-            } catch (error) {
-                console.error('Error fetching drivers:', error);
-                setDrivers(mockDrivers); // setting drivers to mock drivers to test functionality
-            }
-        };
-
-        fetchDrivers();
+        try {
+            //const response = await fetch('http://localhost:5173/api/drivers');
+            //const data = await response.json();
+            //setDrivers(data);
+            fetch('http://localhost:5433/api/active_drivers') // Ensure this matches your Express server's URL
+            .then(response => response.json())
+            .then(data => setDrivers(data))
+        } catch (error) {
+            console.error('Error fetching drivers:', error);
+            setDrivers([]); // setting it to empty if there are no drivers
+        }
     }, []);
 
 
@@ -39,7 +52,9 @@ const DriverInfoCardContainer = () => {
                         key={driver.id}
                         name={driver.name}
                         queueLength={driver.queue_length}
-                        phone={driver.phone}
+                        phone={driver.phone_number}
+                        account={account}
+                        driverId={driver.id}
                     />
                 ))
             )}

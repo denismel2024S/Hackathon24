@@ -1,0 +1,10 @@
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar{
+    background: grey;
+    max-width: 180px;
+}
+
+.leaflet-routing-alternatives-container {
+    margin: 10px;
+    max-height: 300px;
+    overflow: hidden;
+}
