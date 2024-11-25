@@ -22,10 +22,11 @@ import './App.css'
 import './main.jsx'
 import {Routes, Route} from 'react-router-dom'
 import PageMain from "./Components/Page_Main/index.jsx"
-import PageRider from './Components/Page_Rider/index.jsx'
+import {PageRider} from './Components/Page_Rider/index.jsx'
 import PageDriver from './Components/Page_Driver/index.jsx'
 import PageSignin from './Components/Page_Signin/index.jsx'
 import Sidebar from './Components/sidebar/index.jsx'
+import {Login} from './Components/RiderLogin/index.jsx'
 //import PageMain from './components/Page_Main/index.jsx'
 
 
@@ -36,7 +37,7 @@ const App = withAuthInfo((props) => {
     const [code, setCode] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isRider, setIsRider] = useState(false);
-    
+    const [username, setUsername] = useState(''); 
     const logoutFunction = useLogoutFunction()
     const { redirectToLoginPage, redirectToSignupPage, redirectToAccountPage } = useRedirectFunctions()
     // Or if you want to make links instead
@@ -71,7 +72,7 @@ const App = withAuthInfo((props) => {
     }else if(isRider){
         return(
             <div>
-                <PageRider/>
+                username ? <PageRider username = {username}/> : <Login onSubmit = {setUsername}/>
             </div>
         );
     }else {

@@ -2,7 +2,7 @@ import React, { useState} from "react";
 import Sidebar from "../sidebar";
 import PageSignin from "../Page_Signin";
 import PageDriver from "../Page_Driver";
-import PageRider from "../Page_Rider";
+import {PageRider} from "../Page_Rider";
 
 const PageMain = () => {
     
