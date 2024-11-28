@@ -11,6 +11,7 @@ const connections = {}
 const users = {}
 //send a message from the server to every user 
 const broadcast = () => {
+    console.log("Broadcasting...")
     Object.keys(connections).forEach(uuid => {
         const connection = connections[uuid]
         const message = JSON.stringify(users)
@@ -18,17 +19,21 @@ const broadcast = () => {
     })
 }
 
+function broadcastUsers(){
+    const userList = Object.values(users)
+    const userListString = JSON.stringify(userList)
+    for(const uuid in connections){
+        connections[uuid].send(userListString)
+    }
+}
+
 
 wsServer.on("connection", (connection, request) => {
-    const {username} = url.parse(request.url, true). query
-    const {passengers} = url.parse(request.url, true). query
-    const {phoneNumber} = url.parse(request.url, true). query
-
+    console.log('Request URL:', request.url); 
+    const queryParams = url.parse(request.url, true).query;
+    const {username, passengers, phoneNumber, currentLocation} = queryParams; 
     const uuid = uuidv4()
 
-    console.log(username)
-    console.log(passengers)
-    console.log(phoneNumber)
 
     console.log(uuid)
 
@@ -37,11 +42,25 @@ wsServer.on("connection", (connection, request) => {
     users[uuid] = {
         username, 
         passengers,
-        phoneNumber
+        phoneNumber,
+        currentLocation
     }
+    console.log(users[uuid])
+    
+    console.log(username)
+    console.log(passengers)
+    console.log(phoneNumber)
+    console.log(currentLocation)
+    broadcastUsers()
+    connection.on('close', () => {
+        console.log(`User disconnected: ${username}`)
+        delete connections[uuid]
+        delete users[uuid]
+        broadcastUsers()
+    })
 
-    connection.on("message", message => handleMessage(message, uuid))
-    connection.on("close", () => handleClose(uuid))
+    //connection.on("message", message => handleMessage(message, uuid))
+    //connection.on("close", () => handleClose(uuid))
 })
 
 

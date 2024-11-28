@@ -1,6 +1,8 @@
 import {useState} from 'react'
+import {PageRider} from '../Page_Rider'
 
 export function Login({onSubmit}){
+    const[submitted, setSubmitted] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
         passengers: '',
@@ -17,10 +19,13 @@ export function Login({onSubmit}){
       const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Rider Information:', formData);
-        alert('Ride request submitted');
+        setSubmitted(true)
         //process form data
-        //add it to driver
       };
+    console.log("In the RiderLogin")
+    if(submitted){
+        return <PageRider formData = {formData}/>
+    }
     return (
         <div>
             <h1>Rider Information</h1>
@@ -51,7 +56,8 @@ export function Login({onSubmit}){
                 <label>
                     Phone Number:
                     <input
-                        type="tel"
+                        //type="tel"
+                        type="number"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}

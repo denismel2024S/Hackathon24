@@ -70,9 +70,10 @@ const App = withAuthInfo((props) => {
             </div>
         );
     }else if(isRider){
+        console.log({username})
         return(
             <div>
-                username ? <PageRider username = {username}/> : <Login onSubmit = {setUsername}/>
+                {username ? <PageRider username = {username}/> : <Login onSubmit = {setUsername}/>}
             </div>
         );
     }else {
@@ -88,7 +89,7 @@ const App = withAuthInfo((props) => {
                         type = "text"
                         value = {code}
                         onChange={(e) => setCode(e.target.value)}   
-                        placeHolder = "Enter Code"
+                        placeholder = "Enter Code"
                         />
                         <button onClick = {handleCodeSubmit}>Submit</button>
                         {errorMessage && <p style = {{color: 'red'}}>{errorMessage}</p>}
