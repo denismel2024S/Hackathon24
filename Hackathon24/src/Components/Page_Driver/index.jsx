@@ -8,6 +8,11 @@ import ButtonContainer from "../queue_nav_container";
 const Page_Driver = ({ account }) => {
     const [connectedUsers, setConnectedUsers] = useState([])
     const previousUsers = useRef([])
+    console.log(account.user.userId)
+    console.log(account.user.email)
+    console.log(account.user.username)
+    console.log(account.user.firstName)
+    console.log(account.user.lastName)
 
     //HOW TO GET INFORMATION FOR ACCOUNT OBJECT???????????
 
@@ -41,10 +46,9 @@ const Page_Driver = ({ account }) => {
         //TEMPORARY!!! NOT THE PARAMETERS FOR A DRIVER  
         const queryParams = new URLSearchParams({
             type: "driver",
-            username: "Cooper Driver",
-            passengers: 5,
+            username: (account.user.firstName + account.user.lastName),
             phoneNumber: 1234567890,
-            currentLocation: "Burrus Hall"
+            queue: 3
 
         }).toString()
         const WSURL = `ws://localhost:8080?${queryParams}`
@@ -54,6 +58,7 @@ const Page_Driver = ({ account }) => {
         }
         socket.onmessage = (e) => {
             const userList = JSON.parse(e.data)
+            console.log("Recieved new data from WS")
             if(JSON.stringify(previousUsers.current) !== JSON.stringify(userList)){
                 setConnectedUsers(userList)
                 previousUsers.current = userList
@@ -77,13 +82,14 @@ const Page_Driver = ({ account }) => {
             <MapWithDirections pickupLocation={pickupLocation} destination={destination} />
             <ButtonContainer/>
         </div>
+        <h1><strong>QUEUE</strong></h1>
         <ul>
                 {connectedUsers.map((user, index) => (
                     <li key = {index}>
-                        <p>{user.username}</p>
-                        <p>{user.passengers}</p>
-                        <p>{user.phoneNumber}</p>
-                        <p>{user.currentLocation}</p>
+                        <p>Name: {user.username}</p>
+                        <p>Phone Number: {user.phoneNumber}</p>
+                        <p>Pickup Location: {user.pickupLocation}</p>
+                        <p>Dropoff Location: {user.dropoffLocation}</p>
                     </li>
                 ))}
             </ul>

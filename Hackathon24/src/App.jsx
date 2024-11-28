@@ -63,7 +63,7 @@ const App = withAuthInfo((props) => {
     if (props.isLoggedIn) {
         return (
                 <div>
-                <PageDriver/>
+                <PageDriver account = {props}/>
                 <p>You are logged in as a driver{props.user.email}</p>
                 <button onClick={() => redirectToAccountPage()}>Account</button>
                 <button onClick={() => logoutFunction(true)}>Logout</button>

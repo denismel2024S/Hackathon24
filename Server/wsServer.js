@@ -9,6 +9,8 @@ const port = 8080
 
 const connections = {}
 const users = {}
+const drivers = {}
+const riders = {}
 //send a message from the server to every user 
 const broadcast = () => {
     console.log("Broadcasting...")
@@ -19,6 +21,24 @@ const broadcast = () => {
     })
 }
 
+function broadcastRiders(){
+    console.log("Broadcasting Riders...")
+    const riderList = Object.values(riders)
+    const riderListString = JSON.stringify(riderList)
+    for(const uuid in drivers){
+        const driverConnection = connections[uuid]
+        driverConnection.send(riderListString)
+    }
+}
+function broadcastDrivers(){
+    console.log("Broadcasting Drivers...")
+    const driverList = Object.values(drivers)
+    const driverListString = JSON.stringify(driverList)
+    for(const uuid in riders){
+        const riderConnection = connections[uuid]
+        riderConnection.send(driverListString)
+    }
+}
 function broadcastUsers(){
     const userList = Object.values(users)
     const userListString = JSON.stringify(userList)
@@ -27,35 +47,81 @@ function broadcastUsers(){
     }
 }
 
+/*
+What parameters does a Driver NEED
+Name
+Phone number
+Current queue
 
+What parameters does a Rider need
+Name
+Phone number
+Pickup Location
+Dropoff location
+*/
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
+//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
 wsServer.on("connection", (connection, request) => {
     console.log('Request URL:', request.url); 
     const queryParams = url.parse(request.url, true).query;
     //need to find a way to parse this data based on if the parameters are
     //given as a driver or as a rider
-
-    const {type, username, passengers, phoneNumber, currentLocation} = queryParams; 
+    console.log("Type: ", queryParams.type)
     const uuid = uuidv4()
 
-
-    console.log(uuid)
+    console.log("UUID: ", uuid)
 
     connections[uuid] = connection
 
-    users[uuid] = {
-        type,
-        username, 
-        passengers,
-        phoneNumber,
-        currentLocation
+    if(queryParams.type == "driver"){
+        console.log("A driver has connected")
+        const {type, username, phoneNumber, queue} = queryParams; 
+        drivers[uuid] = {
+            type,
+            username, 
+            phoneNumber,
+            queue
+        }
+        console.log(drivers[uuid])
+        broadcastRiders()
+        
+
+    }else if(queryParams.type == "rider"){
+        console.log("A rider has connected")
+        const {type, username, phoneNumber, pickupLocation, dropoffLocation} = queryParams; 
+        riders[uuid] = {
+            type,
+            username, 
+            phoneNumber,
+            pickupLocation,
+            dropoffLocation
+        }
+        console.log(riders[uuid])
+        broadcastDrivers()
+        broadcastRiders()
     }
-    console.log(users[uuid])
+    //const {type, username, passengers, phoneNumber, currentLocation} = queryParams; 
+
+    //users[uuid] = {
+        //type,
+        //username, 
+        //passengers,
+        //phoneNumber,
+        //currentLocation
+    //}
+    //console.log(users[uuid])
     
-    console.log(type)
-    console.log(username)
-    console.log(passengers)
-    console.log(phoneNumber)
-    console.log(currentLocation)
     /*
     pseudocode for switching types
     if(type == driver){
@@ -64,12 +130,22 @@ wsServer.on("connection", (connection, request) => {
         broadcastAllDriversToRider()
     }
     */
-    broadcastUsers()
+    //broadcastUsers()
     connection.on('close', () => {
-        console.log(`User disconnected: ${username}`)
+        console.log(`User disconnected: ${queryParams.username}`)
+        if(queryParams.type == "driver"){
+            delete drivers[uuid]
+            broadcastDrivers()
+            broadcastRiders()
+
+        }else if(queryParams.type == "rider"){
+            delete riders[uuid]
+            broadcastDrivers()
+            broadcastRiders()
+        }
         delete connections[uuid]
-        delete users[uuid]
-        broadcastUsers()
+        //delete users[uuid]
+        //broadcastUsers()
     })
 
     //connection.on("message", message => handleMessage(message, uuid))

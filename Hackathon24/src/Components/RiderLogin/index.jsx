@@ -5,9 +5,9 @@ export function Login({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
-        passengers: '',
         phone: '',
-        location: '',
+        pickup: '',
+        dropoff: '',
     
       });
     
@@ -42,18 +42,6 @@ export function Login({onSubmit}){
                 </label>
                 <br />
                 <label>
-                    Number of Passengers:
-                    <input
-                        type="number"
-                        name="passengers"
-                        value={formData.passengers}
-                        onChange={handleChange}
-                        required
-                        min="1"
-                    />
-                </label>
-                <br />
-                <label>
                     Phone Number:
                     <input
                         //type="tel"
@@ -67,11 +55,22 @@ export function Login({onSubmit}){
                 </label>
                 <br />
                 <label>
-                    Current Location:
+                    Pickup Location:
                     <input
                         type="text"
-                        name="location"
-                        value={formData.location}
+                        name="pickup"
+                        value={formData.pickup}
+                        onChange={handleChange}
+                        required
+                    />
+                </label>
+                <br/>
+                <label>
+                    Dropoff Location:
+                    <input
+                        type="text"
+                        name="dropoff"
+                        value={formData.dropoff}
                         onChange={handleChange}
                         required
                     />
