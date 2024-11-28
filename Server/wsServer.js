@@ -31,7 +31,10 @@ function broadcastUsers(){
 wsServer.on("connection", (connection, request) => {
     console.log('Request URL:', request.url); 
     const queryParams = url.parse(request.url, true).query;
-    const {username, passengers, phoneNumber, currentLocation} = queryParams; 
+    //need to find a way to parse this data based on if the parameters are
+    //given as a driver or as a rider
+
+    const {type, username, passengers, phoneNumber, currentLocation} = queryParams; 
     const uuid = uuidv4()
 
 
@@ -40,6 +43,7 @@ wsServer.on("connection", (connection, request) => {
     connections[uuid] = connection
 
     users[uuid] = {
+        type,
         username, 
         passengers,
         phoneNumber,
@@ -47,10 +51,19 @@ wsServer.on("connection", (connection, request) => {
     }
     console.log(users[uuid])
     
+    console.log(type)
     console.log(username)
     console.log(passengers)
     console.log(phoneNumber)
     console.log(currentLocation)
+    /*
+    pseudocode for switching types
+    if(type == driver){
+        broadcastAllRidersToDriver()
+    }else if(type == rider){
+        broadcastAllDriversToRider()
+    }
+    */
     broadcastUsers()
     connection.on('close', () => {
         console.log(`User disconnected: ${username}`)

@@ -23,6 +23,7 @@ export function PageRider({formData}){
     //implement auto reconnection module ; read documentation
     useEffect(() => {
         const queryParams = new URLSearchParams({
+            type: "rider",
             username: formData.name,
             passengers: formData.passengers,
             phoneNumber: formData.phone,
