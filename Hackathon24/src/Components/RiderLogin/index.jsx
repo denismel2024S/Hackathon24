@@ -27,8 +27,11 @@ export function RiderLogin({onSubmit}){
         return <PageRider formData = {formData}/>
     }
     return (
-        <div>
+        <div className = "design">
+            <i  class="fa-solid fa-car carLogo"></i>
             <h1>Rider Information</h1>
+            <h2 className = "header1"></h2>
+            <i class="fa-solid fa-user idLogo"></i>
             <form onSubmit={handleSubmit}>
                 <label>
                     Name:
