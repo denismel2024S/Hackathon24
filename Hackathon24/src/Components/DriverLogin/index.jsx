@@ -1,14 +1,11 @@
 import {useState} from 'react'
-import {PageRider} from '../Page_Rider'
+import {PageDriver} from '../Page_Driver'
 
-export function RiderLogin({onSubmit}){
+export function DriverLogin({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
-        pickup: '',
-        dropoff: '',
-    
       });
     
       const handleChange = (e) => {
@@ -18,17 +15,17 @@ export function RiderLogin({onSubmit}){
     
       const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Rider Information:', formData);
+        console.log('Driver Information:', formData);
         setSubmitted(true)
         //process form data
       };
-    console.log("In the RiderLogin")
+    console.log("In the DriverLogin")
     if(submitted){
-        return <PageRider formData = {formData}/>
+        return <PageDriver formData = {formData}/>
     }
     return (
         <div>
-            <h1>Rider Information</h1>
+            <h1>Driver Information</h1>
             <form onSubmit={handleSubmit}>
                 <label>
                     Name:
@@ -53,29 +50,6 @@ export function RiderLogin({onSubmit}){
                         pattern="[0-9]{10}" 
                     />
                 </label>
-                <br />
-                <label>
-                    Pickup Location:
-                    <input
-                        type="text"
-                        name="pickup"
-                        value={formData.pickup}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
-                <br/>
-                <label>
-                    Dropoff Location:
-                    <input
-                        type="text"
-                        name="dropoff"
-                        value={formData.dropoff}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
-                <br />
                 <button type="submit">Submit</button>
             </form>
         </div>

@@ -5,7 +5,7 @@ import MapWithDirections from "../map_with_directions";
 import ButtonContainer from "../queue_nav_container";
 
 
-const Page_Driver = () => {
+export function PageDriver({formData}) {
     const [connectedUsers, setConnectedUsers] = useState([])
     const previousUsers = useRef([])
     //console.log(account.user.userId)
@@ -46,8 +46,8 @@ const Page_Driver = () => {
         //TEMPORARY!!! NOT THE PARAMETERS FOR A DRIVER  
         const queryParams = new URLSearchParams({
             type: "driver",
-            username: "nate obama", //(account.user.firstName + account.user.lastName),
-            phoneNumber: 1234567890,
+            username: "nate obcemea", //(account.user.firstName + account.user.lastName),
+            phoneNumber: "1234567890", 
             queue: 3
 
         }).toString()
@@ -72,17 +72,12 @@ const Page_Driver = () => {
     
     return(
         <>
-        <div className="container">
-            <CurrentQueuePassengerInfoCard
-            name={passenger.name}
-            phone={passenger.phone}
-            location={passenger.location}
-            destination={passenger.destination}
-            />
-            <MapWithDirections pickupLocation={pickupLocation} destination={destination} />
-            <ButtonContainer/>
+        <div>
+            <h1>Driver Information</h1>
+            <p><strong>Name:</strong> {formData.name}</p>
+            <p><strong>Phone Number:</strong> {formData.phone}</p>
         </div>
-        <h1><strong>QUEUE</strong></h1>
+        <h1><strong>QUEUE: 0</strong></h1>
         <ul>
                 {connectedUsers.map((user, index) => (
                     <li key = {index}>
@@ -93,9 +88,16 @@ const Page_Driver = () => {
                     </li>
                 ))}
             </ul>
+        <div className="container">
+            <CurrentQueuePassengerInfoCard
+            name={passenger.name}
+            phone={passenger.phone}
+            location={passenger.location}
+            destination={passenger.destination}
+            />
+            <MapWithDirections pickupLocation={pickupLocation} destination={destination} />
+            <ButtonContainer/>
+        </div>
         </>
     );   
 };
-
-
-export default Page_Driver;

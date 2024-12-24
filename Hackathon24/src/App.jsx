@@ -23,10 +23,11 @@ import './main.jsx'
 import {Routes, Route} from 'react-router-dom'
 import PageMain from "./Components/Page_Main/index.jsx"
 import {PageRider} from './Components/Page_Rider/index.jsx'
-import PageDriver from './Components/Page_Driver/index.jsx'
+import {PageDriver} from './Components/Page_Driver/index.jsx'
 import PageSignin from './Components/Page_Signin/index.jsx'
 import Sidebar from './Components/sidebar/index.jsx'
-import {Login} from './Components/RiderLogin/index.jsx'
+import {RiderLogin} from './Components/RiderLogin/index.jsx'
+import {DriverLogin} from './Components/DriverLogin/index.jsx'
 
 const App = () => {
     const [showCodeInput, setShowCodeInput] = useState(false);
@@ -45,11 +46,6 @@ const App = () => {
     const handleDriverButtonClick = () => {
         console.log("Clicked Login")
         setIsDriver(true);
-        return (
-            <div>
-                <PageDriver/>
-            </div>
-        );
     };
     const handleCodeSubmit = () => {
         if(code == correctCode){
@@ -68,13 +64,13 @@ const App = () => {
         console.log({username})
         return(
             <div>
-                {username ? <PageRider username = {username}/> : <Login onSubmit = {setUsername}/>}
+                {username ? <PageRider username = {username}/> : <RiderLogin onSubmit = {setUsername}/>}
             </div>
         );
     }else if(isDriver){
         return (
             <div>
-                <PageDriver/>
+                <DriverLogin/>
             </div>
         );
     }
