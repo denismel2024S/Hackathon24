@@ -29,6 +29,8 @@ function broadcastRiders(){
         const driverConnection = connections[uuid]
         driverConnection.send(riderListString)
     }
+    const length = Object.keys(riders).length
+    console.log("Amounnt of Riders: ", length)
 }
 function broadcastDrivers(){
     console.log("Broadcasting Drivers...")
@@ -59,19 +61,6 @@ Phone number
 Pickup Location
 Dropoff location
 */
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
-//BROADCASTING DOESNT WORK FIX THIS!!!!!!!!!!!!!!!!!
 wsServer.on("connection", (connection, request) => {
     console.log('Request URL:', request.url); 
     const queryParams = url.parse(request.url, true).query;

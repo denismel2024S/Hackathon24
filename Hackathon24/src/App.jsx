@@ -27,21 +27,14 @@ import PageDriver from './Components/Page_Driver/index.jsx'
 import PageSignin from './Components/Page_Signin/index.jsx'
 import Sidebar from './Components/sidebar/index.jsx'
 import {Login} from './Components/RiderLogin/index.jsx'
-//import PageMain from './components/Page_Main/index.jsx'
 
-
-import { withAuthInfo, useRedirectFunctions, useLogoutFunction } from '@propelauth/react'
-
-const App = withAuthInfo((props) => {
+const App = () => {
     const [showCodeInput, setShowCodeInput] = useState(false);
     const [code, setCode] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isRider, setIsRider] = useState(false);
+    const [isDriver, setIsDriver] = useState(false);
     const [username, setUsername] = useState(''); 
-    const logoutFunction = useLogoutFunction()
-    const { redirectToLoginPage, redirectToSignupPage, redirectToAccountPage } = useRedirectFunctions()
-    // Or if you want to make links instead
-    // const { getLoginPageUrl, getSignupPageUrl, getAccountPageUrl } = useHostedPageUrls()
     const correctCode = '12345';
 
     const handlePassengerButtonClick = () => {
@@ -49,7 +42,15 @@ const App = withAuthInfo((props) => {
         setErrorMessage('');
         setCode('');
     };
-
+    const handleDriverButtonClick = () => {
+        console.log("Clicked Login")
+        setIsDriver(true);
+        return (
+            <div>
+                <PageDriver/>
+            </div>
+        );
+    };
     const handleCodeSubmit = () => {
         if(code == correctCode){
             setIsRider(true);
@@ -60,28 +61,28 @@ const App = withAuthInfo((props) => {
         }
     };
 
-    if (props.isLoggedIn) {
-        return (
-                <div>
-                <PageDriver account = {props}/>
-                <p>You are logged in as a driver{props.user.email}</p>
-                <button onClick={() => redirectToAccountPage()}>Account</button>
-                <button onClick={() => logoutFunction(true)}>Logout</button>
-            </div>
-        );
-    }else if(isRider){
+
+
+
+    if(isRider){
         console.log({username})
         return(
             <div>
                 {username ? <PageRider username = {username}/> : <Login onSubmit = {setUsername}/>}
             </div>
         );
-    }else {
+    }else if(isDriver){
+        return (
+            <div>
+                <PageDriver/>
+            </div>
+        );
+    }
+    else {
         return (
             <div>
                 <p>You are not logged in</p>
-                <button onClick={() => redirectToLoginPage()}>Login</button>
-                <button onClick={() => redirectToSignupPage()}>Signup</button>
+                <button onClick={handleDriverButtonClick}>Driver</button>
                 <button onClick={handlePassengerButtonClick}>Passenger</button>
                 {showCodeInput && (
                     <div>
@@ -100,9 +101,5 @@ const App = withAuthInfo((props) => {
             </div>
         );
     }
-})
-
-
-
-
+}
 export default App

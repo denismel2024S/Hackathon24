@@ -5,14 +5,14 @@ import MapWithDirections from "../map_with_directions";
 import ButtonContainer from "../queue_nav_container";
 
 
-const Page_Driver = ({ account }) => {
+const Page_Driver = () => {
     const [connectedUsers, setConnectedUsers] = useState([])
     const previousUsers = useRef([])
-    console.log(account.user.userId)
-    console.log(account.user.email)
-    console.log(account.user.username)
-    console.log(account.user.firstName)
-    console.log(account.user.lastName)
+    //console.log(account.user.userId)
+    //console.log(account.user.email)
+    //console.log(account.user.username)
+    //console.log(account.user.firstName)
+    //console.log(account.user.lastName)
 
     //HOW TO GET INFORMATION FOR ACCOUNT OBJECT???????????
 
@@ -46,7 +46,7 @@ const Page_Driver = ({ account }) => {
         //TEMPORARY!!! NOT THE PARAMETERS FOR A DRIVER  
         const queryParams = new URLSearchParams({
             type: "driver",
-            username: (account.user.firstName + account.user.lastName),
+            username: "nate obama", //(account.user.firstName + account.user.lastName),
             phoneNumber: 1234567890,
             queue: 3
 
