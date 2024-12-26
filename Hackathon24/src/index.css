@@ -94,19 +94,7 @@ label{
   font-size: 5rem;
   color:#b8bcff;
   position: absolute;
-  top: 76%; 
+  top: 90%; 
   z-index: 1;
 }
 
-.header1{
-  position: absolute; /* Allows the gradient to be freely positioned */
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Perfect centering */
-    background: radial-gradient(circle, rgba(116, 123, 255, 0.4), rgba(44, 47, 94, 0));
-    width: 70vw; /* Ensure the circle is large enough to cover the whole page */
-    height: 40vw;
-    border-radius: 50%; /* Makes it a circle */
-    z-index: 0; /* Ensure it sits behind other content */
-    pointer-events: none; /* Prevent interactions with the circle */
-}
