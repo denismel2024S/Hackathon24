@@ -46,9 +46,9 @@ export function PageDriver({formData}) {
         //TEMPORARY!!! NOT THE PARAMETERS FOR A DRIVER  
         const queryParams = new URLSearchParams({
             type: "driver",
-            username: "nate obcemea", //(account.user.firstName + account.user.lastName),
-            phoneNumber: "1234567890", 
-            queue: 3
+            username: formData.name.toString(), //(account.user.firstName + account.user.lastName),
+            phoneNumber: formData.phone.toString(), 
+            queue: 0
 
         }).toString()
         const WSURL = `ws://localhost:8080?${queryParams}`

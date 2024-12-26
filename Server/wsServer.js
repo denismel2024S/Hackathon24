@@ -40,6 +40,8 @@ function broadcastDrivers(){
         const riderConnection = connections[uuid]
         riderConnection.send(driverListString)
     }
+    const length = Object.keys(drivers).length
+    console.log("Amounnt of Drivers: ", length)
 }
 function broadcastUsers(){
     const userList = Object.values(users)
