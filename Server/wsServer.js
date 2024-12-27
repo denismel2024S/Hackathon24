@@ -5,7 +5,12 @@ const uuidv4 = require("uuid").v4
 const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
+const sqlite3 = require('sqlite3').verbose();
+const { addDriver, addRider } = require('./database'); // Import the database functions
 
+
+// Open SQLite database
+const db = new sqlite3.Database('./app.db');
 
 const connections = {}
 const users = {}
@@ -85,6 +90,9 @@ wsServer.on("connection", (connection, request) => {
             queue
         }
         console.log(drivers[uuid])
+
+        addDriver(username, phoneNumber, queue);
+
         broadcastDrivers()
         broadcastRiders()
         
@@ -101,6 +109,9 @@ wsServer.on("connection", (connection, request) => {
             driverId
         }
         console.log(riders[uuid])
+
+        addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId);
+
         broadcastDrivers()
         broadcastRiders()
     }
@@ -124,27 +135,6 @@ wsServer.on("connection", (connection, request) => {
     }
     */
     //broadcastUsers()
-
-
-    // // Handle a Rider joining a Driver's Queue
-    // connection.on('message', (message) => {
-    //     const { driverId, riderId } = JSON.parse(message); // Parse driverId and riderId from the message
-    //     console.log(`Driver ${driverId} queue being updated by Rider ${riderId}`);
-    //     if (drivers[driverId]) {
-    //         // Increment the driver's queue position
-    //         drivers[driverId].queue += 1;
-    //         console.log(`Driver ${driverId} queue updated: ${drivers[driverId].queue}`);
-
-    //         // Update the rider's driverId
-    //         if (riders[riderId]) {
-    //             riders[riderId].driverId = driverId; // Set the rider's driverId attribute
-    //             console.log(`Rider ${riderId} assigned to Driver ${driverId}`);
-    //         }
-    //         // Broadcast the updated information to all drivers and riders
-    //         broadcastDrivers();
-    //         broadcastRiders();
-    //     }
-    // });
 
     // users joining queue
     connection.on('message', (message) => {
@@ -208,6 +198,53 @@ wsServer.on("connection", (connection, request) => {
             console.log('Riders:', riders);
         }
 
+        // SQL QUERY
+
+        if (data.action === 'joinQueue') {
+            const { riderId, driverId } = data;
+      
+            // Find driver by username
+            db.get('SELECT * FROM drivers WHERE username = ?', [driverId], (err, driver) => {
+              if (err) {
+                console.error('Error fetching driver:', err);
+                return;
+              }
+      
+              if (driver) {
+                // Find rider by username
+                db.get('SELECT * FROM riders WHERE username = ?', [riderId], (err, rider) => {
+                  if (err) {
+                    console.error('Error fetching rider:', err);
+                    return;
+                  }
+      
+                  if (rider) {
+                    // Update rider's driver_id and increment driver's queue length
+                    db.run('UPDATE riders SET driver_id = ? WHERE username = ?', [driver.id, riderId], (err) => {
+                      if (err) {
+                        console.error('Error updating rider:', err);
+                        return;
+                      }
+      
+                      // Increment the driver's queue length
+                      db.run('UPDATE drivers SET queue_length = queue_length + 1 WHERE username = ?', [driverId], (err) => {
+                        if (err) {
+                          console.error('Error updating driver queue length:', err);
+                          return;
+                        }
+      
+                        // Notify clients about the updated queue
+                        broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length + 1 });
+                      });
+                    });
+                  }
+                });
+              } else {
+                console.log('Driver not found.');
+              }
+            });
+          }
+
         // users leaving a queue
         if (data.action === "leaveQueue") {
             const { driverId, riderId } = data;
@@ -246,6 +283,51 @@ wsServer.on("connection", (connection, request) => {
                 console.log("Invalid driver or rider username.");
             }
         }
+
+        // SQL QUERY
+
+        if (data.action === 'leaveQueue') {
+            const { riderId, driverId } = data;
+      
+            // Find driver by username
+            db.get('SELECT * FROM drivers WHERE username = ?', [driverId], (err, driver) => {
+              if (err) {
+                console.error('Error fetching driver:', err);
+                return;
+              }
+      
+              if (driver) {
+                // Find rider by username
+                db.get('SELECT * FROM riders WHERE username = ?', [riderId], (err, rider) => {
+                  if (err) {
+                    console.error('Error fetching rider:', err);
+                    return;
+                  }
+      
+                  if (rider && rider.driver_id === driver.id) {
+                    // Remove rider from the queue (set driver_id to NULL)
+                    db.run('UPDATE riders SET driver_id = NULL WHERE username = ?', [riderId], (err) => {
+                      if (err) {
+                        console.error('Error updating rider:', err);
+                        return;
+                      }
+      
+                      // Decrement driver's queue length
+                      db.run('UPDATE drivers SET queue_length = queue_length - 1 WHERE username = ?', [driverId], (err) => {
+                        if (err) {
+                          console.error('Error updating driver queue length:', err);
+                          return;
+                        }
+      
+                        // Notify clients about the updated queue
+                        broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length - 1 });
+                      });
+                    });
+                  }
+                });
+              }
+            });
+          }
     });
 
     connection.on('close', () => {
@@ -269,6 +351,14 @@ wsServer.on("connection", (connection, request) => {
     //connection.on("close", () => handleClose(uuid))
 })
 
+// Broadcast function to send data to all connected WebSocket clients
+function broadcastToClients(message) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(message));
+      }
+    });
+  }
 
 server.listen(port, () => {
     console.log(`Websocket server is running on port ${port}`)
