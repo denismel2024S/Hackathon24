@@ -22,12 +22,14 @@ import './App.css'
 import './main.jsx'
 import {Routes, Route} from 'react-router-dom'
 import PageMain from "./Components/Page_Main/index.jsx"
-import {PageRider} from './Components/Page_Rider/index.jsx'
-import {PageDriver} from './Components/Page_Driver/index.jsx'
+import {PageRider} from './components/Page_Rider/index.jsx'
+import {PageDriver} from './components/Page_Driver/index.jsx'
 import PageSignin from './Components/Page_Signin/index.jsx'
 import Sidebar from './Components/sidebar/index.jsx'
 import {RiderLogin} from './Components/RiderLogin/index.jsx'
 import {DriverLogin} from './Components/DriverLogin/index.jsx'
+import { UserProvider } from "./context/UserContext";
+
 
 const App = () => {
     const [showCodeInput, setShowCodeInput] = useState(false);
@@ -63,15 +65,19 @@ const App = () => {
     if(isRider){
         console.log({username})
         return(
-            <div>
-                {username ? <PageRider username = {username}/> : <RiderLogin onSubmit = {setUsername}/>}
-            </div>
+            <UserProvider>
+                <div>
+                    {username ? <PageRider username = {username}/> : <RiderLogin onSubmit = {setUsername}/>}
+                </div>
+            </UserProvider>
         );
     }else if(isDriver){
         return (
-            <div>
-                <DriverLogin/>
-            </div>
+            <UserProvider>
+                <div>
+                    <DriverLogin/>
+                </div>
+            </UserProvider>
         );
     }
     else {

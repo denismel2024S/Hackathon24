@@ -10,6 +10,8 @@ import throttle from 'lodash.throttle'
 export function PageRider({formData}){
     const [connectedUsers, setConnectedUsers] = useState([])
     const previousUsers = useRef([])
+    const socketRef = useRef(null);
+
     //queryParams adds ? to the url with the params
     //implement auto reconnection module ; read documentation
     useEffect(() => {
@@ -18,14 +20,15 @@ export function PageRider({formData}){
             username: formData.name,
             phoneNumber: formData.phone,
             pickupLocation: formData.pickup,
-            dropoffLocation: formData.dropoff
+            dropoffLocation: formData.dropoff,
+            driverId: undefined,
         }).toString();
         const WSURL = `ws://localhost:8080?${queryParams}`
-        const socket = new WebSocket(WSURL)
-        socket.onopen = () => {
+        socketRef.current = new WebSocket(WSURL)
+        socketRef.current.onopen = () => {
             console.log('Websocket connection established')
         }
-        socket.onmessage = (e) => {
+        socketRef.current.onmessage = (e) => {
             const userList = JSON.parse(e.data)
             if(JSON.stringify(previousUsers.current) !== JSON.stringify(userList)){
 
@@ -35,6 +38,9 @@ export function PageRider({formData}){
             }
 
         }
+        return () => {
+            socketRef.current.close();
+        };
 
     }, [formData])
 
@@ -51,7 +57,11 @@ export function PageRider({formData}){
                 <p><strong>Dropoff Location:</strong> {formData.dropoff}</p>
                 <br/>
                 <h1><strong>Drivers</strong></h1>
-                <DriverInfoCardContainer connectedUsers = {connectedUsers}/>
+                <DriverInfoCardContainer
+                connectedUsers = {connectedUsers}
+                socket={socketRef.current}
+                riderId = {formData.name}
+                />
             </div>
         </>
     )

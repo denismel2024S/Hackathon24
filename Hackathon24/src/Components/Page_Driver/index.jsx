@@ -59,12 +59,25 @@ export function PageDriver({formData}) {
         socket.onmessage = (e) => {
             const userList = JSON.parse(e.data)
             console.log("Recieved new data from WS")
-            if(JSON.stringify(previousUsers.current) !== JSON.stringify(userList)){
-                setConnectedUsers(userList)
-                previousUsers.current = userList
+
+            // filtering so that only riders with driverId matching this user's username will be shown
+
+            const username = formData.name;
+            // const filteredUsers = userList
+            const filteredUsers = userList.filter(
+                (user) => user.driverId === username
+            )
+
+            if(JSON.stringify(previousUsers.current) !== JSON.stringify(filteredUsers)){
+                setConnectedUsers(filteredUsers)
+                previousUsers.current = filteredUsers
             }
         }
-    }, []);
+
+        return () => {
+            socket.close();
+        };
+    }, [formData]);
 
     if (!passenger) {
         return <div>Loading...</div>;
@@ -77,7 +90,7 @@ export function PageDriver({formData}) {
             <p><strong>Name:</strong> {formData.name}</p>
             <p><strong>Phone Number:</strong> {formData.phone}</p>
         </div>
-        <h1><strong>QUEUE: 0</strong></h1>
+        <h1><strong>QUEUE: {connectedUsers.length}</strong></h1>
         <ul>
                 {connectedUsers.map((user, index) => (
                     <li key = {index}>

@@ -85,18 +85,20 @@ wsServer.on("connection", (connection, request) => {
             queue
         }
         console.log(drivers[uuid])
+        broadcastDrivers()
         broadcastRiders()
         
 
     }else if(queryParams.type == "rider"){
         console.log("A rider has connected")
-        const {type, username, phoneNumber, pickupLocation, dropoffLocation} = queryParams; 
+        const {type, username, phoneNumber, pickupLocation, dropoffLocation, driverId} = queryParams; 
         riders[uuid] = {
             type,
             username, 
             phoneNumber,
             pickupLocation,
-            dropoffLocation
+            dropoffLocation,
+            driverId
         }
         console.log(riders[uuid])
         broadcastDrivers()
@@ -122,6 +124,130 @@ wsServer.on("connection", (connection, request) => {
     }
     */
     //broadcastUsers()
+
+
+    // // Handle a Rider joining a Driver's Queue
+    // connection.on('message', (message) => {
+    //     const { driverId, riderId } = JSON.parse(message); // Parse driverId and riderId from the message
+    //     console.log(`Driver ${driverId} queue being updated by Rider ${riderId}`);
+    //     if (drivers[driverId]) {
+    //         // Increment the driver's queue position
+    //         drivers[driverId].queue += 1;
+    //         console.log(`Driver ${driverId} queue updated: ${drivers[driverId].queue}`);
+
+    //         // Update the rider's driverId
+    //         if (riders[riderId]) {
+    //             riders[riderId].driverId = driverId; // Set the rider's driverId attribute
+    //             console.log(`Rider ${riderId} assigned to Driver ${driverId}`);
+    //         }
+    //         // Broadcast the updated information to all drivers and riders
+    //         broadcastDrivers();
+    //         broadcastRiders();
+    //     }
+    // });
+
+    // users joining queue
+    connection.on('message', (message) => {
+        const data = JSON.parse(message);
+
+        if (data.action === "joinQueue") {
+            const { driverId, riderId } = data;
+            console.log(`Rider ${riderId} is attepmting to join a queue`);
+            console.log(data);
+            
+
+             // Log the data to debug
+            console.log('Received data:', data);
+
+            // Ensure drivers and riders are defined
+            console.log('Drivers:', drivers);
+            console.log('Riders:', riders);
+
+            // Loop through all connections to find the driver with the matching username
+            let driverFound = null;
+
+            for (let connUuid in connections) {
+                const conn = connections[connUuid];
+                // Check if the connection is a driver and if the username matches
+                if (drivers[connUuid] && drivers[connUuid].username === driverId) {
+                    driverFound = drivers[connUuid]; // Found the matching driver
+                    break;
+                }
+            }
+
+            // Loop through all rider connections
+
+            let riderFound = null;
+
+            for (let connUuid in connections){
+                const conn = connections[connUuid];
+                // check if connection is a rider and has matching username
+                if (riders[connUuid] && riders[connUuid].username === riderId) {
+                    riderFound = riders[connUuid]; // Found the matching rider
+                    break;
+                }
+            }
+            console.log(riderFound);
+
+            // Check if a driver was found and if the rider exists
+            if (driverFound && riderFound) {
+                // Update the driver's queue length
+                driverFound.queue += 1;
+                // Assign the rider to the driver
+                riderFound.driverId = driverId;
+
+                console.log(`Rider ${riderId} joined the queue for driver ${driverId}`);
+                broadcastDrivers();
+                broadcastRiders();
+            } else {
+                console.log("Invalid driver or rider username.");
+            }
+
+            // Ensure drivers and riders are defined
+            console.log('Drivers:', drivers);
+            console.log('Riders:', riders);
+        }
+
+        // users leaving a queue
+        if (data.action === "leaveQueue") {
+            const { driverId, riderId } = data;
+            console.log(`Rider ${riderId} is attempting to leave the queue`);
+    
+            let driverFound = null;
+    
+            // Find the driver with matching username
+            for (let connUuid in connections) {
+                const conn = connections[connUuid];
+                if (drivers[connUuid] && drivers[connUuid].username === driverId) {
+                    driverFound = drivers[connUuid];
+                    break;
+                }
+            }
+    
+            let riderFound = null;
+            // Find the rider with matching username
+            for (let connUuid in connections) {
+                const conn = connections[connUuid];
+                if (riders[connUuid] && riders[connUuid].username === riderId) {
+                    riderFound = riders[connUuid];
+                    break;
+                }
+            }
+    
+            if (driverFound && riderFound) {
+                // Update the queue and remove the rider's driverId
+                driverFound.queue -= 1;
+                riderFound.driverId = null;  // Rider is no longer assigned to a driver
+    
+                console.log(`Rider ${riderId} left the queue for driver ${driverId}`);
+                broadcastDrivers();
+                broadcastRiders();
+            } else {
+                console.log("Invalid driver or rider username.");
+            }
+        }
+    });
+
     connection.on('close', () => {
         console.log(`User disconnected: ${queryParams.username}`)
         if(queryParams.type == "driver"){
