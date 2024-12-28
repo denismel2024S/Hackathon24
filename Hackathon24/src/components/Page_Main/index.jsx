@@ -15,7 +15,7 @@ const PageMain = () => {
   };
 
   return (
-    <div>
+    <div >
       <Sidebar />
       {!currentAccount ? (
         <PageSignin onLogin={handleLogin}/>
