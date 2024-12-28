@@ -22,9 +22,9 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination }) =
                             <div className="ps-3">
                                 <div id="driver-info">
                                     <h2 className="card-title" id="passenger-name">{name}</h2>
-                                    <p id="passenger-phone">{phone}</p>
-                                    <p id="passenger-location">{location}</p>
-                                    <p id="passenger-destination">{destination}</p>
+                                    <p id="passenger-phone">Phone: {phone}</p>
+                                    <p id="passenger-location">Pickup From: {location}</p>
+                                    <p id="passenger-destination">Going to: {destination}</p>
                                 </div>
                             </div>
                         </div>

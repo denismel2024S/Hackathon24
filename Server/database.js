@@ -72,8 +72,8 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS drivers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE,
-      phone_number TEXT,
+      username TEXT,
+      phone_number TEXT UNIQUE,
       queue_length INTEGER DEFAULT 0
     );
   `);
@@ -82,8 +82,8 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS riders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE,
-      phone_number TEXT,
+      username TEXT,
+      phone_number TEXT UNIQUE,
       pickup_location TEXT,
       dropoff_location TEXT,
       driver_id INTEGER,
@@ -94,31 +94,79 @@ db.serialize(() => {
 
 console.log("Database and tables are ready.");
 
-// Function to insert a new driver into the drivers table
 function addDriver(username, phoneNumber, queueLength = 0) {
-  const stmt = db.prepare("INSERT INTO drivers (username, phone_number, queue_length) VALUES (?, ?, ?)");
-  stmt.run(username, phoneNumber, queueLength, function(err) {
-    if (err) {
-      console.error("Error inserting driver:", err);
-    } else {
-      console.log(`Driver added with ID ${this.lastID}`);
-    }
+  db.serialize(() => {
+    db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
+      if (err) {
+        console.error("Error querying drivers table:", err);
+        return;
+      }
+
+      if (row) {
+        // Update only the username, leave queue_length unchanged
+        const updateStmt = db.prepare("UPDATE drivers SET username = ? WHERE phone_number = ?");
+        updateStmt.run(username, phoneNumber, (err) => {
+          if (err) {
+            console.error("Error updating driver:", err);
+          } else {
+            console.log(`Driver with phone number ${phoneNumber} updated.`);
+          }
+        });
+        updateStmt.finalize();
+      } else {
+        // Insert a new driver
+        const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, queue_length) VALUES (?, ?, ?)");
+        insertStmt.run(username, phoneNumber, queueLength, function (err) {
+          if (err) {
+            console.error("Error inserting driver:", err);
+          } else {
+            console.log(`Driver added with ID ${this.lastID}`);
+          }
+        });
+        insertStmt.finalize();
+      }
+    });
   });
-  stmt.finalize();
 }
 
-// Function to insert a new rider into the riders table
+
 function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId = null) {
-  const stmt = db.prepare("INSERT INTO riders (username, phone_number, pickup_location, dropoff_location, driver_id) VALUES (?, ?, ?, ?, ?)");
-  stmt.run(username, phoneNumber, pickupLocation, dropoffLocation, driverId, function(err) {
-    if (err) {
-      console.error("Error inserting rider:", err);
-    } else {
-      console.log(`Rider added with ID ${this.lastID}`);
-    }
+  db.serialize(() => {
+    db.get("SELECT * FROM riders WHERE phone_number = ?", [phoneNumber], (err, row) => {
+      if (err) {
+        console.error("Error querying riders table:", err);
+        return;
+      }
+
+      if (row) {
+        // Update existing rider details
+        const updateStmt = db.prepare("UPDATE riders SET username = ?, pickup_location = ?, dropoff_location = ?, driver_id = ? WHERE phone_number = ?");
+        updateStmt.run(username, pickupLocation, dropoffLocation, driverId, phoneNumber, (err) => {
+          if (err) {
+            console.error("Error updating rider:", err);
+          } else {
+            console.log(`Rider with phone number ${phoneNumber} updated.`);
+          }
+        });
+        updateStmt.finalize();
+      } else {
+        // Insert a new rider
+        const insertStmt = db.prepare("INSERT INTO riders (username, phone_number, pickup_location, dropoff_location, driver_id) VALUES (?, ?, ?, ?, ?)");
+        insertStmt.run(username, phoneNumber, pickupLocation, dropoffLocation, driverId, function (err) {
+          if (err) {
+            console.error("Error inserting rider:", err);
+          } else {
+            console.log(`Rider added with ID ${this.lastID}`);
+          }
+        });
+        insertStmt.finalize();
+      }
+    });
   });
-  stmt.finalize();
 }
+
+
+
 
 // Export functions for use elsewhere
 module.exports = {

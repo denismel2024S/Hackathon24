@@ -93,21 +93,18 @@ export function PageDriver({formData}) {
         <h1><strong>QUEUE: {connectedUsers.length}</strong></h1>
         <ul>
                 {connectedUsers.map((user, index) => (
-                    <li key = {index}>
-                        <p>Name: {user.username}</p>
-                        <p>Phone Number: {user.phoneNumber}</p>
-                        <p>Pickup Location: {user.pickupLocation}</p>
-                        <p>Dropoff Location: {user.dropoffLocation}</p>
-                    </li>
+                    <div>
+                        <CurrentQueuePassengerInfoCard
+                        key={index}
+                        name={user.username}
+                        phone={user.phoneNumber}
+                        location={user.pickupLocation}
+                        destination={user.dropoffLocation}
+                        />
+                    </div>
                 ))}
             </ul>
         <div className="container">
-            <CurrentQueuePassengerInfoCard
-            name={passenger.name}
-            phone={passenger.phone}
-            location={passenger.location}
-            destination={passenger.destination}
-            />
             <MapWithDirections pickupLocation={pickupLocation} destination={destination} />
             <ButtonContainer/>
         </div>

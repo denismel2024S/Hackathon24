@@ -1,5 +1,5 @@
 const http = require('http')
-const {WebSocketServer} = require('ws')
+const {WebSocketServer, WebSocket } = require('ws')
 const url = require('url')
 const uuidv4 = require("uuid").v4
 const server = http.createServer()
@@ -80,41 +80,132 @@ wsServer.on("connection", (connection, request) => {
 
     connections[uuid] = connection
 
-    if(queryParams.type == "driver"){
-        console.log("A driver has connected")
-        const {type, username, phoneNumber, queue} = queryParams; 
-        drivers[uuid] = {
-            type,
-            username, 
-            phoneNumber,
-            queue
-        }
-        console.log(drivers[uuid])
+    // if(queryParams.type == "driver"){
+    //     console.log("A driver has connected")
+    //     const {type, username, phoneNumber, queue} = queryParams; 
+    //     drivers[uuid] = {
+    //         type,
+    //         username, 
+    //         phoneNumber,
+    //         queue
+    //     }
+    //     console.log(drivers[uuid])
 
+    //     addDriver(username, phoneNumber, queue);
+
+    //     broadcastDrivers()
+    //     broadcastRiders()
+
+    if (queryParams.type == "driver") {
+        console.log("A driver has connected");
+        const { type, username, phoneNumber, queue } = queryParams; 
         addDriver(username, phoneNumber, queue);
 
-        broadcastDrivers()
-        broadcastRiders()
-        
+        // Query the database for the driver using the phone number
+        db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
+            if (err) {
+                console.error("Error fetching driver data:", err);
+                return;
+            }
+            
+            if (row) {
+                // Driver exists in the database, use their data
+                drivers[uuid] = {
+                    type,
+                    username: row.username, // Use the username from the database
+                    phoneNumber: row.phone_number,
+                    queue: row.queue_length // Use the queue length from the database
+                };
+                console.log(drivers[uuid]);
+            } else {
+                // Driver does not exist in the database, add them
+                drivers[uuid] = {
+                    type,
+                    username,
+                    phoneNumber,
+                    queue
+                };
+                console.log(drivers[uuid]);
+            }
 
-    }else if(queryParams.type == "rider"){
-        console.log("A rider has connected")
-        const {type, username, phoneNumber, pickupLocation, dropoffLocation, driverId} = queryParams; 
-        riders[uuid] = {
-            type,
-            username, 
-            phoneNumber,
-            pickupLocation,
-            dropoffLocation,
-            driverId
-        }
-        console.log(riders[uuid])
+            broadcastDrivers();
+            broadcastRiders();
+        });
 
-        addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId);
+    // }else if(queryParams.type == "rider"){
+    //     console.log("A rider has connected")
+    //     const {type, username, phoneNumber, pickupLocation, dropoffLocation, driverId} = queryParams; 
+    //     riders[uuid] = {
+    //         type,
+    //         username, 
+    //         phoneNumber,
+    //         pickupLocation,
+    //         dropoffLocation,
+    //         driverId
+    //     }
+    //     console.log(riders[uuid])
 
-        broadcastDrivers()
-        broadcastRiders()
+    //     addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId);
+
+    //     broadcastDrivers()
+    //     broadcastRiders()
+    // }
+
+
+    } else if (queryParams.type == "rider") {
+        console.log("A rider has connected");
+        const { type, username, phoneNumber, pickupLocation, dropoffLocation, driverId } = queryParams;
+
+        // Query the database for the rider using the phone number
+        db.get("SELECT * FROM riders WHERE phone_number = ?", [phoneNumber], (err, row) => {
+            if (err) {
+                console.error("Error fetching rider data:", err);
+                return;
+            }
+
+            if (row) {
+                // Rider exists in the database, update their details
+                console.log("Updating rider with phone number:", phoneNumber);
+                db.run(
+                    "UPDATE riders SET username = ?, pickup_location = ?, dropoff_location = ?, driver_id = ? WHERE phone_number = ?",
+                    [username, pickupLocation, dropoffLocation, driverId, phoneNumber],
+                    (updateErr) => {
+                        if (updateErr) {
+                            console.error("Error updating rider:", updateErr);
+                        } else {
+                            console.log("Rider updated successfully.");
+                        }
+                    }
+                );
+
+                riders[uuid] = {
+                    type,
+                    username,
+                    phoneNumber,
+                    pickupLocation,
+                    dropoffLocation,
+                    driverId
+                };
+                console.log(riders[uuid]);
+            } else {
+                // Rider does not exist in the database, add them
+                addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId);
+                riders[uuid] = {
+                    type,
+                    username,
+                    phoneNumber,
+                    pickupLocation,
+                    dropoffLocation,
+                    driverId
+                };
+                console.log(riders[uuid]);
+            }
+
+            broadcastDrivers();
+            broadcastRiders();
+        });
     }
+
     //const {type, username, passengers, phoneNumber, currentLocation} = queryParams; 
 
     //users[uuid] = {
@@ -234,7 +325,7 @@ wsServer.on("connection", (connection, request) => {
                         }
       
                         // Notify clients about the updated queue
-                        broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length + 1 });
+                        // broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length + 1 });
                       });
                     });
                   }
@@ -320,7 +411,7 @@ wsServer.on("connection", (connection, request) => {
                         }
       
                         // Notify clients about the updated queue
-                        broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length - 1 });
+                        // broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length - 1 });
                       });
                     });
                   }
@@ -353,7 +444,7 @@ wsServer.on("connection", (connection, request) => {
 
 // Broadcast function to send data to all connected WebSocket clients
 function broadcastToClients(message) {
-    wss.clients.forEach((client) => {
+    wsServer.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(message));
       }
