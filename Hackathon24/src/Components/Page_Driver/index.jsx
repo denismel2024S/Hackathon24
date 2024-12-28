@@ -104,10 +104,6 @@ export function PageDriver({formData}) {
                     </div>
                 ))}
             </ul>
-        <div className="container">
-            <MapWithDirections pickupLocation={pickupLocation} destination={destination} />
-            <ButtonContainer/>
-        </div>
         </>
     );   
 };

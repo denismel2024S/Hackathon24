@@ -64,7 +64,7 @@ const DriverInfoCard = ({ username, queueLength, phoneNumber, pickupLocation, de
                 <div className="card-body">
                     <h2 className="card-title pricing-card-title">{queueLength} in Queue</h2>
                     <ul className="list-unstyled mt-3 mb-4">
-                        <li>Phone number: {phoneNumber}</li>
+                        <h4 className="my-0 fw-normal">Phone number: {phoneNumber}</h4>
                     </ul>
                     <button
                         className="btn btn-primary d-inline-flex align-items-center btn-join-queue"
