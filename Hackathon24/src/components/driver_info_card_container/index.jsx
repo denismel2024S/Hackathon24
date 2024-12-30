@@ -3,14 +3,8 @@ import DriverInfoCard from "../driver_info_card";
 
 import './index.css'
 
-function DriverInfoCardContainer({ connectedUsers, socket, riderId }) {
+function DriverInfoCardContainer({ inQueue, connectedUsers, socket, riderId }) {
     const[drivers, setDrivers] = useState([]);
-
-    // useEffect(() => {
-    //     setDrivers(connectedUsers);
-    //     console.log(drivers.length);
-    //     console.log("Drivers updated");
-    // }, [connectedUsers]);
 
     useEffect(() => {
         setDrivers(connectedUsers);
@@ -24,7 +18,7 @@ function DriverInfoCardContainer({ connectedUsers, socket, riderId }) {
     const addToQueuue = (index) => {
         setDrivers((prevDrivers) => {
             const updatedDrivers = [...prevDrivers];
-            updatedDrivers[index].queue = Number(updatedDrivers[index].queue) + 1;
+            updatedDrivers[index].queue = Number(updatedDrivers[index].queue);
             return updatedDrivers;
         });
         console.log("Add to queue clicked");
@@ -37,6 +31,8 @@ function DriverInfoCardContainer({ connectedUsers, socket, riderId }) {
                 <p>No active drivers</p>
             ) : (
                 drivers.map((user, index) => (
+                    
+                    <>
                     <DriverInfoCard 
                         key={index}
                         username={user.username}
@@ -45,7 +41,10 @@ function DriverInfoCardContainer({ connectedUsers, socket, riderId }) {
                         socket={socket}
                         onAddQueue={() => addToQueuue(index)}
                         riderId={riderId}
+                        driverId={user.id}
+                        inQueue={inQueue}
                     />
+                    </>
                 ))
             )}
         </div>

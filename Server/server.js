@@ -1,5 +1,8 @@
 //Boiler Plate
+
+
 const express = require('express')
+const sqlite3 = require("sqlite3").verbose();
 const cors = require('cors')
 const pool = require('./database')
 const bodyParser = require('body-parser');
@@ -9,6 +12,14 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(cors()) //if client and server are at different urls
+
+const db = new sqlite3.Database("./app.db", (err) => {
+  if (err) {
+    console.error("Error opening database", err);
+  } else {
+    console.log("Database opened successfully");
+  }
+});
 
 // Route to fetch active drivers
 app.get("/api/active_drivers", async (req, res) => {
@@ -21,6 +32,52 @@ app.get("/api/active_drivers", async (req, res) => {
     }
       // Send the product data as JSON
   });
+
+
+app.get("/api/rider/by-phone/:phone", (req, res) => {
+  const { phone } = req.params;
+  console.log("Phone number received:", phone); // Debugging the phone number
+  const query = `SELECT * FROM riders WHERE phone_number = ?`;
+
+  console.log("Executing query:", query, "with params:", [phone]); // Debugging the query
+
+  db.get(query, [phone], (err, row) => {
+    if (err) {
+      console.error("Error fetching rider by phone", err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    if (row) {
+      res.setHeader("Content-Type", "application/json"); // Set content type to JSON
+      res.json(row);
+    } else {
+      res.status(404).json({ message: "Rider with phone not found" });
+      console.log("failed getting rider with phone number", phone);
+    }
+  });
+});
+
+
+app.get("/api/driver/by-phone/:phone", (req, res) => {
+  const { phone } = req.params;
+  console.log("Phone number received:", phone); // Debugging the phone number
+  const query = `SELECT * FROM drivers WHERE phone_number = ?`;
+
+  console.log("Executing query:", query, "with params:", [phone]); // Debugging the query
+
+  db.get(query, [phone], (err, row) => {
+    if (err) {
+      console.error("Error fetching rider by phone", err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    if (row) {
+      res.setHeader("Content-Type", "application/json"); // Set content type to JSON
+      res.json(row);
+    } else {
+      res.status(404).json({ message: "Driver with phone not found" });
+      console.log("failed getting rider with phone number", phone);
+    }
+  });
+});
 
 app.post("/login", async (req, res) => {
     const { username, password } = req.body; // Expect username and password in the request body
@@ -57,7 +114,7 @@ app.post("/login", async (req, res) => {
         console.error('Error joining the queue:', error);
         res.status(500).json({ message: 'Failed to join the queue' });
     }
-});
+  });
 
 app.post('/api/leave-queue/:riderId', async (req, res) => {
   const { riderId } = req.params;

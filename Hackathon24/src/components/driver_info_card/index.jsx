@@ -1,57 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const DriverInfoCard = ({ username, queueLength, phoneNumber, pickupLocation, destination, driverId, account, socket, riderId }) => {
+const DriverInfoCard = ({ username, queueLength, phoneNumber, driverId, socket, riderId, inQueue }) => {
     const [joining, setJoining] = useState(false);
-    const [joined, setJoined] = useState(false);
+    const [joined, setJoined] = useState(inQueue);  // Use `inQueue` prop to determine initial state
     const [error, setError] = useState(null);
 
-    const handleJoinQueue = async (event) => {
+    // Update the front-end UI when the rider's queue status changes
+    useEffect(() => {
+        setJoined(inQueue);
+    }, [inQueue]);
+
+    
+    const handleQueueAction = async (event) => {
         event.preventDefault(); // Prevent the default form submission
         setJoining(true);
+        
+        const message = {
+            driverId: driverId,  // driver's ID
+            riderId: riderId,    // rider's ID
+        };
 
         try {
-            // Send message to WebSocket server to join the queue
-            const message = {
-                action: "joinQueue",
-                driverId: username, // driver's username
-                riderId: riderId,   // rider's uuid
-            };
+            if (joined) {
+                // If rider is already in the queue, end the queue
+                message.action = "endQueue";
+            } else {
+                // If rider is not in the queue, join the queue
+                message.action = "joinQueue";
+            }
 
-            // Assuming WebSocket connection is stored in a `socket` variable
+            // Send WebSocket message to the server
             socket.send(JSON.stringify(message));
             console.log(message);
 
-            // Update state to indicate that the rider has joined
-            setJoined(true);
+            // Update state after the action
+            setJoined(!joined);  // Toggle between join and leave state
         } catch (err) {
-            console.error("Failed to join the queue", err);
-            setError("Failed to join the queue. Please try again.");    // error handling
+            console.error("Failed to update queue", err);
+            setError("Failed to update the queue. Please try again.");  // Error handling
         } finally {
-            setJoining(false); // Set isJoining to false after the request
-        }
-    };
-
-    // Leave Queue Handler
-    const handleLeaveQueue = async (event) => {
-        event.preventDefault();
-        setJoining(true);
-
-        try {
-            const message = {
-                action: "leaveQueue",
-                driverId: username, // driver's username
-                riderId: riderId,   // rider's uuid
-            };
-
-            socket.send(JSON.stringify(message));
-            console.log(message);
-
-            setJoined(false);  // Update UI to reflect the rider has left the queue
-        } catch (err) {
-            console.error("Failed to leave the queue", err);
-            setError("Failed to leave the queue. Please try again.");
-        } finally {
-            setJoining(false);
+            setJoining(false); // Reset the joining state
         }
     };
 
@@ -63,16 +51,13 @@ const DriverInfoCard = ({ username, queueLength, phoneNumber, pickupLocation, de
                 </div>
                 <div className="card-body">
                     <h2 className="card-title pricing-card-title">{queueLength} in Queue</h2>
-                    <ul className="list-unstyled mt-3 mb-4">
-                        <h4 className="my-0 fw-normal">Phone number: {phoneNumber}</h4>
-                    </ul>
                     <button
                         className="btn btn-primary d-inline-flex align-items-center btn-join-queue"
                         type="button"
-                        onClick={joined ? handleLeaveQueue : handleJoinQueue} // Toggle button action
+                        onClick={handleQueueAction} // Handle join or leave
                         disabled={joining}
                     >
-                        {joining ? 'Joining...' : joined ? 'Leave Queue' : 'Join Queue'}
+                        {joining ? 'Processing...' : joined ? 'End Queue' : 'Join Queue'}
                     </button>
                     {error && <div className="alert alert-danger mt-2">{error}</div>}
                 </div>

@@ -5,7 +5,7 @@ import MapWithDirections from "../map_with_directions";
 
 const MySwal = withReactContent(Swal);
 
-const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination }) => {
+const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, riderId, driverId, socket}) => {
     const [arrivedAtPickup, setArrivedAtPickup] = useState(false);
     const [arrivedAtDestination, setArrivedAtDestination] = useState(false);
 
@@ -53,7 +53,28 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination }) =
                 setArrivedAtDestination(true);
                 MySwal.fire('Confirmed!', 'You have arrived at the destination.', 'success');
             }
+
+            const message = {
+                driverId: driverId,  // driver's ID
+                riderId: riderId,    // rider's ID
+                action: "endQueue",
+            };
+    
+            try {
+                // Send WebSocket message to the server
+                socket.send(JSON.stringify(message));
+                console.log(message);
+    
+                // Update state after the action
+                setJoined(!joined);  // Toggle between join and leave state
+            } catch (err) {
+                console.error("Failed to update queue", err);
+                setError("Failed to update the queue. Please try again.");  // Error handling
+            }
         });
+
+        
+        
     };
 
     return (

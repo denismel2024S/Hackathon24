@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "express": "^4.21.2",
+    "lodash.throttle": "^4.1.1",
     "nodemon": "^3.1.4",
     "pg": "^8.13.0",
     "react-sweetalert2": "^0.6.0",

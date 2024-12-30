@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider } = require('./database'); // Import the database functions
+const { addDriver, addRider, getRiderByPhoneNumber, addQueue, updateQueueEndTime, getQueueByRiderId } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -80,345 +80,179 @@ wsServer.on("connection", (connection, request) => {
 
     connections[uuid] = connection
 
-    // if(queryParams.type == "driver"){
-    //     console.log("A driver has connected")
-    //     const {type, username, phoneNumber, queue} = queryParams; 
-    //     drivers[uuid] = {
-    //         type,
-    //         username, 
-    //         phoneNumber,
-    //         queue
-    //     }
-    //     console.log(drivers[uuid])
-
-    //     addDriver(username, phoneNumber, queue);
-
-    //     broadcastDrivers()
-    //     broadcastRiders()
-
     if (queryParams.type == "driver") {
         console.log("A driver has connected");
         const { type, username, phoneNumber, queue } = queryParams; 
-        addDriver(username, phoneNumber, queue);
+        addDriver(username, phoneNumber, queue, uuid, drivers);
 
-        // Query the database for the driver using the phone number
-        db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
-            if (err) {
-                console.error("Error fetching driver data:", err);
-                return;
-            }
-            
-            if (row) {
-                // Driver exists in the database, use their data
-                drivers[uuid] = {
-                    type,
-                    username: row.username, // Use the username from the database
-                    phoneNumber: row.phone_number,
-                    queue: row.queue_length // Use the queue length from the database
-                };
-                console.log(drivers[uuid]);
-            } else {
-                // Driver does not exist in the database, add them
-                drivers[uuid] = {
-                    type,
-                    username,
-                    phoneNumber,
-                    queue
-                };
-                console.log(drivers[uuid]);
-            }
-
+        setTimeout(() => {
             broadcastDrivers();
             broadcastRiders();
-        });
 
-    // }else if(queryParams.type == "rider"){
-    //     console.log("A rider has connected")
-    //     const {type, username, phoneNumber, pickupLocation, dropoffLocation, driverId} = queryParams; 
-    //     riders[uuid] = {
-    //         type,
-    //         username, 
-    //         phoneNumber,
-    //         pickupLocation,
-    //         dropoffLocation,
-    //         driverId
-    //     }
-    //     console.log(riders[uuid])
-
-    //     addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId);
-
-    //     broadcastDrivers()
-    //     broadcastRiders()
-    // }
-
+        }, 100); // Allow time for `addDriver` to complete
 
     } else if (queryParams.type == "rider") {
         console.log("A rider has connected");
         const { type, username, phoneNumber, pickupLocation, dropoffLocation, driverId } = queryParams;
 
-        // Query the database for the rider using the phone number
-        db.get("SELECT * FROM riders WHERE phone_number = ?", [phoneNumber], (err, row) => {
-            if (err) {
-                console.error("Error fetching rider data:", err);
-                return;
-            }
-
-            if (row) {
-                // Rider exists in the database, update their details
-                console.log("Updating rider with phone number:", phoneNumber);
-                db.run(
-                    "UPDATE riders SET username = ?, pickup_location = ?, dropoff_location = ?, driver_id = ? WHERE phone_number = ?",
-                    [username, pickupLocation, dropoffLocation, driverId, phoneNumber],
-                    (updateErr) => {
-                        if (updateErr) {
-                            console.error("Error updating rider:", updateErr);
-                        } else {
-                            console.log("Rider updated successfully.");
-                        }
-                    }
-                );
-
-                riders[uuid] = {
-                    type,
-                    username,
-                    phoneNumber,
-                    pickupLocation,
-                    dropoffLocation,
-                    driverId
-                };
-                console.log(riders[uuid]);
-            } else {
-                // Rider does not exist in the database, add them
-                addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId);
-                riders[uuid] = {
-                    type,
-                    username,
-                    phoneNumber,
-                    pickupLocation,
-                    dropoffLocation,
-                    driverId
-                };
-                console.log(riders[uuid]);
-            }
-
+        addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId, uuid, riders);
+        
+        setTimeout(() => {
             broadcastDrivers();
             broadcastRiders();
-        });
+
+        }, 100); // Allow time for `addDriver` to complete
+
     }
 
-    //const {type, username, passengers, phoneNumber, currentLocation} = queryParams; 
-
-    //users[uuid] = {
-        //type,
-        //username, 
-        //passengers,
-        //phoneNumber,
-        //currentLocation
-    //}
-    //console.log(users[uuid])
-    
-    /*
-    pseudocode for switching types
-    if(type == driver){
-        broadcastAllRidersToDriver()
-    }else if(type == rider){
-        broadcastAllDriversToRider()
-    }
-    */
-    //broadcastUsers()
-
-    // users joining queue
+    // when anyone sends a json message to server
     connection.on('message', (message) => {
         const data = JSON.parse(message);
 
         if (data.action === "joinQueue") {
             const { driverId, riderId } = data;
-            console.log(`Rider ${riderId} is attepmting to join a queue`);
-            console.log(data);
-            
-
-             // Log the data to debug
+            console.log(`Rider ID: ${riderId} is attepmting to join a queue`);
             console.log('Received data:', data);
-
+            
             // Ensure drivers and riders are defined
             console.log('Drivers:', drivers);
             console.log('Riders:', riders);
 
+            addQueue(riderId, driverId, (err, queueId) => {
+                if (err) {
+                  console.error("Failed to add to queue:", err);
+                } else {
+                  console.log("Queue entry created with ID:", queueId);
+                }
+            });
+
+            setTimeout(() => {
+                broadcastDrivers();
+                broadcastRiders();
+            }, 100);
+
+        
             // Loop through all connections to find the driver with the matching username
+            console.log('Searching websocket connections for valid driver')
+
             let driverFound = null;
 
             for (let connUuid in connections) {
                 const conn = connections[connUuid];
                 // Check if the connection is a driver and if the username matches
-                if (drivers[connUuid] && drivers[connUuid].username === driverId) {
+                if (drivers[connUuid] && drivers[connUuid].id === driverId) {
                     driverFound = drivers[connUuid]; // Found the matching driver
                     break;
                 }
             }
 
-            // Loop through all rider connections
+            // Loop through all rider connections to find matching username
+            console.log('Searching websocket connections for valid rider')
 
             let riderFound = null;
 
             for (let connUuid in connections){
                 const conn = connections[connUuid];
                 // check if connection is a rider and has matching username
-                if (riders[connUuid] && riders[connUuid].username === riderId) {
+                if (riders[connUuid] && riders[connUuid].id === riderId) {
                     riderFound = riders[connUuid]; // Found the matching rider
                     break;
                 }
             }
-            console.log(riderFound);
 
             // Check if a driver was found and if the rider exists
             if (driverFound && riderFound) {
-                // Update the driver's queue length
+                // Update the driver's queue length NEED TO DECREMENT QUEUE OF EXISTING DRIVER IF RIDER IS ALREADY IN A QUEUE
                 driverFound.queue += 1;
                 // Assign the rider to the driver
                 riderFound.driverId = driverId;
 
-                console.log(`Rider ${riderId} joined the queue for driver ${driverId}`);
-                broadcastDrivers();
-                broadcastRiders();
+                console.log(`Rider ID: ${riderId} joined the queue for driver ID:${driverId}`);
+                setTimeout(() => {
+                    broadcastDrivers();
+                    broadcastRiders();
+                }, 100);
             } else {
-                console.log("Invalid driver or rider username.");
+                console.log("Invalid driver or rider ID.");
             }
-
-            // Ensure drivers and riders are defined
-            console.log('Drivers:', drivers);
-            console.log('Riders:', riders);
         }
 
-        // SQL QUERY
 
-        if (data.action === 'joinQueue') {
-            const { riderId, driverId } = data;
-      
-            // Find driver by username
-            db.get('SELECT * FROM drivers WHERE username = ?', [driverId], (err, driver) => {
-              if (err) {
-                console.error('Error fetching driver:', err);
-                return;
-              }
-      
-              if (driver) {
-                // Find rider by username
-                db.get('SELECT * FROM riders WHERE username = ?', [riderId], (err, rider) => {
-                  if (err) {
-                    console.error('Error fetching rider:', err);
-                    return;
-                  }
-      
-                  if (rider) {
-                    // Update rider's driver_id and increment driver's queue length
-                    db.run('UPDATE riders SET driver_id = ? WHERE username = ?', [driver.id, riderId], (err) => {
-                      if (err) {
-                        console.error('Error updating rider:', err);
-                        return;
-                      }
-      
-                      // Increment the driver's queue length
-                      db.run('UPDATE drivers SET queue_length = queue_length + 1 WHERE username = ?', [driverId], (err) => {
-                        if (err) {
-                          console.error('Error updating driver queue length:', err);
-                          return;
-                        }
-      
-                        // Notify clients about the updated queue
-                        // broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length + 1 });
-                      });
-                    });
-                  }
-                });
-              } else {
-                console.log('Driver not found.');
-              }
-            });
-          }
-
-        // users leaving a queue
-        if (data.action === "leaveQueue") {
+        // Websocket updated for endQueue
+        if (data.action === "endQueue") {
             const { driverId, riderId } = data;
-            console.log(`Rider ${riderId} is attempting to leave the queue`);
-    
-            let driverFound = null;
-    
-            // Find the driver with matching username
-            for (let connUuid in connections) {
-                const conn = connections[connUuid];
-                if (drivers[connUuid] && drivers[connUuid].username === driverId) {
-                    driverFound = drivers[connUuid];
-                    break;
-                }
-            }
-    
-            let riderFound = null;
-            // Find the rider with matching username
-            for (let connUuid in connections) {
-                const conn = connections[connUuid];
-                if (riders[connUuid] && riders[connUuid].username === riderId) {
-                    riderFound = riders[connUuid];
-                    break;
-                }
-            }
-    
-            if (driverFound && riderFound) {
-                // Update the queue and remove the rider's driverId
-                driverFound.queue -= 1;
-                riderFound.driverId = null;  // Rider is no longer assigned to a driver
-    
-                console.log(`Rider ${riderId} left the queue for driver ${driverId}`);
-                broadcastDrivers();
-                broadcastRiders();
-            } else {
-                console.log("Invalid driver or rider username.");
-            }
-        }
-
-        // SQL QUERY
-
-        if (data.action === 'leaveQueue') {
-            const { riderId, driverId } = data;
-      
-            // Find driver by username
-            db.get('SELECT * FROM drivers WHERE username = ?', [driverId], (err, driver) => {
-              if (err) {
-                console.error('Error fetching driver:', err);
-                return;
-              }
-      
-              if (driver) {
-                // Find rider by username
-                db.get('SELECT * FROM riders WHERE username = ?', [riderId], (err, rider) => {
-                  if (err) {
-                    console.error('Error fetching rider:', err);
+            console.log(`Rider ID: ${riderId} is attempting to leave the queue`);
+            console.log('Received data:', data);
+            
+            getQueueByRiderId(riderId, (err, queue) => {
+                if (err) {
+                    console.error('Error getting queue:', err);
                     return;
-                  }
-      
-                  if (rider && rider.driver_id === driver.id) {
-                    // Remove rider from the queue (set driver_id to NULL)
-                    db.run('UPDATE riders SET driver_id = NULL WHERE username = ?', [riderId], (err) => {
-                      if (err) {
-                        console.error('Error updating rider:', err);
-                        return;
-                      }
-      
-                      // Decrement driver's queue length
-                      db.run('UPDATE drivers SET queue_length = queue_length - 1 WHERE username = ?', [driverId], (err) => {
-                        if (err) {
-                          console.error('Error updating driver queue length:', err);
-                          return;
-                        }
-      
-                        // Notify clients about the updated queue
-                        // broadcastToClients({ action: 'updateQueue', driverId, queueLength: driver.queue_length - 1 });
-                      });
+                }
+                
+                if (queue) {
+                    // Step 2: Extract queueId from the result (queue object)
+                    const queueId = queue.id; // queue.id is the unique ID of the queue entry
+                    console.log('Queue found. Queue ID:', queueId);
+                
+                    // Step 3: Call updateQueueEndTime with the queueId to update the end time
+                    updateQueueEndTime(queueId, (updateErr) => {
+                    if (updateErr) {
+                        console.error('Error updating queue end time:', updateErr);
+                    } else {
+                        console.log('Queue end time updated successfully.');
+                    }
                     });
-                  }
+                } else {
+                    console.log('No queue found for this rider.');
+                }
                 });
-              }
-            });
-          }
+
+                // Step 4: update websocket connections involved with joining and adding queues
+
+                // Find the driver with matching username
+                console.log('Searching websocket connections for valid driver')
+
+                let driverFound = null;
+
+                for (let connUuid in connections) {
+                    const conn = connections[connUuid];
+                    if (drivers[connUuid] && drivers[connUuid].id === driverId) {
+                        driverFound = drivers[connUuid];
+                        console.log("Rider found");
+                        break;
+                    }
+                }
+
+                // Find the rider with matching username
+                console.log('Searching websocket connections for valid rider')
+
+                let riderFound = null;
+
+                for (let connUuid in connections) {
+                    const conn = connections[connUuid];
+                    if (riders[connUuid] && riders[connUuid].id === riderId) {
+                        riderFound = riders[connUuid];
+                        console.log("Driver found");
+                        break;
+                    }
+                }
+        
+                if (driverFound && riderFound) {
+                    // Update the queue and remove the rider's driverId
+                    driverFound.queue -= 1;
+                    riderFound.driverId = null;  // Rider is no longer assigned to a driver
+        
+                    console.log(`Rider ID: ${riderId} left the queue for driver ${driverId}`);
+                    setTimeout(() => {
+                        broadcastDrivers();
+                        broadcastRiders();
+                    }, 100);
+                } else {
+                    console.log("Invalid driver or rider username.");
+                }
+            }
+
     });
 
     connection.on('close', () => {

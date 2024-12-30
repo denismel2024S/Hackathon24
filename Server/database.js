@@ -1,58 +1,4 @@
-// const { Pool } = require('pg');
 
-// // Create a connection pool to PostgreSQL
-// const pool = new Pool({
-//   user: 'postgres',
-//   host: 'localhost',
-//   database: "rideshare_app",
-//   password: "alphasigmaphi",
-//   port: 5432,
-// });
-
-// pool.connect().then(()=> console.log("connected"));
-
-// const createQuery =  `CREATE TABLE IF NOT EXISTS accounts(
-// user_id serial PRIMARY KEY,
-// username VARCHAR (50 ) UNIQUE NOT NULL,
-// password VARCHAR (50) UNIQUE NOT NULL);`
-
-// pool.query(createQuery).then((res) => {
-//   console.log("database created");
-//   console.log(res);
-
-
-// }).catch((error) => {
-//   console.log(error);
-// })
-
-  
-//   pool.query(`CREATE TABLE IF NOT EXISTS public.drivers(
-//     name character varying COLLATE pg_catalog."default",
-//     phone_number character varying COLLATE pg_catalog."default",
-//     car_model character varying COLLATE pg_catalog."default",
-//     car_make character varying COLLATE pg_catalog."default",
-//     car_color character varying COLLATE pg_catalog."default",
-//     is_driving boolean,
-//     queue_length integer
-//   )
-
-//   TABLESPACE pg_default;
-
-//   ALTER TABLE IF EXISTS public.drivers
-//       OWNER to postgres;
-
-//   GRANT ALL ON TABLE public.drivers TO postgres;`)
-//   .then((res) => {
-//     console.log("database created");
-//     console.log(res);
-  
-  
-//   }).catch((error) => {
-//     console.log(error);
-//   })
-
-
-// module.exports = pool;
 
 /*
 
@@ -90,11 +36,24 @@ db.serialize(() => {
       FOREIGN KEY (driver_id) REFERENCES drivers(id)
     );
   `);
+
+  // Create queue table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rider_id INTEGER NOT NULL,
+    driver_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ended_at DATETIME,
+    FOREIGN KEY (rider_id) REFERENCES riders(id),
+    FOREIGN KEY (driver_id) REFERENCES drivers(id)
+    );
+  `);
 });
 
 console.log("Database and tables are ready.");
 
-function addDriver(username, phoneNumber, queueLength = 0) {
+function addDriver(username, phoneNumber, queueLength = 0, uuid, drivers) {
   db.serialize(() => {
     db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
       if (err) {
@@ -110,6 +69,16 @@ function addDriver(username, phoneNumber, queueLength = 0) {
             console.error("Error updating driver:", err);
           } else {
             console.log(`Driver with phone number ${phoneNumber} updated.`);
+
+            // Update the drivers object with the existing driver's details
+            drivers[uuid] = {
+              type: 'driver',
+              id: row.id,
+              username: username,  // Use the updated username
+              phoneNumber: phoneNumber,
+              queue: row.queue_length // Leave the queue length unchanged
+            };
+            console.log(drivers[uuid]);
           }
         });
         updateStmt.finalize();
@@ -121,6 +90,16 @@ function addDriver(username, phoneNumber, queueLength = 0) {
             console.error("Error inserting driver:", err);
           } else {
             console.log(`Driver added with ID ${this.lastID}`);
+
+            // Add the new driver to the drivers object after insertion
+            drivers[uuid] = {
+              type: 'driver',
+              id: this.lastID, // Use the newly inserted driver's ID
+              username: username,
+              phoneNumber: phoneNumber,
+              queue: queueLength
+            };
+            console.log(drivers[uuid]);
           }
         });
         insertStmt.finalize();
@@ -130,7 +109,7 @@ function addDriver(username, phoneNumber, queueLength = 0) {
 }
 
 
-function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId = null) {
+function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId = null, uuid, riders) {
   db.serialize(() => {
     db.get("SELECT * FROM riders WHERE phone_number = ?", [phoneNumber], (err, row) => {
       if (err) {
@@ -140,12 +119,23 @@ function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driver
 
       if (row) {
         // Update existing rider details
-        const updateStmt = db.prepare("UPDATE riders SET username = ?, pickup_location = ?, dropoff_location = ?, driver_id = ? WHERE phone_number = ?");
-        updateStmt.run(username, pickupLocation, dropoffLocation, driverId, phoneNumber, (err) => {
+        const updateStmt = db.prepare("UPDATE riders SET username = ?, pickup_location = ?, dropoff_location = ? WHERE phone_number = ?");
+        updateStmt.run(username, pickupLocation, dropoffLocation, phoneNumber, (err) => {
           if (err) {
             console.error("Error updating rider:", err);
           } else {
             console.log(`Rider with phone number ${phoneNumber} updated.`);
+
+            riders[uuid] = {
+              type: 'rider',
+              id: row.id,
+              username: username,
+              phoneNumber: phoneNumber,
+              pickupLocation: pickupLocation,
+              dropoffLocation: dropoffLocation,
+              driverId: row.driver_id,
+            }
+            
           }
         });
         updateStmt.finalize();
@@ -156,7 +146,16 @@ function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driver
           if (err) {
             console.error("Error inserting rider:", err);
           } else {
-            console.log(`Rider added with ID ${this.lastID}`);
+            console.log(`Rider added to database with ID: ${this.lastID}`);
+            riders[uuid] = {
+              type: 'rider',
+              id: this.lastID,
+              username: username, 
+              phoneNumber: phoneNumber,
+              pickupLocation: pickupLocation,
+              dropoffLocation: dropoffLocation,
+              driverId: driverId
+            }
           }
         });
         insertStmt.finalize();
@@ -165,11 +164,215 @@ function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driver
   });
 }
 
+/**
+ * 
+ * @param {*} riderId // database id of rider being added
+ * @param {*} driverId // database id of driver being added
+ * @param {*} callback // prevents crashing if adding is unsuccessful
+ */
+function addQueue(riderId, driverId, callback = () => {}) {
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION', (err) => {
+      if (err) {
+        console.error('Failed to start transaction:', err);
+        callback(err);
+        return;
+      }
+
+      // Find the driver by ID
+      db.get('SELECT * FROM drivers WHERE id = ?', [driverId], (err, driver) => {
+        if (err) {
+          console.error('Error fetching driver:', err);
+          db.run('ROLLBACK', () => console.error('Transaction rolled back due to driver fetch error.'));
+          callback(err);
+          return;
+        }
+
+        if (!driver) {
+          console.error('Driver not found.');
+          db.run('ROLLBACK', () => console.error('Transaction rolled back: Driver not found.'));
+          callback(new Error('Driver not found'));
+          return;
+        }
+
+        // Find the rider by ID
+        db.get('SELECT * FROM riders WHERE id = ?', [riderId], (err, rider) => {
+          if (err) {
+            console.error('Error fetching rider:', err);
+            db.run('ROLLBACK', () => console.error('Transaction rolled back due to rider fetch error.'));
+            callback(err);
+            return;
+          }
+
+          if (!rider) {
+            console.error('Rider not found.');
+            db.run('ROLLBACK', () => console.error('Transaction rolled back: Rider not found.'));
+            callback(new Error('Rider not found'));
+            return;
+          }
+
+          // Update the rider's driver_id
+          db.run('UPDATE riders SET driver_id = ? WHERE id = ?', [driver.id, riderId], (err) => {
+            if (err) {
+              console.error('Error updating rider:', err);
+              db.run('ROLLBACK', () => console.error('Transaction rolled back due to rider update error.'));
+              callback(err);
+              return;
+            }
+
+            // Insert into queue table
+            const insertStmt = db.prepare(`
+              INSERT INTO queue (rider_id, driver_id) 
+              VALUES (?, ?)
+            `);
+            insertStmt.run(riderId, driverId, function (err) {
+              if (err) {
+                console.error('Error inserting into queue:', err);
+                db.run('ROLLBACK', () => console.error('Transaction rolled back due to queue insert error.'));
+                callback(err);
+                return;
+              }
+
+              const queueId = this.lastID; // Get the newly created queue ID
+
+              // Update the driver's queue length
+              db.get('SELECT COUNT(*) AS queueLength FROM riders WHERE driver_id = ?', [driver.id], (err, row) => {
+                if (err) {
+                  console.error('Error fetching rider count for driver queue length:', err);
+                  db.run('ROLLBACK', () => console.error('Transaction rolled back due to queue length fetch error.'));
+                  callback(err);
+                  return;
+                }
+
+                const queueLength = row ? row.queueLength : 0; // Default to 0 if no riders are found
+                db.run('UPDATE drivers SET queue_length = ? WHERE id = ?', [queueLength, driver.id], (updateErr) => {
+                  if (updateErr) {
+                    console.error('Error updating driver queue length:', updateErr);
+                    db.run('ROLLBACK', () => console.error('Transaction rolled back due to driver update error.'));
+                    callback(updateErr);
+                  } else {
+                    // Commit the transaction if all steps succeed
+                    db.run('COMMIT', (commitErr) => {
+                      if (commitErr) {
+                        console.error('Failed to commit transaction:', commitErr);
+                        callback(commitErr);
+                      } else {
+                        console.log(`Driver ${driver.username}'s queue length updated to ${queueLength}`);
+                        callback(null, { riderId, driverId, queueId }); // Return the queue ID
+                      }
+                    });
+                  }
+                });
+              });
+
+              insertStmt.finalize();
+            });
+          });
+        });
+      });
+    });
+  });
+}
+
+
+/**
+ * 
+ * @param {*} riderId // database id of rider
+ * @param {*} driverId // database id of driver
+ * @param {*} callback // prevents crashing if adding is unsuccessful
+ */
+
+function updateQueueEndTime(riderId, driverId, callback = () => {}) {
+  const endTime = new Date().toISOString(); // Current timestamp
+  db.serialize(() => {
+    const updateStmt = db.prepare(`
+      UPDATE queue SET ended_at = ? WHERE rider_id = ? AND driver_id = ?
+    `);
+    updateStmt.run(endTime, riderId, driverId, (err) => {
+      if (err) {
+        console.error("Error updating queue end time:", err);
+        callback(err);
+      } else {
+        console.log(`Queue entry for rider ID: ${riderId} and driver ID: ${driverId} marked as ended.`);
+        callback(null);
+      }
+    });
+    updateStmt.finalize();
+  });
+}
+
+
+/**
+ * 
+ * @param {*} queueId // database id of queue being ended
+ * @param {*} callback // prevents crashing if adding is unsuccessful
+ */
+
+function updateQueueEndTime(queueId, callback = () => {}) {
+  const endTime = new Date().toISOString(); // Current timestamp
+  db.serialize(() => {
+    const updateStmt = db.prepare(`
+      UPDATE queue SET ended_at = ? WHERE id = ?
+    `);
+    updateStmt.run(endTime, queueId, (err) => {
+      if (err) {
+        console.error("Error updating queue end time:", err);
+        callback(err);
+      } else {
+        console.log(`Queue entry ${queueId} marked as ended.`);
+        callback(null);
+      }
+    });
+    updateStmt.finalize();
+  });
+}
+
+
+// Function to get driver by ID
+function getQueueByRiderId(riderId, callback) {
+  db.get('SELECT * FROM queue WHERE rider_id = ? AND ended_at IS NULL', [riderId], (err, row) => {
+    if (err) {
+      console.error('Error fetching queue:', err);
+      callback(err, null);
+      return;
+    }
+    callback(null, row);
+  });
+}
+
+// Function to get driver by ID
+function getDriverByPhoneNumber(driverPhoneNumber, callback) {
+  db.get('SELECT * FROM drivers WHERE phone_number = ?', [driverPhoneNumber], (err, row) => {
+    if (err) {
+      console.error('Error fetching driver:', err);
+      callback(err, null);
+      return;
+    }
+    callback(null, row);
+  });
+}
+
+// Function to get rider by ID
+function getRiderByPhoneNumber(riderPhoneNumber, callback) {
+  db.get('SELECT * FROM riders WHERE phone_number = ?', [riderPhoneNumber], (err, row) => {
+    if (err) {
+      console.error('Error fetching rider:', err);
+      callback(err, null);
+      return;
+    }
+    callback(null, row);
+  });
+}
 
 
 
 // Export functions for use elsewhere
 module.exports = {
   addDriver,
-  addRider
+  addRider,
+  addQueue,
+  updateQueueEndTime,
+  getDriverByPhoneNumber,
+  getRiderByPhoneNumber,
+  getQueueByRiderId
 };
