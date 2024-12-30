@@ -113,7 +113,7 @@ export function PageRider({formData}){
 
     return (
         <>
-            <div>
+            <div >
                 <h1>Rider Information Submitted</h1>
                 <p><strong>Name:</strong> {formData.name}</p>
                 <p><strong>Phone Number:</strong> {formData.phone}</p>
