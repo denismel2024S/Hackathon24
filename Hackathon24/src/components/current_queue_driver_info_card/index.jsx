@@ -2,36 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 
 const CurrentQueueDriverInfoCard = ({rider, driver, setDriver, setRider, inQueue, setInQueue, socket, updateRiderData}) => {
 
-//   const handleLeaveQueue = async (event) => {
-//     event.preventDefault(); // Prevent the default form submission
-//     const riderId = rider.id;
-//     try {
-//         // Replace with your backend API endpoint
-//         const response = await fetch(`http://localhost:5433/api/leave-queue/${riderId}`,{
-//             method: 'POST',
-//             headers:{
-//                 'Content-Type': 'application/json', // Set the appropriate content type
-//             }
-//         });
-//         // Check if the response is okay (status in the range 200-299)
-//         if (response.ok) {
-//             const data = await response.json(); // Parse the JSON response
-//             // Handle success (e.g., update UI or notify user)
-//             console.log(data.message);
-//         } else {
-//             const errorData = await response.json();
-//             setError(`Failed to leave the queue: ${errorData.message}`);
-//         }
-//         } catch (err) {
-//         setError('Failed to leave the queue. Please try again.');
-//         console.error(err);
-//     }
-    
-// };
-
-
-
-
 useEffect(() => {
   setDriver(driver);
 

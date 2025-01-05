@@ -168,24 +168,11 @@ wsServer.on("connection", (connection, request) => {
                 broadcastDrivers();
                 broadcastRiders();
             }, 100);
-
         
             // Loop through all connections to find the driver with the matching username
             console.log('Searching websocket connections for valid driver')
 
             let driverFound = null;
-
-            // for (let connUuid in connections) {
-            //     const conn = connections[connUuid];
-            //     // Check if the connection is a driver and if the username matches
-            //     if (drivers[connUuid] && drivers[connUuid].id === driverId) {
-            //         driverFound = drivers[connUuid]; // Found the matching driver
-            //         console.log(`Matching driver connection found when joining queue (Driver ID: ${driverId})`);
-            //         break;
-            //     }
-            // }
-
-            // TEST CODE
 
             for (let driverUuid in drivers) {
                 if (Number(drivers[driverUuid].id) === Number(driverId)) {
@@ -195,26 +182,10 @@ wsServer.on("connection", (connection, request) => {
                 }
             }
 
-            // END TEST CODE 
-
             // Loop through all rider connections to find matching username
             console.log('Searching websocket connections for valid rider')
 
             let riderFound = null;
-
-            // for (let connUuid in connections){
-            //     const conn = connections[connUuid];
-            //     // check if connection is a rider and has matching username
-            //     if (riders[connUuid] && riders[connUuid].id === riderId) {
-            //         riderFound = riders[connUuid]; // Found the matching rider
-            //         console.log(`Matching rider connection found when joining queue (Rider ID: ${riderId})`);
-            //         break;
-            //     }
-            // }
-
-
-            // TEST CODE
-            // END TEST CODE 
 
             for (let riderUuid in riders) {
                 if (Number(riders[riderUuid].id) === Number(riderId)) {
@@ -224,9 +195,6 @@ wsServer.on("connection", (connection, request) => {
                 }
             }
 
-            // END TEST CODE 
-
-            
             // Check if a driver was found and if the rider exists
             if (driverFound && riderFound) {
                 // Update the driver's queue length NEED TO DECREMENT QUEUE OF EXISTING DRIVER IF RIDER IS ALREADY IN A QUEUE
@@ -240,26 +208,6 @@ wsServer.on("connection", (connection, request) => {
                     broadcastRiders();
                 }, 100);
             } 
-
-
-            // ^^^ UPDATE: DO WE EVEN NEED TO CHECK FOR A VALID RIDER CONNECTION? WE ARE THE CONNECTION
-
-            // TEST CODE -->
-
-            // if (driverFound && riderFound) {
-            //     // Update the driver's queue length NEED TO DECREMENT QUEUE OF EXISTING DRIVER IF RIDER IS ALREADY IN A QUEUE
-            //     driverFound.queue_length += 1;
-            //     // Assign the rider to the driver
-            //     riderFound.driver_id = driverId;
-
-            //     console.log(`Rider ID: ${riderId} joined the queue for driver ID:${driverId}`);
-            //     setTimeout(() => {
-            //         broadcastDrivers();
-            //         broadcastRiders();
-            //     }, 100);
-            // }
-
-            // END TEST CODE
             
             else {
                 console.log("Invalid driver or rider ID.");
@@ -320,15 +268,6 @@ wsServer.on("connection", (connection, request) => {
             console.log('Searching websocket connections for valid rider')
 
             let riderFound = null;
-
-            // for (let connUuid in connections) {
-            //     const conn = connections[connUuid];
-            //     if (riders[connUuid] && riders[connUuid].id === riderId) {
-            //         riderFound = riders[connUuid];
-            //         console.log("Driver found");
-            //         break;
-            //     }
-            // }
     
             for (let riderUuid in riders) {
                 if (Number(riders[riderUuid].id) === Number(riderId)) {
