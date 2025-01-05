@@ -99,10 +99,9 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                 // Update the connected users if necessary
                 else if (Array.isArray(parsedMessage)) {
                     const userList = parsedMessage;
-                    setFilteredUsers(userList);
-                    // if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
-                    //     setConnectedUsers(userList);
-                    //     previousUsers.current = userList;
+                    if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
+                        setConnectedUsers(userList);
+                        previousUsers.current = userList;
 
                     //     // const filtered = userList.filter(
                     //     //     (user) => Number(user.driver_id) === Number(driver.id)
@@ -111,7 +110,7 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                     //     // console.log("Filtered Users:", filtered);
                     //     // setFilteredUsers(filtered);
                     
-                    // }
+                    }
                 }
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
@@ -172,7 +171,7 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                             location={filteredUsers[0].pickupLocation}
                             destination={filteredUsers[0].dropoffLocation}
                             socket={socketRef.current}
-                            riderId={filteredUsers[0].id}
+                            riderId={filteredUsers[0].riderId}
                             driverId={driver.id}
                         />
                     </div>

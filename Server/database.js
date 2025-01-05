@@ -346,17 +346,37 @@ function getQueuesForDriver(driverId, callback) {
 
     console.log("Fetching queues for driverId:", driverId);
     db.all(query, [Number(driverId)], (err, rows) => {
-      console.log("Database rows:", rows); // Log the result from the database
       if (err) {
         console.error("Error retrieving queue with riders:", err);
         callback(err, null);
       } else {
         console.log("Retrieved queue with riders:", rows);
-        callback(null, rows);
+
+        // Count the number of rows returned
+        const queueLength = rows.length;
+
+        // Update the queue_length in the drivers table
+        const updateQuery = `
+          UPDATE drivers
+          SET queue_length = ?
+          WHERE id = ?
+        `;
+
+        db.run(updateQuery, [queueLength, Number(driverId)], (updateErr) => {
+          if (updateErr) {
+            console.error("Error updating driver's queue length:", updateErr);
+          } else {
+            console.log(`Updated driver's queue length to ${queueLength}`);
+          }
+
+          // Proceed with the callback
+          callback(null, rows);
+        });
       }
     });
   });
 }
+
 
 
 

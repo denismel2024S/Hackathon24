@@ -16,3 +16,24 @@ TODO:
 Overall:
 Plan deployment. Think about scalability, reliability.
 Note: Research websocket reconnection (cellular)
+
+
+
+TO RUN: 
+
+1: In a separate terminal, run "node server.js" while in Server folder 
+2: In a separate terminal, run "node wsServer.js" while in Server folder 
+3: In a separate terminal, run "npm run dev" while in Hackathon24 folder
+
+
+CURRENT STATUS:
+
++ CREATE NEW USERS (DRIVERS & RIDERS)
++ LOAD EXISTING USERS (DRIVERS & RIDERS)
++ SHOWS ACTIVE DRIVERS
++ LOADS QUEUE FOR RECONNECTING USERS (DRIVERS & RIDERS)
++ ADD/JOIN QUEUE FUNCTIONALITY FOR RIDERS
++ QUEUE TABLE FULLY IMPLEMENTED
++/- END QUEUE FUNCTIONALITY FOR DRIVERS NOT WORKING AS INTENDED
++/- QUEUE LENGTHS FOR RIDERS NOT 100% ACCURATE & NEEDS IT'S VALUE VERIFIED AND UPDATED
++/- EXISTING RIDERS AND DRIVER'S NEW DATA NOT OVERWRITING OLD DATA

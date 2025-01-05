@@ -336,7 +336,8 @@ wsServer.on("connection", (connection, request) => {
                 console.log(`Driver (ID: ${driverId}) not connected to websocket at the moment. Unassigning driver from rider.`);
 
                 riderFound.driver_id = null;  // Rider is no longer assigned to a driver
-    
+                const riderString = JSON.stringify(riderFound)
+
                 console.log(`Rider ID: ${riderId} left the queue for driver ${driverId}`);
                 setTimeout(() => {
                     riderConnection.send(riderString)
@@ -349,6 +350,7 @@ wsServer.on("connection", (connection, request) => {
                 console.log(`Rider (ID: ${riderId}) not connected to websocket at the moment. Unassigning driver from rider.`);
 
                 driverFound.queue_length = String(Number(driverFound.queue_length) - 1);
+                const driverString = JSON.stringify(driverFound);
      
                 console.log(`Rider ID: ${riderId} left the queue for driver ${driverId}`);
                 setTimeout(() => {

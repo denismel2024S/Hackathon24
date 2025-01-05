@@ -125,6 +125,7 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
                     {/* Arrived at Pickup and Arrived at Destination Buttons */}
 
                     <ButtonContainer
+                        key={riderId}
                         riderId={riderId}
                         driverId={driverId}
                         socket={socket}

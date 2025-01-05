@@ -1,42 +1,51 @@
 import React, { useState, useEffect, useRef } from "react";
+import Swal from 'sweetalert2';
+
+import withReactContent from 'sweetalert2-react-content';
+
+
+const MySwal = withReactContent(Swal);
 
 const CurrentQueueDriverInfoCard = ({rider, driver, setDriver, setRider, inQueue, setInQueue, socket, updateRiderData}) => {
-
-useEffect(() => {
-  setDriver(driver);
-
-}, [driver]);
-
-
-useEffect(() => {
-  setRider(rider);
-
-}, [rider]);
 
 const handleLeaveQueue = async (event) => {
   event.preventDefault(); // Prevent the default form submission
   
-  const message = {
-    driverId: driver.id,  // driver's ID
-    riderId: rider.id,    // rider's ID
-    action: "endQueue",
-  };
+  MySwal.fire({
+    title: 'Confirm Leave Queue',
+    text: `Are you sure you want to leave the queue?`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, leave!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const message = {
+        driverId: driver.id,  // driver's ID
+        riderId: rider.id,    // rider's ID
+        action: "endQueue",
+      };
+    
+      try {
+    
+        updateRiderData({
+          driver_id: null, // Rider is leaving the queue, so we reset driver_id
+        });
+    
+        // Send WebSocket message to the server
+        socket.send(JSON.stringify(message));
+        console.log(message);
+    
+        // Update state after the action
+        setInQueue(!inQueue);  // Toggle between join and leave state
+      } catch (err) {
+        console.error("Failed to update queue", err);
+      }
 
-  try {
-
-    updateRiderData({
-      driver_id: null, // Rider is leaving the queue, so we reset driver_id
-    });
-
-    // Send WebSocket message to the server
-    socket.send(JSON.stringify(message));
-    console.log(message);
-
-    // Update state after the action
-    setInQueue(!inQueue);  // Toggle between join and leave state
-  } catch (err) {
-    console.error("Failed to update queue", err);
-  }
+    }
+  });
+  
 };
 
     return (
@@ -49,6 +58,7 @@ const handleLeaveQueue = async (event) => {
           <div className="ps-3">
             <div id="driver-info">
               <h3 className="card-title" id="driver-name"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
+              <p><b>Queue Length: </b>{Number(driver.queue_length) + 1}</p>
               <p><b>Queue Position: </b>N/A</p>
               <p><b>Queue Status: </b>N/A</p>
 

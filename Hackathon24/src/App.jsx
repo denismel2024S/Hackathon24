@@ -38,7 +38,7 @@ const App = () => {
     const [isRider, setIsRider] = useState(false);
     const [isDriver, setIsDriver] = useState(false);
     const [username, setUsername] = useState(''); 
-    const correctCode = '12345';
+    const correctCode = '1234';
 
 
     const handlePassengerButtonClick = () => {
