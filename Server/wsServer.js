@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider, getRiderByPhoneNumber, addQueue, updateQueueEndTime, getQueueByRiderId } = require('./database'); // Import the database functions
+const { addDriver, addRider, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueEndTime, getQueueByRiderId } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -173,10 +173,12 @@ wsServer.on("connection", (connection, request) => {
             console.log('Searching websocket connections for valid driver')
 
             let driverFound = null;
+            let driverConnection = null;
 
             for (let driverUuid in drivers) {
                 if (Number(drivers[driverUuid].id) === Number(driverId)) {
                     driverFound = drivers[driverUuid];
+                    driverConnection = connections[driverUuid];
                     console.log(`Matching driver connection found when joining queue (Driver ID: ${driverId})`);
                     break;
                 }
@@ -186,10 +188,12 @@ wsServer.on("connection", (connection, request) => {
             console.log('Searching websocket connections for valid rider')
 
             let riderFound = null;
+            let riderConnection = null;
 
             for (let riderUuid in riders) {
-                if (Number(riders[riderUuid].id) === Number(riderId)) {
+                if (Number(riders[riderUuid].id) === Number(riderId)) { 
                     riderFound = riders[riderUuid];
+                    riderConnection = connections[riderUuid];
                     console.log(`Matching rider connection found when joining queue (Rider ID: ${riderId})`);
                     break;
                 }
@@ -197,13 +201,30 @@ wsServer.on("connection", (connection, request) => {
 
             // Check if a driver was found and if the rider exists
             if (driverFound && riderFound) {
+
                 // Update the driver's queue length NEED TO DECREMENT QUEUE OF EXISTING DRIVER IF RIDER IS ALREADY IN A QUEUE
                 driverFound.queue_length = String(Number(driverFound.queue_length) + 1);
                 // Assign the rider to the driver
                 riderFound.driver_id = String(driverId);
 
+                // TEST MESSASGE
+                console.log("\n\nSTART TEST MESSAGE\n\n");
+                
+                riderConnection.send("I think I have your queue, sir.")
+                const riderString = JSON.stringify(riderFound)
+                console.log(riderString);
+                driverConnection.send("I think I have your queue, sir.")
+                const driverString = JSON.stringify(driverFound);
+                console.log(driverString);
+
+                console.log("\n\nEND TEST MESSAGE\n\n");
+                // END TEST MESSASGE
+
                 console.log(`Rider ID: ${riderId} joined the queue for driver ID:${driverId}`);
                 setTimeout(() => {
+                    riderConnection.send(riderString)
+                    driverConnection.send(driverString)
+
                     broadcastDrivers();
                     broadcastRiders();
                 }, 100);
@@ -255,10 +276,12 @@ wsServer.on("connection", (connection, request) => {
             console.log('Searching websocket connections for valid driver')
 
             let driverFound = null;
+            let driverConnection = null;
 
             for (let driverUuid in drivers) {
                 if (Number(drivers[driverUuid].id) === Number(driverId)) {
                     driverFound = drivers[driverUuid];
+                    driverConnection = connections[driverUuid];
                     console.log("Driver found");
                     break;
                 }
@@ -268,10 +291,12 @@ wsServer.on("connection", (connection, request) => {
             console.log('Searching websocket connections for valid rider')
 
             let riderFound = null;
+            let riderConnection = null;
     
             for (let riderUuid in riders) {
                 if (Number(riders[riderUuid].id) === Number(riderId)) {
                     riderFound = riders[riderUuid];
+                    riderConnection = connections[riderUuid];
                     console.log("Rider found");
                     break;
                 }
@@ -282,11 +307,27 @@ wsServer.on("connection", (connection, request) => {
                 // Update the queue and remove the rider's driverId
                 driverFound.queue_length = String(Number(driverFound.queue_length) - 1);
                 riderFound.driver_id = null;  // Rider is no longer assigned to a driver
+
+                // TEST MESSASGE
+                console.log("\n\nSTART TEST MESSAGE\n\n");
+                
+                riderConnection.send("I think I have your queue, sir.")
+                const riderString = JSON.stringify(riderFound)
+                console.log(riderString);
+                driverConnection.send("I think I have your queue, sir.")
+                const driverString = JSON.stringify(driverFound);
+                console.log(driverString);
+
+
+                console.log("\n\nEND TEST MESSAGE\n\n");
+                // END TEST MESSASGE
     
                 console.log(`Rider ID: ${riderId} left the queue for driver ${driverId}`);
                 setTimeout(() => {
                     broadcastDrivers();
                     broadcastRiders();
+                    driverConnection.send(driverString);
+                    riderConnection.send(riderString);
                 }, 100);
             } 
             
@@ -298,11 +339,26 @@ wsServer.on("connection", (connection, request) => {
     
                 console.log(`Rider ID: ${riderId} left the queue for driver ${driverId}`);
                 setTimeout(() => {
+                    riderConnection.send(riderString)
                     broadcastDrivers();
                     broadcastRiders();
                 }, 100);
 
-            } else {
+            } // if the rider is not connected at the moment, allow driver to end the queue
+            else if (!riderFound && driverFound){
+                console.log(`Rider (ID: ${riderId}) not connected to websocket at the moment. Unassigning driver from rider.`);
+
+                driverFound.queue_length = String(Number(driverFound.queue_length) - 1);
+     
+                console.log(`Rider ID: ${riderId} left the queue for driver ${driverId}`);
+                setTimeout(() => {
+                    driverConnection.send(driverString)
+                    broadcastDrivers();
+                    broadcastRiders();
+                }, 100);
+
+            }
+            else {
                 console.log("Invalid driver or rider username.");
             }
 
@@ -310,6 +366,61 @@ wsServer.on("connection", (connection, request) => {
             console.log('Drivers:', drivers);
             console.log('Riders:', riders);
         }
+
+        if (data.action === "getActiveQueues") {
+            const { driverId } = data;
+            console.log('Retrieving all active queues with driver_id: ', driverId);
+            getQueuesForDriver(driverId, (err, rows) => {
+                if (err) {
+                  console.error("Failed to fetch queue:", err);
+                } else {
+                  console.log("Queue details for driver 1:", rows);
+                  rows.forEach((row, index) => {
+                    console.log(`Position ${index + 1}:`, row);
+                  });
+
+                  // Find the driver with matching username
+                    console.log('Searching websocket connections for valid driver')
+
+                    let driverFound = null;
+                    let driverConnection = null;
+
+                    for (let driverUuid in drivers) {
+                        if (Number(drivers[driverUuid].id) === Number(driverId)) {
+                            driverFound = drivers[driverUuid];
+                            driverConnection = connections[driverUuid];
+                            console.log("Driver found");
+                            break;
+                        }
+                    }
+                    
+
+                    if (driverFound){
+                        const users = rows.map((row, index) => ({
+                            position: index + 1,
+                            riderId: row.rider_id,
+                            username: row.username,
+                            phoneNumber: row.phone_number,
+                            pickupLocation: row.pickup_location,
+                            dropoffLocation: row.dropoff_location,
+                            startTime: row.created_at,
+                            queueId: row.queue_id,
+                        }));
+                    
+                        const message = {
+                            type: "driver_queue",  // Make sure this type indicates it's specific to the driver's queue
+                            data: users  // The array of users (queue data)
+                        };
+                        
+                        setTimeout(() => {
+                        driverConnection.send(JSON.stringify(message))
+                        }, 100);
+                    }
+                }
+            });
+
+        }
+
 
     });
 

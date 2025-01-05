@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import Swal from 'sweetalert2';
 
 import withReactContent from 'sweetalert2-react-content';
@@ -6,7 +6,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-const ButtonContainer = () => {
+const ButtonContainer = ({riderId, driverId, socket }) => {
   const [arrivedAtPickup, setArrivedAtPickup] = useState(false);
   const [arrivedAtDestination, setArrivedAtDestination] = useState(false);
   const currentPassenger = { name: 'John Doe' }; // Example passenger data
@@ -30,18 +30,35 @@ const ButtonContainer = () => {
 
   const handleArrivedDestination = () => {
     MySwal.fire({
-      title: 'Confirm Arrival',
-      text: `Are you sure ${currentPassenger.name} has reached their destination?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, arrived!'
+        title: 'Confirm Arrival',
+        text: `Are you sure ${name} has reached their destination?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, arrived!'
     }).then((result) => {
-      if (result.isConfirmed) {
-        setArrivedAtDestination(true);
-        MySwal.fire('Confirmed!', 'You have arrived at the destination.', 'success');
-      }
+        if (result.isConfirmed) {
+            const message = {
+                driverId: driverId,  // driver's ID
+                riderId: riderId,    // rider's ID
+                action: "endQueue",
+            };
+    
+            try {
+                // Send WebSocket message to the server
+                socket.send(JSON.stringify(message));
+                console.log(message);
+    
+                // Update state after the action
+                setArrivedAtDestination(true);
+                MySwal.fire('Confirmed!', 'You have arrived at the destination.', 'success');
+            } catch (err) {
+                console.error("Failed to update queue", err);
+                setError("Failed to update the queue. Please try again.");  // Error handling
+            }
+            
+        }
     });
   };
 
@@ -55,19 +72,21 @@ const ButtonContainer = () => {
 
   return (
     <div className="arrived-back-button-container">
-      <button
-        id="arrived-pickup"
-        className="btn btn-primary mt-3"
-        onClick={handleArrivedPickup}
-      >
-        Arrived at Pickup
-      </button>
-
-      {arrivedAtPickup && (
+      {!arrivedAtPickup && (
         <button
-          id="arrived-destination"
-          className="btn btn-success mt-3"
-          onClick={handleArrivedDestination}
+            id="arrived-pickup"
+            className="btn btn-primary mt-3"
+            onClick={handleArrivedPickup}
+        >
+            Arrived at Pickup
+        </button>
+      )}
+
+      {arrivedAtPickup && !arrivedAtDestination && (
+        <button
+            id="arrived-destination"
+            className="btn btn-success mt-3"
+            onClick={handleArrivedDestination}
         >
           Arrived at Destination
         </button>

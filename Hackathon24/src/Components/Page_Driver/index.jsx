@@ -4,6 +4,7 @@ import axios from "axios";
 import MapCard from "../map_card"
 import MapWithDirections from "../map_with_directions";
 import ButtonContainer from "../queue_nav_container";
+import './index.css';
 
 
 export function PageDriver({formData, driver, setDriver, socket}) {
@@ -32,29 +33,116 @@ export function PageDriver({formData, driver, setDriver, socket}) {
     
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
+
+            const message = {
+                driverId: Number(driver.id),  // driver's ID
+                action: "getActiveQueues",
+              };
+        
+              try {
+                socketRef.current.send(JSON.stringify(message));
+                console.log("Sent message:", message);
+              } catch (err) {
+                console.error("Failed to update queue", err);
+              }
         }
         
         socketRef.current.onmessage = (e) => {
-            const userList = JSON.parse(e.data)
             console.log("Recieved new data from WS", JSON.parse(e.data))
 
-            if(JSON.stringify(previousUsers.current) !== JSON.stringify(userList)){
-                setConnectedUsers(userList)
-                previousUsers.current = userList;
+            try {
+                const parsedMessage = JSON.parse(e.data); // Parse the incoming WebSocket message
+                console.log("Parsed message:", parsedMessage); // Debug the parsed message
+        
+                // Check if the message is for the current driver
+                if (parsedMessage.type === "driver" && parsedMessage.id === driver.id.toString()) {
+                    console.log("Message is for the current driver.");
+        
+                    // POTENTIAL IMPLEMENTATIONS
 
-                const filtered = userList.filter(
-                    (user) => Number(user.driver_id) === Number(driver.id)
-                );
+                    setDriver((prevDriver) => ({
+                        ...prevDriver,
+                        queue_length: parsedMessage.queue_length,
+                    }));
+
+                    const message = {
+                        driverId: Number(driver.id),  // driver's ID
+                        action: "getActiveQueues",
+                    };
+                
+                    try {
+                        setTimeout(() => {
+                            socketRef.current.send(JSON.stringify(message));
+                        }, 100);
+                        console.log("Sent message:", message);
+                    } catch (err) {
+                        console.error("Failed to update queue", err);
+                    }
+
+                    console.log("Driver's info updated:", driver);
+                    
+                }
+
+                if (parsedMessage.type === "driver_queue") {
+                    console.log("Received driver queue data:", parsedMessage.data);
+                    const userList = parsedMessage.data;  // Extract the user data from the message
     
-                console.log("Filtered Users:", filtered);
-                setFilteredUsers(filtered);
+                    // Update the connected users list with the queue data
+                    setFilteredUsers(userList);  // Assuming you're updating the queue for the driver
+                    console.log("Filtered Users:", userList);
+                    setDriver((prevDriver) => ({
+                        ...prevDriver,
+                        queue_length: filteredUsers.length,
+                    }));
+                }
+        
+                // Update the connected users if necessary
+                else if (Array.isArray(parsedMessage)) {
+                    const userList = parsedMessage;
+                    setFilteredUsers(userList);
+                    // if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
+                    //     setConnectedUsers(userList);
+                    //     previousUsers.current = userList;
+
+                    //     // const filtered = userList.filter(
+                    //     //     (user) => Number(user.driver_id) === Number(driver.id)
+                    //     // );
+            
+                    //     // console.log("Filtered Users:", filtered);
+                    //     // setFilteredUsers(filtered);
+                    
+                    // }
+                }
+            } catch (error) {
+                console.error("Error processing WebSocket message:", error);
             }
         }
 
         return () => {
             socketRef.current.close();
         };
-    }, [driver]);
+    }, [driver?.id, driver?.username, driver?.phone_number]);
+
+
+//     // Send message to WebSocket after driver info or queue length updates
+  useEffect(() => {
+    if (socketRef.current) {
+      const message = {
+        driverId: Number(driver.id),  // driver's ID
+        action: "getActiveQueues",
+      };
+
+      try {
+        socketRef.current.send(JSON.stringify(message));
+        console.log("Sent message:", message);
+      } catch (err) {
+        console.error("Failed to update queue", err);
+      }
+    } else {
+      console.log("WebSocket not open, retrying...");
+      // Optionally, you could retry sending the message after a delay, or queue it for later
+    }
+  }, [driver.queue_length]);
 
     // Wait until the driver data is available before rendering
     // Show loading until the driver data is fetched
@@ -68,11 +156,30 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                 <p><strong>Name:</strong> {driver.username}</p>
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>
-                <p><strong>Real Queue Length:</strong> {driver.queue_length}</p>
+                <p><strong>Real Queue Length:</strong> {filteredUsers.length}</p>
             </div>
             <h1><strong>QUEUE: {filteredUsers.length}</strong></h1>
+            <br></br>
             <ul>
-                {filteredUsers.map((user, index) => (
+                {/* Render the first person in the queue if it exists */}
+                {filteredUsers.length > 0 && (
+                    <div>
+                        <h2>First Person in Queue</h2>
+                        <CurrentQueuePassengerInfoCard
+                            key={0}
+                            name={filteredUsers[0].username}
+                            phone={filteredUsers[0].phoneNumber}
+                            location={filteredUsers[0].pickupLocation}
+                            destination={filteredUsers[0].dropoffLocation}
+                            socket={socketRef.current}
+                            riderId={filteredUsers[0].id}
+                            driverId={driver.id}
+                        />
+                    </div>
+                )}
+                
+
+                {/* {filteredUsers.map((user, index) => (
                     <div>
                         <CurrentQueuePassengerInfoCard
                         key={index}
@@ -85,7 +192,37 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                         driverId={driver.id}
                         />
                     </div>
-                ))}
+                ))} */}
+
+
+                <div className="driver-queue-container">
+                    <h1 className="queue-title">Queue: {filteredUsers.length}</h1>
+                    <table className="queue-table">
+                        <thead>
+                            <tr>
+                                <th>Q#</th>
+                                <th>Username</th>
+                                <th>Rider ID</th>
+                                <th>Phone Number</th>
+                                <th>Pickup Location</th>
+                                <th>Dropoff Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredUsers.map((user, index) => (
+                                <tr key={user.queue_id}>
+                                    <td className="queue-number">{index + 1}</td>
+                                    <td>{user.username}</td>
+                                    <td>{user.riderId}</td>
+                                    <td>{user.phoneNumber}</td>
+                                    <td>{user.pickupLocation}</td>
+                                    <td>{user.dropoffLocation}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
             </ul>
         </>
     );   

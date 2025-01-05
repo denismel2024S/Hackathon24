@@ -327,6 +327,38 @@ function updateQueueEndTime(queueId, callback = () => {}) {
   });
 }
 
+function getQueuesForDriver(driverId, callback) {
+  db.serialize(() => {
+    const query = `
+      SELECT 
+        q.id AS queue_id,
+        q.created_at,
+        r.id AS rider_id,
+        r.username,
+        r.phone_number,
+        r.pickup_location,
+        r.dropoff_location
+      FROM queue q
+      INNER JOIN riders r ON q.rider_id = r.id
+      WHERE q.driver_id = ? AND q.ended_at IS NULL
+      ORDER BY q.created_at ASC
+    `;
+
+    console.log("Fetching queues for driverId:", driverId);
+    db.all(query, [Number(driverId)], (err, rows) => {
+      console.log("Database rows:", rows); // Log the result from the database
+      if (err) {
+        console.error("Error retrieving queue with riders:", err);
+        callback(err, null);
+      } else {
+        console.log("Retrieved queue with riders:", rows);
+        callback(null, rows);
+      }
+    });
+  });
+}
+
+
 
 // Function to get driver by ID
 function getQueueByRiderId(riderId, callback) {
@@ -374,5 +406,6 @@ module.exports = {
   updateQueueEndTime,
   getDriverByPhoneNumber,
   getRiderByPhoneNumber,
-  getQueueByRiderId
+  getQueueByRiderId,
+  getQueuesForDriver
 };

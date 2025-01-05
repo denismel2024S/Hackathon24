@@ -60,13 +60,37 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
         socketRef.current.onmessage = (e) => {
             console.log("Raw message from server:", e.data); // Debug the raw message
 
+            try {
+                const parsedMessage = JSON.parse(e.data); // Parse the incoming WebSocket message
+                console.log("Parsed message:", parsedMessage); // Debug the parsed message
+        
+                // Check if the message is for the current rider
+                if (parsedMessage.type === "rider" && parsedMessage.id === rider.id.toString()) {
+                    console.log("Message is for the current rider.");
+        
 
-            const userList = JSON.parse(e.data)
-            console.log("Parsed user list:", userList); // Debug the parsed user list
+                    console.log(parsedMessage.driver_id);
+                    console.log(rider.driver_id);
 
-            if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
-                setConnectedUsers(userList);
-                previousUsers.current = userList;
+                    // Update the rider's driver_id if it has changed
+                    if (parsedMessage.driver_id !== rider.driver_id) {
+                        updateRiderData({
+                            driver_id: parsedMessage.driver_id, // Rider is leaving the queue, so we reset driver_id
+                          });
+                        console.log("Rider's driver_id updated:", parsedMessage.driver_id);
+                    }
+                }
+        
+                // Update the connected users if necessary
+                if (Array.isArray(parsedMessage)) {
+                    const userList = parsedMessage;
+                    if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
+                        setConnectedUsers(userList);
+                        previousUsers.current = userList;
+                    }
+                }
+            } catch (error) {
+                console.error("Error processing WebSocket message:", error);
             }
         }
 

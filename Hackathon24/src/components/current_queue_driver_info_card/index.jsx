@@ -48,10 +48,11 @@ const handleLeaveQueue = async (event) => {
           </div>
           <div className="ps-3">
             <div id="driver-info">
-              <h3 className="card-title" id="driver-name"><b>Your Driver: {driver.username}</b></h3>
-              <p><b>Queue Position: </b>not implemented yet</p>
+              <h3 className="card-title" id="driver-name"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
+              <p><b>Queue Position: </b>N/A</p>
+              <p><b>Queue Status: </b>N/A</p>
+
               <p id="driver-phone"><b>Phone number: </b>{driver.phone_number}</p>
-              <p id="driver-id"><b>ID: </b>{driver.id}</p>
 
             </div>
             <button 

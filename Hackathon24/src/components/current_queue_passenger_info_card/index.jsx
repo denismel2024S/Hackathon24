@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import MapWithDirections from "../map_with_directions";
+import ButtonContainer from "../queue_nav_container";
 
 const MySwal = withReactContent(Swal);
 
@@ -50,26 +51,25 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
             confirmButtonText: 'Yes, arrived!'
         }).then((result) => {
             if (result.isConfirmed) {
-                setArrivedAtDestination(true);
-                MySwal.fire('Confirmed!', 'You have arrived at the destination.', 'success');
-            }
-
-            const message = {
-                driverId: driverId,  // driver's ID
-                riderId: riderId,    // rider's ID
-                action: "endQueue",
-            };
-    
-            try {
-                // Send WebSocket message to the server
-                socket.send(JSON.stringify(message));
-                console.log(message);
-    
-                // Update state after the action
-                setJoined(!joined);  // Toggle between join and leave state
-            } catch (err) {
-                console.error("Failed to update queue", err);
-                setError("Failed to update the queue. Please try again.");  // Error handling
+                const message = {
+                    driverId: driverId,  // driver's ID
+                    riderId: riderId,    // rider's ID
+                    action: "endQueue",
+                };
+        
+                try {
+                    // Send WebSocket message to the server
+                    socket.send(JSON.stringify(message));
+                    console.log(message);
+        
+                    // Update state after the action
+                    setArrivedAtDestination(true);
+                    MySwal.fire('Confirmed!', 'You have arrived at the destination.', 'success');
+                } catch (err) {
+                    console.error("Failed to update queue", err);
+                    setError("Failed to update the queue. Please try again.");  // Error handling
+                }
+                
             }
         });
 
@@ -123,32 +123,17 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
                     </div>
 
                     {/* Arrived at Pickup and Arrived at Destination Buttons */}
-                    <div className="arrived-buttons mt-3">
-                        {!arrivedAtPickup && (
-                            <button
-                                id="arrived-pickup"
-                                className="btn btn-primary"
-                                onClick={handleArrivedPickup}
-                            >
-                                Arrived at Pickup
-                            </button>
-                        )}
 
-                        {arrivedAtPickup && !arrivedAtDestination && (
-                            <button
-                                id="arrived-destination"
-                                className="btn btn-success mt-3"
-                                onClick={handleArrivedDestination}
-                            >
-                                Arrived at Destination
-                            </button>
-                        )}
-                    </div>
+                    <ButtonContainer
+                        riderId={riderId}
+                        driverId={driverId}
+                        socket={socket}
+                    />
                 </div>
             </div>
-            <div>
+            {/* <div>
             <MapWithDirections pickupLocation={driverLocation} destination={currentLocation} />
-            </div>
+            </div> */}
         </div>
     );
 };
