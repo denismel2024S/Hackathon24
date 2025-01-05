@@ -6,7 +6,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-const CurrentQueueDriverInfoCard = ({rider, driver, setDriver, setRider, inQueue, setInQueue, socket, updateRiderData}) => {
+const CurrentQueueDriverInfoCard = ({queuePosition, rider, driver, setDriver, setRider, inQueue, setInQueue, socket, updateRiderData}) => {
 
 const handleLeaveQueue = async (event) => {
   event.preventDefault(); // Prevent the default form submission
@@ -58,11 +58,12 @@ const handleLeaveQueue = async (event) => {
           <div className="ps-3">
             <div id="driver-info">
               <h3 className="card-title" id="driver-name"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
-              <p><b>Queue Length: </b>{Number(driver.queue_length) + 1}</p>
-              <p><b>Queue Position: </b>N/A</p>
+              <p id="driver-phone"><b>Phone number: </b>{driver.phone_number}</p>
+
+              {/* <p><b>Queue Length: </b>{Number(driver.queue_length) + 1}</p> */}
+              <p><b>Queue Position: </b>{queuePosition}</p>
               <p><b>Queue Status: </b>N/A</p>
 
-              <p id="driver-phone"><b>Phone number: </b>{driver.phone_number}</p>
 
             </div>
             <button 

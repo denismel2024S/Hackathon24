@@ -4,6 +4,7 @@ import axios from "axios";
 import MapCard from "../map_card"
 import MapWithDirections from "../map_with_directions";
 import ButtonContainer from "../queue_nav_container";
+import QueueTable from "../queue_table";
 import './index.css';
 
 
@@ -141,7 +142,7 @@ export function PageDriver({formData, driver, setDriver, socket}) {
       console.log("WebSocket not open, retrying...");
       // Optionally, you could retry sending the message after a delay, or queue it for later
     }
-  }, [driver.queue_length]);
+  }, [driver.queue_length, connectedUsers]);
 
     // Wait until the driver data is available before rendering
     // Show loading until the driver data is fetched
@@ -163,7 +164,6 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                 {/* Render the first person in the queue if it exists */}
                 {filteredUsers.length > 0 && (
                     <div>
-                        <h2>First Person in Queue</h2>
                         <CurrentQueuePassengerInfoCard
                             key={0}
                             name={filteredUsers[0].username}
@@ -193,34 +193,9 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                     </div>
                 ))} */}
 
-
-                <div className="driver-queue-container">
-                    <h1 className="queue-title">Queue: {filteredUsers.length}</h1>
-                    <table className="queue-table">
-                        <thead>
-                            <tr>
-                                <th>Q#</th>
-                                <th>Username</th>
-                                <th>Rider ID</th>
-                                <th>Phone Number</th>
-                                <th>Pickup Location</th>
-                                <th>Dropoff Location</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredUsers.map((user, index) => (
-                                <tr key={user.queue_id}>
-                                    <td className="queue-number">{index + 1}</td>
-                                    <td>{user.username}</td>
-                                    <td>{user.riderId}</td>
-                                    <td>{user.phoneNumber}</td>
-                                    <td>{user.pickupLocation}</td>
-                                    <td>{user.dropoffLocation}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <QueueTable
+                filteredUsers={filteredUsers}
+                />
 
             </ul>
         </>

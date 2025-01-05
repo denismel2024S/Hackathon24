@@ -15,6 +15,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     const [connectedUsers, setConnectedUsers] = useState([])
     const [inQueue, setInQueue] = useState(null);  // State to store rider's state
     const [driver, setDriver] = useState(null); // Start as null for better checks
+    const [queue, setQueue] = useState(null);
 
     axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
 
@@ -72,17 +73,29 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                     console.log(parsedMessage.driver_id);
                     console.log(rider.driver_id);
 
-                    // Update the rider's driver_id if it has changed
-                    if (parsedMessage.driver_id !== rider.driver_id) {
-                        updateRiderData({
-                            driver_id: parsedMessage.driver_id, // Rider is leaving the queue, so we reset driver_id
-                          });
-                        console.log("Rider's driver_id updated:", parsedMessage.driver_id);
-                    }
+                    updateRiderData({
+                        driver_id: parsedMessage.driver_id, // Rider is leaving the queue, so we reset driver_id
+                      });
+
+                    console.log("Rider's driver_id updated:", parsedMessage.driver_id);
+
+                }
+
+                // Check if the message is for the current rider's queue
+                if (parsedMessage.type === "rider_queue" && parsedMessage.data) {
+                    console.log("Queue update for current rider:", parsedMessage.data);
+        
+                    // Update the queue state with the new data
+                    setQueue((prevQueue) => ({
+                    ...prevQueue,
+                    ...parsedMessage.data, // Merge the new data with existing queue data
+                    }));
+        
+                    console.log("Updated queue object:", parsedMessage.data);
                 }
         
                 // Update the connected users if necessary
-                if (Array.isArray(parsedMessage)) {
+                else if (Array.isArray(parsedMessage)) {
                     const userList = parsedMessage;
                     if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
                         setConnectedUsers(userList);
@@ -140,7 +153,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
             {inQueue ? (
                     <div>
-                        {!driver?.id ? (
+                        {!driver?.id || !queue ? (
                             <div>
                                 <p>Loading driver info..</p> 
                             </div>
@@ -155,6 +168,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                     setInQueue={setInQueue}
                                     socket={socketRef.current}
                                     updateRiderData={updateRiderData}
+                                    queuePosition={queue ? queue.position : "Loading..."}
                                 />
                             </div>
                         )}

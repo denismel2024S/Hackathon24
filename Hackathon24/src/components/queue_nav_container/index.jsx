@@ -6,10 +6,14 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-const ButtonContainer = ({riderId, driverId, socket }) => {
-  const [arrivedAtPickup, setArrivedAtPickup] = useState(false);
+const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedAtPickup}) => {
   const [arrivedAtDestination, setArrivedAtDestination] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(location);
+
   const currentPassenger = { name: 'John Doe' }; // Example passenger data
+
+   // Update current location dynamically
+   
 
   const handleArrivedPickup = () => {
     MySwal.fire({
@@ -22,8 +26,26 @@ const ButtonContainer = ({riderId, driverId, socket }) => {
       confirmButtonText: 'Yes, arrived!'
     }).then((result) => {
       if (result.isConfirmed) {
-        setArrivedAtPickup(true);
-        MySwal.fire('Confirmed!', 'You have arrived at the pickup location.', 'success');
+        
+        const message = {
+          driverId: driverId,  // driver's ID
+          riderId: riderId,    // rider's ID
+          action: "queueStatusUpdate",
+          message: "Arrived at the designated pickup location.",
+        };
+
+        try {
+            // Send WebSocket message to the server
+            socket.send(JSON.stringify(message));
+            console.log(message);
+
+            // Update state after the action
+            setArrivedAtPickup(true);
+            MySwal.fire('Confirmed!', 'You have arrived at the pickup location.', 'success');
+        } catch (err) {
+            console.error("Failed to update queue", err);
+            setError("Failed to update the queue. Please try again.");  // Error handling
+        }
       }
     });
   };
@@ -71,7 +93,7 @@ const ButtonContainer = ({riderId, driverId, socket }) => {
   };
 
   return (
-    <div className="arrived-back-button-container">
+    <div>
       {!arrivedAtPickup && (
         <button
             id="arrived-pickup"
@@ -92,7 +114,7 @@ const ButtonContainer = ({riderId, driverId, socket }) => {
         </button>
       )}
 
-      <button
+      {/* <button
         id="go-back"
         className="btn btn-warning mt-3"
         onClick={handleGoBack}
@@ -108,7 +130,7 @@ const ButtonContainer = ({riderId, driverId, socket }) => {
         >
           Go Back
         </button>
-      )}
+      )} */}
     </div>
   );
 };

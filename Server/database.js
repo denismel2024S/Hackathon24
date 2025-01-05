@@ -301,6 +301,58 @@ function updateQueueEndTime(riderId, driverId, callback = () => {}) {
   });
 }
 
+/**
+ * Updates the queue with an ended_at time and resets the rider's driver_id to NULL.
+ *
+ * @param {*} riderId // Database ID of the rider
+ * @param {*} queueId // Database ID of the queue entry
+ * @param {*} callback // Prevents crashing if the update is unsuccessful
+ */
+function updateQueueAndResetDriver(riderId, queueId, callback = () => {}) {
+  const endTime = new Date().toISOString(); // Current timestamp
+
+  db.serialize(() => {
+    // Update the queue's ended_at time
+    const updateQueueStmt = db.prepare(`
+      UPDATE queue 
+      SET ended_at = ? 
+      WHERE id = ?
+    `);
+
+    updateQueueStmt.run(endTime, queueId, (err) => {
+      if (err) {
+        console.error("Error updating queue end time:", err);
+        callback(err);
+        return;
+      }
+
+      console.log(`Queue entry with ID: ${queueId} marked as ended.`);
+
+      // Reset the rider's driver_id to NULL
+      const resetDriverStmt = db.prepare(`
+        UPDATE riders 
+        SET driver_id = NULL 
+        WHERE id = ?
+      `);
+
+      resetDriverStmt.run(riderId, (err) => {
+        if (err) {
+          console.error("Error resetting rider's driver_id:", err);
+          callback(err);
+        } else {
+          console.log(`Rider ID: ${riderId} driver_id set to NULL.`);
+          callback(null);
+        }
+      });
+
+      resetDriverStmt.finalize();
+    });
+
+    updateQueueStmt.finalize();
+  });
+}
+
+
 
 /**
  * 
@@ -427,5 +479,6 @@ module.exports = {
   getDriverByPhoneNumber,
   getRiderByPhoneNumber,
   getQueueByRiderId,
-  getQueuesForDriver
+  getQueuesForDriver,
+  updateQueueAndResetDriver
 };
