@@ -3,7 +3,7 @@ import DriverInfoCard from "../driver_info_card";
 
 import './index.css'
 
-function DriverInfoCardContainer({ inQueue, connectedUsers, socket, riderId }) {
+function DriverInfoCardContainer({ inQueue, setInQueue, connectedUsers, socket, riderId, rider, setRider, updateRiderData }) {
     const[drivers, setDrivers] = useState([]);
 
     useEffect(() => {
@@ -14,8 +14,12 @@ function DriverInfoCardContainer({ inQueue, connectedUsers, socket, riderId }) {
         console.log(drivers.length);
         console.log("Drivers updated");
     }, [drivers]);
+    
+    useEffect(() => {
+        setRider(rider);
+    }, [rider]);
 
-    const addToQueuue = (index) => {
+    const addToQueue = (index) => {
         setDrivers((prevDrivers) => {
             const updatedDrivers = [...prevDrivers];
             updatedDrivers[index].queue = Number(updatedDrivers[index].queue);
@@ -34,15 +38,17 @@ function DriverInfoCardContainer({ inQueue, connectedUsers, socket, riderId }) {
                     
                     <>
                     <DriverInfoCard 
+                        driver={user}
                         key={index}
-                        username={user.username}
-                        phoneNumber={user.phoneNumber}
-                        queueLength={user.queue}
                         socket={socket}
-                        onAddQueue={() => addToQueuue(index)}
+                        onAddQueue={() => addToQueue(index)}
+                        rider={rider}
+                        setRider={setRider}
                         riderId={riderId}
                         driverId={user.id}
                         inQueue={inQueue}
+                        setInQueue={setInQueue}
+                        updateRiderData={updateRiderData}
                     />
                     </>
                 ))

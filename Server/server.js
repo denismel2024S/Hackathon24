@@ -21,17 +21,60 @@ const db = new sqlite3.Database("./app.db", (err) => {
   }
 });
 
-// Route to fetch active drivers
-app.get("/api/active_drivers", async (req, res) => {
-    try {
-      const result = await pool.query('SELECT * FROM drivers WHERE is_driving = true AND queue_length > 0');
-      res.json(result.rows);
-    } catch (error) {
-      console.error("Error fetching active drivers:", error);
-      res.status(500).send("Server error");
+app.post("/api/driver/add", (req, res) => {
+  const { username, phone_number, queue_length } = req.body;
+
+  if (!username || !phone_number) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const query = `
+    INSERT INTO drivers (username, phone_number, queue_length)
+    VALUES (?, ?, ?)
+  `;
+
+  db.run(
+    query,
+    [username, phone_number, queue_length],
+    function (err) {
+      if (err) {
+        console.error("Error inserting new driver:", err);
+        return res.status(500).json({ error: "Failed to add new driver" });
+      }
+
+      console.log("New driver added with ID:", this.lastID);
+      res.status(201).json({ id: this.lastID });
     }
-      // Send the product data as JSON
-  });
+  );
+});
+
+app.post("/api/rider/add", (req, res) => {
+  const { username, phone_number, pickup_location, dropoff_location, driver_id} = req.body;
+  console.log(req.body);
+  if (!username || !phone_number || !pickup_location || !dropoff_location) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const query = `
+    INSERT INTO riders (username, phone_number, pickup_location, dropoff_location, driver_id)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  db.run(
+    query,
+    [username, phone_number, pickup_location, dropoff_location, driver_id],
+    function (err) {
+      if (err) {
+        console.error("Error inserting new rider:", err);
+        return res.status(500).json({ error: "Failed to add new rider" });
+      }
+
+      console.log("New rider added with ID:", this.lastID);
+      res.status(201).json({ id: this.lastID });
+    }
+  );
+});
+
 
 
 app.get("/api/rider/by-phone/:phone", (req, res) => {
@@ -49,6 +92,7 @@ app.get("/api/rider/by-phone/:phone", (req, res) => {
     if (row) {
       res.setHeader("Content-Type", "application/json"); // Set content type to JSON
       res.json(row);
+      console.log(row);
     } else {
       res.status(404).json({ message: "Rider with phone not found" });
       console.log("failed getting rider with phone number", phone);
@@ -66,7 +110,7 @@ app.get("/api/driver/by-phone/:phone", (req, res) => {
 
   db.get(query, [phone], (err, row) => {
     if (err) {
-      console.error("Error fetching rider by phone", err);
+      console.error("Error fetching driver by phone", err);
       return res.status(500).json({ error: "Database query failed" });
     }
     if (row) {
@@ -74,111 +118,34 @@ app.get("/api/driver/by-phone/:phone", (req, res) => {
       res.json(row);
     } else {
       res.status(404).json({ message: "Driver with phone not found" });
-      console.log("failed getting rider with phone number", phone);
+      console.log("failed getting driver with phone number", phone);
     }
   });
 });
 
-app.post("/login", async (req, res) => {
-    const { username, password } = req.body; // Expect username and password in the request body
 
-    try {
-      // Assuming you have a 'users' table with 'username', 'password', and 'role' columns
-      const query = 'SELECT * FROM accounts WHERE username = $1 AND password = $2';
-      const result = await pool.query(query, [username, password]);
 
-      if (result.rows.length > 0) {
-          const account = result.rows[0];
-          res.json({ success: true, role: account.role, id: account.user_id, currentLocation_x: account.currentLocation.x, destination: account.destination }); // Send back role of user
+  app.get('/api/driver/by-id/:driver_id', (req, res) => {
+    const { driver_id } = req.params;
+    console.log("Driver id received:", driver_id); // Debugging the phone number
+
+    const query = `SELECT * FROM drivers WHERE id = ?`;
+
+    console.log("Executing query:", query, "with params:", [driver_id]); // Debugging the query
+
+    db.get(query, [driver_id], (err, row) => {
+      if (err) {
+        console.error("Error fetching driver by id", err);
+        return res.status(500).json({ error: "Database query failed" });
+      }
+      if (row) {
+        res.setHeader("Content-Type", "application/json"); // Set content type to JSON
+        res.json(row);
       } else {
-          res.status(401).json({ success: false, message: 'Invalid credentials' });
+        res.status(404).json({ message: "Driver with id not found" });
+        console.log("failed getting driver with id", driver_id);
       }
-    } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
-    }
-  });
-
-  app.post('/api/join-queue/:riderId/:driverId', async (req, res) => {
-    const { riderId, driverId } = req.params;
-    try {
-        // Logic to add the rider to the queue with the specified driver
-        // For example, you could insert a new record in the queue table
-        const result = await pool.query(
-            'INSERT INTO queue (rider_id, driver_id, status) VALUES ($1, $2, $3)',
-            [riderId, driverId, 'active']
-        );
-        
-        res.json({ message: 'Successfully joined the queue!' });
-    } catch (error) {
-        console.error('Error joining the queue:', error);
-        res.status(500).json({ message: 'Failed to join the queue' });
-    }
-  });
-
-app.post('/api/leave-queue/:riderId', async (req, res) => {
-  const { riderId } = req.params;
-  try {
-      // Logic to add the rider to the queue with the specified driver
-      // For example, you could insert a new record in the queue table
-      const result = await pool.query(
-          'UPDATE queue SET status = $1 WHERE rider_id = $2 AND status = $3',
-          ['canceled', riderId, 'active']
-      );
-      
-      res.json({ message: 'Successfully left the queue!' });
-  } catch (error) {
-      console.error('Error joining the queue:', error);
-      res.status(500).json({ message: 'Failed to join the queue' });
-  }
-});
-
-
-  app.get('/queue/rider/:rider_id', async (req, res) => {
-    const riderId = req.params.rider_id;
-
-    try{
-      const result = await pool.query(
-        'SELECT * FROM queue WHERE rider_id = $1 AND status = $2',
-        [riderId, 'active']
-      );
-      //check if the number of active queue's is greater than 0
-      // Check if a driver with the given ID exists
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'Queue not found for rider' });
-      }
-      res.json(result.rows[0]);
-    } catch (error) {
-      console.error('Error fetching driver data:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  });
-
-  
-
-
-
-  app.get('/driver/:driver_id', async (req, res) => {
-    const driverId = req.params.driver_id;
-  
-    try {
-      // Query to get driver information from the database
-      const result = await pool.query(
-        'SELECT * FROM drivers WHERE id = $1',
-        [driverId]
-      );
-  
-      // Check if a driver with the given ID exists
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'Driver not found' });
-      }
-  
-      // Send the driver data as a response
-      res.json(result.rows[0]);
-    } catch (error) {
-      console.error('Error fetching driver data:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
+    });
   });
 
 app.listen(5433, () => {

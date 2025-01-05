@@ -6,8 +6,10 @@ import MapWithDirections from "../map_with_directions";
 import ButtonContainer from "../queue_nav_container";
 
 
-export function PageDriver({formData}) {
+export function PageDriver({formData, driver, setDriver, socket}) {
     const [connectedUsers, setConnectedUsers] = useState([])
+    const [filteredUsers, setFilteredUsers] = useState([]);
+
     const previousUsers = useRef([])
     const socketRef = useRef(null);
 
@@ -16,33 +18,11 @@ export function PageDriver({formData}) {
     const destination = { lat: 37.24309222144794, lng:  -80.42563313338609 };
 
     const [passenger, setPassenger] = useState(null);
-    const [driver, setDriver] = useState(null);
 
     
     axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
 
 
-    const fetchDriverByPhone = async (phoneNumber) => {
-        try {
-          console.log("attempting to retrieve a driver's data....")
-          const response = await axios.get(`/api/driver/by-phone/${phoneNumber}`);
-          if (response.data) {
-            console.log("Driver data fetched successfully:", response.data);
-            setDriver(response.data);
-
-          } else {
-            console.log("Driver not found");
-          }
-        } catch (error) {
-          console.error("Error fetching driver ID:", error);
-        }
-    };
-
-    
-    useEffect(() => {
-        fetchDriverByPhone(formData.phone);
-    }, [formData.phone]); // Dependency array ensures this only runs when formData.phone changes
-    
 
     /**
      *  Repeated WebSocket Connections
@@ -88,79 +68,64 @@ export function PageDriver({formData}) {
 
     useEffect(() => {
         // Fetch passenger data from an API or other source
-        const fetchPassengerData = async () => {
 
-            try {
-                // Mock data for testing
-                const mockData = {
-                    name: "John Doe",
-                    phone: "+1234567890",
-                    location: "575 Washington St SW, Blacksburg",
-                    destination: "Kabrich Crescent Blacksburg, VA"
-                };
-                setPassenger(mockData);
-            } catch (error) {
-                console.error('Error fetching passenger data:', error);
-            }
-
-    
-        };
-
-        fetchPassengerData();
         //TEMPORARY!!! NOT THE PARAMETERS FOR A DRIVER  
+
+
         const queryParams = new URLSearchParams({
             type: "driver",
-            username: formData.name.toString(), //(account.user.firstName + account.user.lastName),
-            phoneNumber: formData.phone, 
-            queue: 0
+            id: driver.id,
+            username: driver.username,
+            phone_number: driver.phone_number,
+            queue_length: driver.queue_length,
+        }).toString();
 
-        }).toString()
         const WSURL = `ws://localhost:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
-
+    
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
         }
         
         socketRef.current.onmessage = (e) => {
             const userList = JSON.parse(e.data)
-            console.log("Recieved new data from WS")
+            console.log("Recieved new data from WS", JSON.parse(e.data))
 
             if(JSON.stringify(previousUsers.current) !== JSON.stringify(userList)){
                 setConnectedUsers(userList)
                 previousUsers.current = userList;
+
+                const filtered = userList.filter(
+                    (user) => Number(user.driver_id) === Number(driver.id)
+                );
+    
+                console.log("Filtered Users:", filtered);
+                setFilteredUsers(filtered);
             }
         }
 
         return () => {
             socketRef.current.close();
         };
-    }, [formData]);
+    }, [driver]);
 
     // Wait until the driver data is available before rendering
     // Show loading until the driver data is fetched
     if (!driver) {
-        fetchDriverByPhone(formData.phone);
-    }
-    if (!driver) {
         return <h1>Loading driver information...</h1>; 
     }
 
-    if (!passenger) {
-        return <div>Loading...</div>;
-    }
-
-    const filteredUsers = connectedUsers.filter(
-        (user) => user.driverId === driver.id // if the driver id is set to the driver's phone number
-    )
+    
     
     return(
         <>
         <div>
             <h1>Driver Information</h1>
-            <p><strong>Name:</strong> {formData.name}</p>
-            <p><strong>Phone Number:</strong> {formData.phone}</p>
+            <p><strong>Name:</strong> {driver.username}</p>
+            <p><strong>Phone Number:</strong> {driver.phone_number}</p>
             <p><strong>Driver ID:</strong> {driver.id}</p>
+            <p><strong>Real Queue Length:</strong> {driver.queue_length}</p>
+
 
         </div>
         <h1><strong>QUEUE: {filteredUsers.length}</strong></h1>
@@ -170,9 +135,9 @@ export function PageDriver({formData}) {
                         <CurrentQueuePassengerInfoCard
                         key={index}
                         name={user.username}
-                        phone={user.phoneNumber}
-                        location={user.pickupLocation}
-                        destination={user.dropoffLocation}
+                        phone={user.phone_number}
+                        location={user.pickup_location}
+                        destination={user.dropoff_location}
                         socket={socketRef.current}
                         riderId={user.id}
                         driverId={driver.id}

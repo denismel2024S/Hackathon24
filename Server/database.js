@@ -75,8 +75,8 @@ function addDriver(username, phoneNumber, queueLength = 0, uuid, drivers) {
               type: 'driver',
               id: row.id,
               username: username,  // Use the updated username
-              phoneNumber: phoneNumber,
-              queue: row.queue_length // Leave the queue length unchanged
+              phone_number: phoneNumber,
+              queue_length: row.queue_length // Leave the queue length unchanged
             };
             console.log(drivers[uuid]);
           }
@@ -96,8 +96,8 @@ function addDriver(username, phoneNumber, queueLength = 0, uuid, drivers) {
               type: 'driver',
               id: this.lastID, // Use the newly inserted driver's ID
               username: username,
-              phoneNumber: phoneNumber,
-              queue: queueLength
+              phone_number: phoneNumber,
+              queue_length: queueLength
             };
             console.log(drivers[uuid]);
           }

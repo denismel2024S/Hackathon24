@@ -10,45 +10,95 @@ import throttle from "lodash.throttle";
 // import { fetchRiderByPhone } from "../../../../Server/server";
 
 
-export function PageRider({formData}){
-    const [connectedUsers, setConnectedUsers] = useState([])
-    const [riderUUID, setRiderUUID] = useState(null);
-    const [inQueue, setInQueue] = useState(null);  // State to store rider's queue position
-    const previousUsers = useRef([])
+export function PageRider({formData, rider, setRider, updateRiderData}){
     const socketRef = useRef(null);
+    const previousUsers = useRef([])
+    const [connectedUsers, setConnectedUsers] = useState([])
+    const [inQueue, setInQueue] = useState(null);  // State to store rider's state
 
     // CHANGE IN DEVELOPMENT
-    const [riderId, setRiderId] = useState(null);
-    const [rider, setRider] = useState(null);
+    // const [driver, setDriver] = useState({
+    //     id: null,
+    //     username: '',
+    //     phone_number: '',
+    //     queue_length: 0,
+    // });    
+
+
+    // TEST ENV CONSTANTS
+    const [driver, setDriver] = useState(null); // Start as null for better checks
+
+
 
 
     axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
 
+    
 
-    const fetchRiderByPhone = async (phoneNumber) => {
+    // const fetchDriverInfoById = (driverId) => {
+    //     try {
+    //         if(inQueue){
+    //             console.log("attempting to retrieve a driver's data....")
+    //             const response = axios.get(`/api/driver/by-id/${driverId}`);
+    //             if (response.data){
+    //                 console.log("Driver data fetched successfully:", response.data);
+    //                 // setDriver(response.data);
+
+    //                 const newDriverData = {
+    //                     id: response.data.id,
+    //                     username: response.data.username,
+    //                     phone_number: response.data.phone_number,
+    //                     queue_length: response.data.queue_length,
+    //                 };
+
+    //                 updateDriverData(newDriverData);
+
+    //             } else {
+    //                 setDriver(null);
+    //             }
+    //         }
+    //     } catch (error) {
+    //       console.error("Error fetching rider ID:", error);
+    //     }
+    // };
+
+    // TEST FUNCTION
+    const fetchDriverInfoById = async (driverId) => {
         try {
-          console.log("attempting to retrieve a rider's data....")
-          const response = await axios.get(`/api/rider/by-phone/${phoneNumber}`);
-          if (response.data) {
-            console.log("Rider data fetched successfully:", response.data);
-            setRider(response.data);
-            if (!(!rider.driver_id)){
-                setInQueue(false)
+            const response = await axios.get(`/api/driver/by-id/${driverId}`);
+            if (response.data) {
+                setDriver({
+                    id: response.data.id,
+                    username: response.data.username,
+                    phone_number: response.data.phone_number,
+                    queue_length: response.data.queue_length,
+                });
+            } else {
+                setDriver(null);
             }
-            console.log(rider.id)
-
-          } else {
-            console.log("Rider not found");
-          }
         } catch (error) {
-          console.error("Error fetching rider ID:", error);
+            console.error("Error fetching driver data:", error);
         }
     };
 
-    
-    useEffect(() => {
-        fetchRiderByPhone(formData.phone);
-    }, [formData.phone]); // Dependency array ensures this only runs when formData.phone changes
+    // const updateDriverData = (newData) => {
+    //     setDriver(prevState => ({
+    //         ...prevState,
+    //         ...newData
+    //     }));
+    // };
+
+
+    // useEffect(() => {
+    //     setRider(rider);
+
+    //     if (rider.driver_id === null){
+    //         setInQueue(false);
+    //     } else {
+    //         setInQueue(true);
+    //     }
+    // }, [rider]);
+
     
 
     //queryParams adds ? to the url with the params
@@ -56,11 +106,12 @@ export function PageRider({formData}){
     useEffect(() => {
         const queryParams = new URLSearchParams({
             type: "rider",
-            username: formData.name,
-            phoneNumber: formData.phone,
-            pickupLocation: formData.pickup,
-            dropoffLocation: formData.dropoff,
-            driverId: undefined,
+            id: rider?.id,
+            username: rider?.username,
+            phone_number: rider?.phone_number,
+            pickup_location: rider?.pickup_location,
+            dropoff_location: rider?.dropoff_location,
+            driver_id: rider?.driver_id,
         }).toString();
 
         const WSURL = `ws://localhost:8080?${queryParams}`
@@ -68,11 +119,11 @@ export function PageRider({formData}){
 
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
-            fetchRiderByPhone(formData.phone)
         }
 
         socketRef.current.onmessage = (e) => {
             console.log("Raw message from server:", e.data); // Debug the raw message
+
 
             const userList = JSON.parse(e.data)
             console.log("Parsed user list:", userList); // Debug the parsed user list
@@ -80,7 +131,6 @@ export function PageRider({formData}){
             if (JSON.stringify(previousUsers.current) !== JSON.stringify(userList)) {
                 setConnectedUsers(userList);
                 previousUsers.current = userList;
-
 
                 // // Check for rider and set the riderUUID
                 // const rider = userList.find(user => user.phoneNumber === formData.phone);
@@ -103,7 +153,27 @@ export function PageRider({formData}){
         return () => {
             socketRef.current.close();
         };
-    }, [formData]);
+    }, [rider?.id, rider?.username, rider?.phone_number, rider?.pickup_location, rider?.dropoff_location,]);
+
+
+
+    // FETCH DRIVER INFO FROM DB IF INQUEUE CHANGES TO TRUE AND RIDER.DRIVER_ID IS SET AS NON NULL
+    useEffect(() => {
+        if (rider.driver_id && inQueue) {
+            fetchDriverInfoById(rider.driver_id);
+        }
+    }, [inQueue, rider.driver_id]);
+
+    // TEST USEEFFECT
+
+    // Set `inQueue` state based on `rider.driver_id`
+    useEffect(() => {
+        if (!rider.driver_id){
+            setInQueue(false);
+        } else {
+            setInQueue(true)
+        }
+    }, [rider.driver_id]);
 
 
     console.log('Form Data:', formData);
@@ -111,25 +181,159 @@ export function PageRider({formData}){
 
     console.log(rider);
 
-    return (
-        <>
-            <div >
-                <h1>Rider Information Submitted</h1>
-                <p><strong>Name:</strong> {formData.name}</p>
-                <p><strong>Phone Number:</strong> {formData.phone}</p>
-                <p><strong>Pickup Location:</strong> {formData.pickup}</p>
-                <p><strong>Dropoff Location:</strong> {formData.dropoff}</p>
-                <br/>
-                <h1><strong>Drivers</strong></h1>
-                <h1><strong>{rider && rider.id === null ? "loading..." : rider?.id}</strong></h1>
+    if (inQueue === null) {
+        return <p>Loading...</p>; // Show loading state until `inQueue` is determined
+    } 
 
-                <DriverInfoCardContainer
-                connectedUsers = {connectedUsers}
-                socket={socketRef.current}
-                riderId = {rider && rider.id === null ? 0 : rider?.id}
-                inQueue={inQueue}
-                />
-            </div>
-        </>
+    return(
+        <div>
+            <h1>Rider Information Submitted</h1>
+            <p><strong>Name:</strong> {rider.username}</p>
+            <p><strong>Phone Number:</strong> {rider.phone_number}</p>
+            <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
+            <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
+            <p><strong>Rider ID:</strong> {rider.id}</p>
+            <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
+            {inQueue ? (
+                    <div>
+                        {!driver?.id ? (
+                            <div>
+                                <p>Loading driver info..</p> 
+                            </div>
+                        ) : (
+                            <div>
+                                <CurrentQueueDriverInfoCard
+                                    rider={rider}
+                                    driver={driver}
+                                    setDriver={setDriver}
+                                    setRider={setRider}
+                                    inQueue={inQueue}
+                                    setInQueue={setInQueue}
+                                    socket={socketRef.current}
+                                    updateRiderData={updateRiderData}
+                                />
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <DriverInfoCardContainer
+                    connectedUsers = {connectedUsers}
+                    socket={socketRef.current}
+                    rider = {rider === null ? 0 : rider}
+                    inQueue={inQueue}
+                    setInQueue={setInQueue}
+                    setRider={setRider}
+                    updateRiderData={updateRiderData}
+                    />
+                )}
+        </div>
     )
+
+    // {!driver?.id ? (
+    //     <div>
+    //         <p>Loading driver info...</p>; // Driver data not yet fetched
+    //     </div>
+    // ) : (
+    //     <div>
+
+    //     </div>
+    // )}
+
+
+    // if (inQueue) {
+    //     if (!driver?.id) {
+    //         return <p>Loading driver info...</p>; // Driver data not yet fetched
+    //     }
+
+    //     return (
+    //         <div>
+    //             <h1>Rider Information Submitted</h1>
+    //             <p><strong>Name:</strong> {rider.username}</p>
+    //             <p><strong>Phone Number:</strong> {rider.phone_number}</p>
+    //             <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
+    //             <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
+    //             <p><strong>Rider ID:</strong> {rider.id}</p>
+    //             <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
+    //             <CurrentQueueDriverInfoCard
+    //                 rider={rider}
+    //                 driver={driver}
+    //                 setDriver={setDriver}
+    //                 setRider={setRider}
+    //                 inQueue={inQueue}
+    //                 setInQueue={setInQueue}
+    //                 socket={socketRef.current}
+    //                 updateRiderData={updateRiderData}
+    //             />
+    //         </div>
+            
+    //     );
+    // }
+
+    // return (
+    //     <div>
+    //         <h1>Rider Information Submitted</h1>
+    //         <p><strong>Name:</strong> {rider.username}</p>
+    //         <p><strong>Phone Number:</strong> {rider.phone_number}</p>
+    //         <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
+    //         <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
+    //         <p><strong>Rider ID:</strong> {rider.id}</p>
+    //         <p><strong>Driver ID:</strong> {rider && rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
+    //         <br></br>
+    //         <h1><strong>Drivers</strong></h1>
+    //         <DriverInfoCardContainer
+    //             connectedUsers={connectedUsers}
+    //             socket={socketRef.current}
+    //             rider={rider || {}}
+    //             inQueue={inQueue}
+    //             setInQueue={setInQueue}
+    //             setRider={setRider}
+    //             updateRiderData={updateRiderData}
+    //         />
+    //     </div>
+        
+    // );
+
+    // return (
+    //     <>
+    //         <div >
+                
+
+    //             <br/>
+    //             <h1><strong>Drivers</strong></h1>
+    //             <h1><strong></strong></h1>
+    //             <p>{inQueue ? "USER IS IN A QUEUE" : "USER IS NOT IN A QUEUE" }</p>
+    //             {driver === null ? (
+    //                 <div>Loading....</div>
+    //             ) : (
+                    
+    //                 <div>
+    //                     <p>Driver: {rider.driver_id}</p>
+    //                 <CurrentQueueDriverInfoCard 
+    //                     rider={rider}
+    //                     riderId={rider?.id}
+    //                     setRider={setRider}
+    //                     driver={driver}
+    //                     setDriver={setDriver}
+    //                     inQueue={inQueue}
+    //                     setInQueue={setInQueue}
+    //                     socket={socketRef.current}
+    //                     />  
+    //                 </div>
+    //             )}
+                
+    //             {inQueue ? (
+    //                 <p>User is in a Queue</p>
+    //             ) : (
+    //                 <DriverInfoCardContainer
+    //                 connectedUsers = {connectedUsers}
+    //                 socket={socketRef.current}
+    //                 rider = {rider === null ? 0 : rider}
+    //                 inQueue={inQueue}
+    //                 setInQueue={setInQueue}
+    //                 setRider={setRider}
+    //                 />
+    //             )}
+    //         </div>
+    //     </>
+    // )
 }

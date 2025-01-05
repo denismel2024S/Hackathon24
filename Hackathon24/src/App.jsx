@@ -40,6 +40,7 @@ const App = () => {
     const [username, setUsername] = useState(''); 
     const correctCode = '12345';
 
+
     const handlePassengerButtonClick = () => {
         setShowCodeInput(true);
         setErrorMessage('');
@@ -84,11 +85,13 @@ const App = () => {
         return (
             <div>
                 <p>You are not logged in</p>
+                <br></br>
                 <button onClick={handleDriverButtonClick}>Driver</button>
                 <button onClick={handlePassengerButtonClick}>Passenger</button>
                 {showCodeInput && (
                     <div>
-                        <input 
+                    <br></br>
+                    <input 
                         type = "text"
                         value = {code}
                         onChange={(e) => setCode(e.target.value)}   

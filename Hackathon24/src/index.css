@@ -65,10 +65,19 @@ button:focus-visible {
     background-color: #ffffff;
   }
   a:hover {
-    color: #747bff;
+    background-color: transparent; /* Black background on hover */
+    color: white; /* White text on hover */
+    border-radius: 5px; /* Rounded corners */
+    border: 5px solid white; /* Optional: Black border */
   }
   button {
-    background-color: #f9f9f9;
+    background-color: white; /* White background */
+    color: #3b0764 var(--tw-gradient-from-position); /* Black text */
+    padding: 10px 20px; /* Padding for better size */
+    font-size: 16px; /* Font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s, color 0.3s; /* Smooth hover effect */
   }
 }
 
@@ -101,3 +110,6 @@ label{
   z-index: 1;
 }
 
+input{
+  color: black
+}
