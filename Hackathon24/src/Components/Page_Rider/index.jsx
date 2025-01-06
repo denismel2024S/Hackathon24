@@ -8,9 +8,9 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     const socketRef = useRef(null);
     const previousUsers = useRef([])
     const [connectedUsers, setConnectedUsers] = useState([])
-    const [inQueue, setInQueue] = useState(null);  // State to store rider's state
+    const [inQueue, setInQueue] = useState(false);  // State to store rider's state
     const [driver, setDriver] = useState(null); // Start as null for better checks
-    const [queue, setQueue] = useState(null);
+    const [queue, setQueue] = useState(null); // Queue status 
 
     axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
 
@@ -48,20 +48,15 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
 
         const WSURL = `ws://localhost:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
-        window.localStorage.setItem('rider', JSON.stringify(rider));
 
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
-            localStorage.setItem('rider', JSON.stringify(rider));
-            const cached = localStorage.getItem('rider');
-            console.log('Rider:', cached);
         }
 
         socketRef.current.onmessage = (e) => {
             console.log("Raw message from server:", e.data); // Debug the raw message
 
             try {
-                localStorage.setItem('rider', JSON.stringify(rider));
                 const parsedMessage = JSON.parse(e.data); // Parse the incoming WebSocket message
                 console.log("Parsed message:", parsedMessage); // Debug the parsed message
         
@@ -119,27 +114,31 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
         if (rider.driver_id) {
             fetchDriverInfoById(rider.driver_id);
             setInQueue(true);
-            console.log("rider", localStorage.getItem('rider'));
-        } else {
+        }else{
             setInQueue(false);
-        }
+        } 
+        window.localStorage.setItem('rider', JSON.stringify(rider));
+        window.localStorage.setItem('queue', JSON.stringify(queue));
+        window.localStorage.setItem('driver', JSON.stringify(driver));
         window.localStorage.setItem('inQueue', inQueue);
     }, [inQueue, rider.driver_id]);
     useEffect(() => {
         const rider = window.localStorage.getItem('rider');
         const inQueue = window.localStorage.getItem('inQueue');
+        const queue = window.localStorage.getItem('queue');
+        const driver = window.localStorage.getItem('driver');
         if (rider) {
-            const parsedRider = JSON.parse(rider);
             setInQueue(inQueue);
-            setRider(parsedRider);
-
-            console.log('Rider:', rider);
+            setRider(JSON.parse(rider));
+            setQueue(JSON.parse(queue));
+            setDriver(JSON.parse(driver));
         }
     }, []);
 
 
     console.log('Form Data:', formData);
     console.log('In the PageRider component');
+    console.log(inQueue)
 
     if (inQueue === null) {
         return <p>Loading...</p>; // Show loading state until `inQueue` is determined
@@ -173,7 +172,6 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                     updateRiderData={updateRiderData}
                                     queuePosition={queue ? queue.position : "Loading..."}
                                     status={queue ? queue.status : "Loading..."}
-
                                 />
                             </div>
                         )}

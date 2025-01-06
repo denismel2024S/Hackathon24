@@ -400,6 +400,7 @@ wsServer.on("connection", (connection, request) => {
                         if (Number(drivers[driverUuid].id) === Number(driverId)) {
                             driverFound = drivers[driverUuid];
                             driverConnection = connections[driverUuid];
+                            //driverFound.queue_length = rows.length;
                             console.log("Driver found");
                             break;
                         }
