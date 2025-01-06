@@ -98,9 +98,21 @@ export function DriverLogin({onSubmit}){
     }
 
     useEffect(() => {
+        const cachedDriver = localStorage.getItem('driver');
+        const submitted = localStorage.getItem('submitted');
+        if (cachedDriver) {
+            const parsedDriver = JSON.parse(cachedDriver);
+            setDriver(parsedDriver);
+            setSubmitted(submitted);
+        }
+    },[]);
+
+    useEffect(() => {
         if (driver.id !== null && submitted) {
             console.log('Driver logged in', driver);
         }
+        window.localStorage.setItem('driver', JSON.stringify(driver));
+        window.localStorage.setItem('submitted', submitted);
     }, [driver, submitted]); // This will log the driver when state changes and is not null
         
     console.log("In the DriverLogin")

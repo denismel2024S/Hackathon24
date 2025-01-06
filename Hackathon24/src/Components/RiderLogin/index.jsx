@@ -27,8 +27,6 @@ export function RiderLogin({onSubmit}){
     // TEST ENV CONSTANT
     const [riderTest, setRiderTest] = useState(null);
 
-    
-    
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormData((prevData) => ({ ...prevData, [name]: value}));
@@ -42,10 +40,10 @@ export function RiderLogin({onSubmit}){
     };
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Rider Information:', formData);
-    setSubmitted(true)
-    axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+        e.preventDefault();
+        console.log('Rider Information:', formData);
+        setSubmitted(true)
+        axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
 
         try {
             console.log("Retrieving riders by phone number")
@@ -100,7 +98,7 @@ export function RiderLogin({onSubmit}){
                     dropoff_location: formData.dropoff,
                     driver_id: null,
                 };
-    
+
                 console.log(newRiderData);
                 
                 try{
@@ -126,17 +124,26 @@ export function RiderLogin({onSubmit}){
             }
         
         }
-        console.log('Rider logged in: ', rider)
-        console.log('Test Rider logged in: ', riderTest)
-
-
+    console.log('Rider logged in: ', rider)
+    console.log('Test Rider logged in: ', riderTest)
 
     }
         
     useEffect(() => {
+        const cachedRider = window.localStorage.getItem('rider');
+        const submitted = window.localStorage.getItem('submitted');
+        if (cachedRider) {
+            const parsedRider = JSON.parse(cachedRider);
+            setRider(parsedRider);
+            setSubmitted(submitted);
+        }
+    }, []);
+    useEffect(() => {
             if (rider.id !== null) {
                 console.log('Rider logged in', rider);
             }
+            window.localStorage.setItem('rider', JSON.stringify(rider));
+            window.localStorage.setItem('submitted', submitted);
         }, [rider]); // This will log the driver when state changes and is not null
 
 

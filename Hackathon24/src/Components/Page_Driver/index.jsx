@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import CurrentQueuePassengerInfoCard from "../current_queue_passenger_info_card";
 import axios from "axios";
-import MapCard from "../map_card"
-import MapWithDirections from "../map_with_directions";
-import ButtonContainer from "../queue_nav_container";
 import QueueTable from "../queue_table";
 import './index.css';
 
 
 export function PageDriver({formData, driver, setDriver, socket}) {
-    const [connectedUsers, setConnectedUsers] = useState([])
+    const [connectedUsers, setConnectedUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
-
     const previousUsers = useRef([])
     const socketRef = useRef(null);
     
@@ -31,6 +27,7 @@ export function PageDriver({formData, driver, setDriver, socket}) {
 
         const WSURL = `ws://localhost:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
+        window.localStorage.setItem('driver', JSON.stringify(driver));
     
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
@@ -146,9 +143,6 @@ export function PageDriver({formData, driver, setDriver, socket}) {
 
     // Wait until the driver data is available before rendering
     // Show loading until the driver data is fetched
-    if (!driver) {
-        return <h1>Loading driver information...</h1>; 
-    }
     return(
         <>
             <div>

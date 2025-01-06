@@ -2,11 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import DriverInfoCardContainer from "../driver_info_card_container";
 import axios from "axios";
 import CurrentQueueDriverInfoCard from "../current_queue_driver_info_card";
-import MapCard from "../map_card";
-import LocationForm from "../location_form";
-import RiderMap from "../rider_map";
-import useWebSocket from 'react-use-websocket'
-import throttle from "lodash.throttle";
 
 
 export function PageRider({formData, rider, setRider, updateRiderData}){
@@ -53,15 +48,20 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
 
         const WSURL = `ws://localhost:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
+        window.localStorage.setItem('rider', JSON.stringify(rider));
 
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
+            localStorage.setItem('rider', JSON.stringify(rider));
+            const cached = localStorage.getItem('rider');
+            console.log('Rider:', cached);
         }
 
         socketRef.current.onmessage = (e) => {
             console.log("Raw message from server:", e.data); // Debug the raw message
 
             try {
+                localStorage.setItem('rider', JSON.stringify(rider));
                 const parsedMessage = JSON.parse(e.data); // Parse the incoming WebSocket message
                 console.log("Parsed message:", parsedMessage); // Debug the parsed message
         
@@ -116,27 +116,30 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
 
     // FETCH DRIVER INFO FROM DB IF INQUEUE CHANGES TO TRUE AND RIDER.DRIVER_ID IS SET AS NON NULL
     useEffect(() => {
-        if (rider.driver_id && inQueue) {
+        if (rider.driver_id) {
             fetchDriverInfoById(rider.driver_id);
-        }
-    }, [inQueue, rider.driver_id]);
-
-    // TEST USEEFFECT
-
-    // Set `inQueue` state based on `rider.driver_id`
-    useEffect(() => {
-        if (!rider.driver_id){
-            setInQueue(false);
+            setInQueue(true);
+            console.log("rider", localStorage.getItem('rider'));
         } else {
-            setInQueue(true)
+            setInQueue(false);
         }
-    }, [rider.driver_id]);
+        window.localStorage.setItem('inQueue', inQueue);
+    }, [inQueue, rider.driver_id]);
+    useEffect(() => {
+        const rider = window.localStorage.getItem('rider');
+        const inQueue = window.localStorage.getItem('inQueue');
+        if (rider) {
+            const parsedRider = JSON.parse(rider);
+            setInQueue(inQueue);
+            setRider(parsedRider);
+
+            console.log('Rider:', rider);
+        }
+    }, []);
 
 
     console.log('Form Data:', formData);
     console.log('In the PageRider component');
-
-    console.log(rider);
 
     if (inQueue === null) {
         return <p>Loading...</p>; // Show loading state until `inQueue` is determined

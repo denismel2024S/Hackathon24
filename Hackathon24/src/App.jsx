@@ -1,45 +1,17 @@
-// import { useState } from 'react'
-// import './App.css'
-// import './main.jsx'
-// import {Routes, Route} from 'react-router-dom'
-// import PageMain from "./components/Page_Main"
-
-
-// function App() {
-
-//   return (
-//     <>
-//     <PageMain/>
-//     </>
-//   )
-// }
-
-// export default App
-
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import './main.jsx'
-import {Routes, Route} from 'react-router-dom'
-import PageMain from "./Components/Page_Main/index.jsx"
-import {PageRider} from './components/Page_Rider/index.jsx'
-import {PageDriver} from './components/Page_Driver/index.jsx'
-import PageSignin from './Components/Page_Signin/index.jsx'
-import Sidebar from './Components/sidebar/index.jsx'
 import {RiderLogin} from './Components/RiderLogin/index.jsx'
 import {DriverLogin} from './Components/DriverLogin/index.jsx'
 import { UserProvider } from "./context/UserContext";
-
+import {Reset} from './Components/Reset/index.jsx'
 
 const App = () => {
     const [showCodeInput, setShowCodeInput] = useState(false);
     const [code, setCode] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [isRider, setIsRider] = useState(false);
-    const [isDriver, setIsDriver] = useState(false);
-    const [username, setUsername] = useState(''); 
-    const correctCode = '1234';
-
+    const [driverOrRider, setDriverOrRider] = useState('');
+    const correctCode = '1';
 
     const handlePassengerButtonClick = () => {
         setShowCodeInput(true);
@@ -47,12 +19,11 @@ const App = () => {
         setCode('');
     };
     const handleDriverButtonClick = () => {
-        console.log("Clicked Login")
-        setIsDriver(true);
+        setDriverOrRider('driver');
     };
     const handleCodeSubmit = () => {
         if(code == correctCode){
-            setIsRider(true);
+            setDriverOrRider('rider');
             setErrorMessage('');
         }else{
             setErrorMessage('Invalid code');
@@ -60,24 +31,36 @@ const App = () => {
         }
     };
 
+    useEffect(() => {
+        const driverOrRider = window.localStorage.getItem('driverOrRider');
+        if(driverOrRider){
+            setDriverOrRider(driverOrRider);
+        }
+    }, []);
 
+    useEffect(() => {
+        console.log('driverOrRider:', driverOrRider);
+        window.localStorage.setItem('driverOrRider', driverOrRider);
+    }, [driverOrRider]);
 
-
-    if(isRider){
-        console.log({username})
+    if(driverOrRider === 'rider'){
         return(
             <UserProvider>
                 <div>
-                    {username ? <PageRider username = {username}/> : <RiderLogin onSubmit = {setUsername}/>}
+                    <RiderLogin/>
                 </div>
+                <Reset/>
+                {/*MAKE THIS A COMPONENT*/}
             </UserProvider>
         );
-    }else if(isDriver){
+    }else if(driverOrRider === 'driver'){
         return (
             <UserProvider>
                 <div>
                     <DriverLogin/>
                 </div>
+                <Reset/>
+                {/*TODO: MAKE THIS A COMPONENT*/}
             </UserProvider>
         );
     }

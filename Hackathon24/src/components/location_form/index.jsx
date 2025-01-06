@@ -1,7 +1,6 @@
 // LocationForm.js
 import React, { useState, useEffect } from 'react';
-import MapWithDirections from '../map_with_directions';
-
+import MapWithDirections from './MapWithDirections';
 const LocationForm = ({ onSubmit }) => {
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
