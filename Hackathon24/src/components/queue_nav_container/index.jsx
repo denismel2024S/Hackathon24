@@ -13,7 +13,24 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
   const currentPassenger = { name: 'John Doe' }; // Example passenger data
 
    // Update current location dynamically
-   
+   useEffect(() => {
+    // Send queueStatusUpdate when the component loads
+    const message = {
+      driverId: driverId,  // driver's ID
+      riderId: riderId,    // rider's ID
+      action: "queueStatusUpdate",
+      status: "in progress",
+    };
+
+    setArrivedAtPickup(false);
+
+    try {
+      socket.send(JSON.stringify(message));
+      console.log("Sent status update on component load:", message);
+    } catch (err) {
+      console.error("Failed to send status update on component load:", err);
+    }
+  }, [driverId, riderId, socket]); // Run this effect when these values change
 
   const handleArrivedPickup = () => {
     MySwal.fire({
@@ -26,12 +43,13 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
       confirmButtonText: 'Yes, arrived!'
     }).then((result) => {
       if (result.isConfirmed) {
-        
+        setArrivedAtPickup(true);
+
         const message = {
           driverId: driverId,  // driver's ID
           riderId: riderId,    // rider's ID
           action: "queueStatusUpdate",
-          message: "Arrived at the designated pickup location.",
+          status: "arrived at rider location",
         };
 
         try {
@@ -40,7 +58,6 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
             console.log(message);
 
             // Update state after the action
-            setArrivedAtPickup(true);
             MySwal.fire('Confirmed!', 'You have arrived at the pickup location.', 'success');
         } catch (err) {
             console.error("Failed to update queue", err);
