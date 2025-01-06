@@ -9,6 +9,7 @@ const QueueTable = ({ filteredUsers }) => {
         <thead>
           <tr>
             <th>Q#</th>
+            <th>Status</th>
             <th>Username</th>
             <th>Rider ID</th>
             <th>Phone Number</th>
@@ -20,6 +21,7 @@ const QueueTable = ({ filteredUsers }) => {
           {filteredUsers.map((user, index) => (
             <tr key={user.queue_id}>
               <td className="queue-number">{index + 1}</td>
+              <td>{user.status}</td>
               <td>{user.username}</td>
               <td>{user.riderId}</td>
               <td>{user.phoneNumber}</td>

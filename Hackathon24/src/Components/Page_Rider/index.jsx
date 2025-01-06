@@ -169,6 +169,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                     socket={socketRef.current}
                                     updateRiderData={updateRiderData}
                                     queuePosition={queue ? queue.position : "Loading..."}
+                                    status={queue ? queue.status : "Loading..."}
+
                                 />
                             </div>
                         )}

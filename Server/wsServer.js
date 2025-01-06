@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId } = require('./database'); // Import the database functions
+const { addDriver, addRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -389,6 +389,7 @@ wsServer.on("connection", (connection, request) => {
                         dropoffLocation: row.dropoff_location,
                         startTime: row.created_at,
                         queueId: row.queue_id,
+                        status: row.status
                     }));
         
                     // Send full queue data to the driver
@@ -434,6 +435,7 @@ wsServer.on("connection", (connection, request) => {
                                     pickupLocation: row.pickup_location,
                                     dropoffLocation: row.dropoff_location,
                                     startTime: row.created_at,
+                                    status: row.status
                                 },
                             };
 
@@ -453,32 +455,50 @@ wsServer.on("connection", (connection, request) => {
             });
         }
         if (data.action === "queueStatusUpdate") {
-            const { driverId, riderId, message } = data;
-
+            const { driverId, riderId, status } = data;
+          
             let riderFound = null;
             let riderConnection = null;
-    
+          
             for (let riderUuid in riders) {
-                if (Number(riders[riderUuid].id) === Number(riderId)) {
-                    riderFound = riders[riderUuid];
-                    riderConnection = connections[riderUuid];
-                    console.log("Rider found");
-                    break;
-                }
+              if (Number(riders[riderUuid].id) === Number(riderId)) {
+                riderFound = riders[riderUuid];
+                riderConnection = connections[riderUuid];
+                console.log("Rider found");
+                break;
+              }
             }
-
+          
             if (riderFound) {
-                const update = JSON.stringify(message)
-
-                console.log(`Driver (ID: ${driverId}) sent message to Rider (ID: ${riderId}; Message: ${update})`);
-                setTimeout(() => {
-                    riderConnection.send(update)
-                    broadcastDrivers();
-                    broadcastRiders();
-                }, 100);
+              // Update the queue status and send the updated queue to the rider
+              updateQueueStatus(riderId, driverId, status, (err, updatedQueue) => {
+                if (err) {
+                  console.error("Failed to update status:", err);
+                } else {
+                  console.log("Status updated successfully. Updated queue:", updatedQueue);
+          
+                  // Construct the WebSocket message for the rider
+                  const message = {
+                    type: "rider_queue",
+                    data: updatedQueue,
+                  };
+          
+                  if (riderConnection && riderConnection.readyState === WebSocket.OPEN) {
+                    console.log(`Sending updated queue to Rider (ID: ${riderId}):`, message);
+          
+                    setTimeout(() => {
+                      riderConnection.send(JSON.stringify(message));
+                      broadcastDrivers();
+                      broadcastRiders();
+                    }, 100);
+                  } else {
+                    console.error("Rider connection is not open or valid.");
+                  }
+                }
+              });
             }
-
-        }
+          }
+          
 
 
     });

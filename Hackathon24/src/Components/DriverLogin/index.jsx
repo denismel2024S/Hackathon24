@@ -13,7 +13,7 @@ export function DriverLogin({onSubmit}){
         queue_length: 0,
     });
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({  
         name: '',
         phone: '',
     });
@@ -47,7 +47,7 @@ export function DriverLogin({onSubmit}){
             // Attempt to retrieve the driver by phone number
             const response = await axios.get(`/api/driver/by-phone/${formData.phone}`);
             console.log("GET request sent");
-    
+                 
             if (response.data) {
                 // If driver found, update driver data state
                 console.log("Driver by phone number retrieved:", response.data);

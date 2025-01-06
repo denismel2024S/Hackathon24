@@ -14,7 +14,7 @@ const db = new sqlite3.Database('./app.db');
 
 // Create tables if they don't already exist
 db.serialize(() => {
-  // Create drivers table
+  // Create drivers table 
   db.run(`
     CREATE TABLE IF NOT EXISTS drivers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,18 +37,37 @@ db.serialize(() => {
     );
   `);
 
-  // Create queue table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS queue (
+  // // Create queue table
+  // db.run(`
+  //   CREATE TABLE IF NOT EXISTS queue (
+  //   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //   rider_id INTEGER NOT NULL,
+  //   driver_id INTEGER NOT NULL,
+  //   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  //   ended_at DATETIME,
+  //   FOREIGN KEY (rider_id) REFERENCES riders(id),
+  //   FOREIGN KEY (driver_id) REFERENCES drivers(id)
+  //   );
+  // `);
+
+  // TEST QUEUE DATABASE
+
+  // Create queue table with status column
+db.run(`
+  CREATE TABLE IF NOT EXISTS queue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     rider_id INTEGER NOT NULL,
     driver_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     ended_at DATETIME,
+    status TEXT DEFAULT 'In queue', -- Add status column with a default value
     FOREIGN KEY (rider_id) REFERENCES riders(id),
     FOREIGN KEY (driver_id) REFERENCES drivers(id)
-    );
-  `);
+  );
+`);
+
+// END TEST QUEUE DATABASE
+
 });
 
 console.log("Database and tables are ready.");
@@ -314,12 +333,13 @@ function updateQueueAndResetDriver(riderId, queueId, callback = () => {}) {
   db.serialize(() => {
     // Update the queue's ended_at time
     const updateQueueStmt = db.prepare(`
-      UPDATE queue 
-      SET ended_at = ? 
+      UPDATE queue
+      SET ended_at = ?, status = ?
       WHERE id = ?
+      RETURNING id AS queue_id, created_at, ended_at, status, rider_id, driver_id
     `);
-
-    updateQueueStmt.run(endTime, queueId, (err) => {
+  
+    updateQueueStmt.get([endTime, "terminated", queueId], (err) => {
       if (err) {
         console.error("Error updating queue end time:", err);
         callback(err);
@@ -349,6 +369,37 @@ function updateQueueAndResetDriver(riderId, queueId, callback = () => {}) {
     });
 
     updateQueueStmt.finalize();
+  });
+}
+
+/**
+ * Update the status of a queue entry and return the updated queue object.
+ * 
+ * @param {*} riderId - The ID of the rider.
+ * @param {*} driverId - The ID of the driver.
+ * @param {*} status - The new status to set.
+ * @param {*} callback - Callback to handle the result (err, queue).
+ */
+function updateQueueStatus(riderId, driverId, status, callback = () => {}) {
+  db.serialize(() => {
+    const updateStmt = db.prepare(`
+      UPDATE queue
+      SET status = ?
+      WHERE rider_id = ? AND driver_id = ?
+      RETURNING id AS queue_id, created_at, status, rider_id, driver_id
+    `);
+
+    updateStmt.get([status, riderId, driverId], (err, row) => {
+      if (err) {
+        console.error("Error updating queue status:", err);
+        callback(err, null);
+      } else {
+        console.log("Queue status updated successfully:", row);
+        callback(null, row); // Return the updated queue object
+      }
+    });
+
+    updateStmt.finalize();
   });
 }
 
@@ -385,6 +436,7 @@ function getQueuesForDriver(driverId, callback) {
       SELECT 
         q.id AS queue_id,
         q.created_at,
+        q.status,
         r.id AS rider_id,
         r.username,
         r.phone_number,
@@ -402,7 +454,7 @@ function getQueuesForDriver(driverId, callback) {
         console.error("Error retrieving queue with riders:", err);
         callback(err, null);
       } else {
-        console.log("Retrieved queue with riders:", rows);
+        console.log("Retrieved queue with riders and statuses:", rows);
 
         // Count the number of rows returned
         const queueLength = rows.length;
@@ -480,5 +532,6 @@ module.exports = {
   getRiderByPhoneNumber,
   getQueueByRiderId,
   getQueuesForDriver,
-  updateQueueAndResetDriver
+  updateQueueAndResetDriver,
+  updateQueueStatus
 };
