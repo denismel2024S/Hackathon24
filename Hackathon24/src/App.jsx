@@ -3,7 +3,6 @@ import './App.css'
 import './main.jsx'
 import {RiderLogin} from './Components/RiderLogin/index.jsx'
 import {DriverLogin} from './Components/DriverLogin/index.jsx'
-import { UserProvider } from "./context/UserContext";
 import {Reset} from './Components/Reset/index.jsx'
 
 const App = () => {
@@ -45,23 +44,17 @@ const App = () => {
 
     if(driverOrRider === 'rider'){
         return(
-            <UserProvider>
                 <div>
                     <RiderLogin/>
+                    <Reset/>
                 </div>
-                <Reset/>
-                {/*MAKE THIS A COMPONENT*/}
-            </UserProvider>
         );
     }else if(driverOrRider === 'driver'){
         return (
-            <UserProvider>
                 <div>
                     <DriverLogin/>
+                    <Reset/>
                 </div>
-                <Reset/>
-                {/*TODO: MAKE THIS A COMPONENT*/}
-            </UserProvider>
         );
     }
     else {

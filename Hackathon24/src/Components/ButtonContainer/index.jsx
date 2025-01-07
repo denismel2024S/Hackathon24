@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
 
 import withReactContent from 'sweetalert2-react-content';
-
 
 const MySwal = withReactContent(Swal);
 
 const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedAtPickup}) => {
   const [arrivedAtDestination, setArrivedAtDestination] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState(location);
 
   const currentPassenger = { name: 'John Doe' }; // Example passenger data
 
@@ -49,7 +47,7 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
           driverId: driverId,  // driver's ID
           riderId: riderId,    // rider's ID
           action: "queueStatusUpdate",
-          status: "arrived at rider location",
+          status: "Arrived At Rider's Location",
         };
 
         try {

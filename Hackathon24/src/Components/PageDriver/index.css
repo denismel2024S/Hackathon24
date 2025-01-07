@@ -14,64 +14,64 @@
     font-size: 1.8rem;
     text-align: center;
     margin-bottom: 20px;
-    color: #333 !important;
+    color: #333 ;
     font-weight: bold;
     text-transform: uppercase;
 }
 
 /* Table styling */
 .driver-queue-container .queue-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin: 0 auto !important;
-    background-color: white !important;
-    border: 1px solid #ddd !important;
+    width: 100% ;
+    border-collapse: collapse ;
+    margin: 0 auto ;
+    background-color: white ;
+    border: 1px solid #ddd ;
 }
 
 /* Header row styling */
 .driver-queue-container .queue-table th {
-    background-color: #4CAF50 !important;
-    color: white !important;
-    padding: 12px 15px !important;
-    text-align: left !important;
-    font-weight: bold !important;
+    background-color: #4CAF50 ;
+    color: white ;
+    padding: 12px 15px ;
+    text-align: left ;
+    font-weight: bold ;
     text-transform: uppercase;
 }
 
 /* Body row styling */
 .driver-queue-container .queue-table td {
-    padding: 10px 15px !important;
-    text-align: left !important;
-    border-bottom: 1px solid #ddd !important;
-    color: #333 !important;
+    padding: 10px 15px ;
+    text-align: left ;
+    border-bottom: 1px solid #ddd ;
+    color: #333 ;
 }
 
 /* Queue numbers styling */
 .driver-queue-container .queue-table .queue-number {
-    font-weight: bold !important;
-    color: #4CAF50 !important;
+    font-weight: bold ;
+    color: #4CAF50 ;
 }
 
 /* Hover effect for rows */
 .driver-queue-container .queue-table tr:hover {
-    background-color: #f1f1f1 !important;
+    background-color: #f1f1f1 ;
 }
 
 /* Alternate row background for better readability */
 .driver-queue-container .queue-table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9 !important;
+    background-color: #f9f9f9 ;
 }
 
 /* Remove extra padding/margin for the table */
 .driver-queue-container .queue-table thead th,
 .driver-queue-container .queue-table tbody td {
-    border-left: none !important;
-    border-right: none !important;
+    border-left: none ;
+    border-right: none ;
 }
 
 /* Ensure no other styles conflict */
 .driver-queue-container .queue-table,
 .driver-queue-container .queue-table * {
     all: unset;
-    all: revert !important; /* Reset styles to browser defaults */
+    all: revert ; /* Reset styles to browser defaults */
 }

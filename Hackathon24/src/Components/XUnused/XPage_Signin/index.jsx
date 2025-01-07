@@ -1,6 +1,6 @@
 import './index.css'
 import React from 'react'
-import LoginCard from '../login_card';
+import LoginCard from '../Xlogin_card';
 
 const PageSignin = ({ onLogin }) => {
     return (

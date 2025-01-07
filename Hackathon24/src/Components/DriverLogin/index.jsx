@@ -1,9 +1,8 @@
 import {useState, useEffect} from 'react'
-import {PageDriver} from '../Page_Driver'
+import {PageDriver} from '../PageDriver'
 import axios from 'axios';
 
-
-export function DriverLogin({onSubmit}){
+export function DriverLogin({}){
     const[submitted, setSubmitted] = useState(false)
 
     const [driver, setDriver] = useState({
@@ -39,7 +38,8 @@ export function DriverLogin({onSubmit}){
         e.preventDefault();
         console.log('Driver Information:', formData);
         setSubmitted(true)
-        axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+        //axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+        axios.defaults.baseURL = 'http://192.168.1.45:5433'; // Replace with your server's base URL if necessary
 
         try {
             console.log("Retrieving driver by phone number");
@@ -120,7 +120,7 @@ export function DriverLogin({onSubmit}){
     if(submitted){
         return(
             <div>
-                {driver && driver.id ? (
+                {driver  ? (
                     <div>
                         <PageDriver formData = {formData} driver={driver} setDriver={setDriver}/>
                     </div>

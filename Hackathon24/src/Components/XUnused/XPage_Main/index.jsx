@@ -1,8 +1,8 @@
 import React, { useState} from "react";
-import Sidebar from "../sidebar";
-import PageSignin from "../Page_Signin";
+import Sidebar from "../Xsidebar";
+import PageSignin from "../XPage_Signin";
 //import PageDriver from "../Page_Driver";
-import {PageRider} from "../Page_Rider";
+import {PageRider} from "../../PageRider";
 
 const PageMain = () => {
     

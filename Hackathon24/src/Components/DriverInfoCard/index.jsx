@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 
 const DriverInfoCard = ({ driver, riderId, socket, rider, inQueue, setInQueue, updateRiderData }) => {
     const [joining, setJoining] = useState(false);
     const [error, setError] = useState(null);
 
     // Update the front-end UI when the rider's queue status changes
-
 
     const handleQueueAction = async (event) => {
         event.preventDefault(); // Prevent the default form submission
@@ -49,7 +48,7 @@ const DriverInfoCard = ({ driver, riderId, socket, rider, inQueue, setInQueue, u
     };
 
 
-    const { username, id, phone_number, queue_length } = driver; // Destructure properties from the `driver` object
+    //const { username, id, phone_number, queue_length } = driver; // Destructure properties from the `driver` object
 
     return (
         <div className="col">

@@ -517,12 +517,8 @@ wsServer.on("connection", (connection, request) => {
             broadcastRiders()
         }
         delete connections[uuid]
-        //delete users[uuid]
-        //broadcastUsers()
     })
 
-    //connection.on("message", message => handleMessage(message, uuid))
-    //connection.on("close", () => handleClose(uuid))
 })
 
 // Broadcast function to send data to all connected WebSocket clients

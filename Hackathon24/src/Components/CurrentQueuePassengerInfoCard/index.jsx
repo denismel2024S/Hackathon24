@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import MapWithDirections from "../map_with_directions";
-import ButtonContainer from "../queue_nav_container";
+import ButtonContainer from "../ButtonContainer";
 
 const MySwal = withReactContent(Swal);
 

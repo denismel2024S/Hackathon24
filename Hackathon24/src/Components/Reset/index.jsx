@@ -1,5 +1,3 @@
-import {useState, useEffect} from 'react';
-
 export function Reset({}){
     const handleClear = () => {
         window.localStorage.clear();

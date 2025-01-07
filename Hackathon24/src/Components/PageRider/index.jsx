@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import DriverInfoCardContainer from "../driver_info_card_container";
+import DriverInfoCardContainer from "../DriverInfoCardContainer";
 import axios from "axios";
-import CurrentQueueDriverInfoCard from "../current_queue_driver_info_card";
+import CurrentQueueDriverInfoCard from "../CurrentQueueDriverInfoCard";
 
 
 export function PageRider({formData, rider, setRider, updateRiderData}){
@@ -12,7 +12,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     const [driver, setDriver] = useState(null); // Start as null for better checks
     const [queue, setQueue] = useState(null); // Queue status 
 
-    axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+    //axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+    axios.defaults.baseURL = 'http://192.168.1.45:5433'; // Replace with your server's base URL if necessary
 
     const fetchDriverInfoById = async (driverId) => {
         try {
@@ -46,7 +47,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             driver_id: rider?.driver_id,
         }).toString();
 
-        const WSURL = `ws://localhost:8080?${queryParams}`
+        //const WSURL = `ws://localhost:8080?${queryParams}`
+        const WSURL = `ws://192.168.1.45:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
 
         socketRef.current.onopen = () => {

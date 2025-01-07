@@ -1,7 +1,7 @@
 import React from "react";
 
 import './index.css'
-import SigninSignoutButton from "../signin_signout_button";
+import SigninSignoutButton from "../Xsignin_signout_button";
 
 const Sidebar = () => {
     const loggedIn = true; // test to see if display updates when user is logged in/out

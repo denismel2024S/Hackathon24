@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'; // Ensure useRef is included
-import {PageRider} from '../Page_Rider'
+import {PageRider} from '../PageRider'
 import axios from 'axios';
 
 export function RiderLogin({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
     
-
     const [rider, setRider] = useState({
         id: null,
         username: '',
@@ -24,9 +23,6 @@ export function RiderLogin({onSubmit}){
       });
 
 
-    // TEST ENV CONSTANT
-    const [riderTest, setRiderTest] = useState(null);
-
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormData((prevData) => ({ ...prevData, [name]: value}));
@@ -43,15 +39,13 @@ export function RiderLogin({onSubmit}){
         e.preventDefault();
         console.log('Rider Information:', formData);
         setSubmitted(true)
-        axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+        //axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+        axios.defaults.baseURL = 'http://192.168.1.45:5433'; // Replace with your server's base URL if necessary
 
         try {
             console.log("Retrieving riders by phone number")
-
             const response = await axios.get(`/api/rider/by-phone/${formData.phone}`);
             console.log("GET request sent")
-
-
             if (response.data){
                 console.log((response.data));
                 console.log("riders by phone number retrieved")
@@ -125,16 +119,14 @@ export function RiderLogin({onSubmit}){
         
         }
     console.log('Rider logged in: ', rider)
-    console.log('Test Rider logged in: ', riderTest)
 
     }
         
     useEffect(() => {
-        const cachedRider = window.localStorage.getItem('rider');
+        const rider = window.localStorage.getItem('rider');
         const submitted = window.localStorage.getItem('submitted');
-        if (cachedRider) {
-            const parsedRider = JSON.parse(cachedRider);
-            setRider(parsedRider);
+        if (rider) {
+            setRider(JSON.parse(rider));
             setSubmitted(submitted);
         }
     }, []);
@@ -145,7 +137,6 @@ export function RiderLogin({onSubmit}){
             window.localStorage.setItem('rider', JSON.stringify(rider));
             window.localStorage.setItem('submitted', submitted);
         }, [rider]); // This will log the driver when state changes and is not null
-
 
 
     console.log("In the RiderLogin")

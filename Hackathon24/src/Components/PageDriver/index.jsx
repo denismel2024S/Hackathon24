@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import CurrentQueuePassengerInfoCard from "../current_queue_passenger_info_card";
+import CurrentQueuePassengerInfoCard from "../CurrentQueuePassengerInfoCard";
 import axios from "axios";
-import QueueTable from "../queue_table";
+import QueueTable from "../QueueTable";
 import './index.css';
-
 
 export function PageDriver({formData, driver, setDriver, socket}) {
     const [connectedUsers, setConnectedUsers] = useState([]);
@@ -11,7 +10,8 @@ export function PageDriver({formData, driver, setDriver, socket}) {
     const previousUsers = useRef([])
     const socketRef = useRef(null);
     
-    axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+    //axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
+    axios.defaults.baseURL = 'http://192.168.1.45:5433'; // Replace with your server's base URL if necessary
 
     useEffect(() => {
 
@@ -25,7 +25,8 @@ export function PageDriver({formData, driver, setDriver, socket}) {
             queue_length: driver.queue_length,
         }).toString();
 
-        const WSURL = `ws://localhost:8080?${queryParams}`
+        //const WSURL = `ws://localhost:8080?${queryParams}`
+        const WSURL = `ws://192.168.1.45:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
         window.localStorage.setItem('driver', JSON.stringify(driver));
     
@@ -171,22 +172,6 @@ export function PageDriver({formData, driver, setDriver, socket}) {
                     </div>
                 )}
                 
-
-                {/* {filteredUsers.map((user, index) => (
-                    <div>
-                        <CurrentQueuePassengerInfoCard
-                        key={index}
-                        name={user.username}
-                        phone={user.phone_number}
-                        location={user.pickup_location}
-                        destination={user.dropoff_location}
-                        socket={socketRef.current}
-                        riderId={user.id}
-                        driverId={driver.id}
-                        />
-                    </div>
-                ))} */}
-
                 <QueueTable
                 filteredUsers={filteredUsers}
                 />
