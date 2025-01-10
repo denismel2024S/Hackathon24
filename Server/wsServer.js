@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId } = require('./database'); // Import the database functions
+const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -91,26 +91,34 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        drivers[uuid] = {
-            type: 'driver',
-            id: id,
-            username: username,  // Use the updated username
-            phone_number: phone_number,
-            queue_length: queue_length // Leave the queue length unchanged
-        };
-        console.log(drivers[uuid]);
+        addOrUpdateDriver(username, phone_number, queue_length, uuid, drivers, (err, driver) => {
+            if (err) {
+              console.error("Error:", err);
+            } else {
+              console.log("Driver returned:", driver);
 
-        // END TEST CODE
+              drivers[uuid] = {
+                type: 'driver',
+                id: driver.id,
+                username: driver.username,  // Use the updated username
+                phone_number: driver.phone_number,
+                queue_length: driver.queue_length // Leave the queue length unchanged
+                };
+                console.log(drivers[uuid]);
+                const driverConnection = connections[uuid];
 
-        setTimeout(() => {
-            broadcastDrivers();
-            broadcastRiders();
-
-        }, 100); // Allow time for `addDriver` to complete
+        
+                setTimeout(() => {
+                    driverConnection.send(JSON.stringify(driver))
+                    broadcastDrivers();
+                    broadcastRiders();
+        
+                }, 100); // Allow time for `addDriver` to complete
+            }
+        });
 
     } else if (queryParams.type == "rider") {
         console.log("A rider has connected");
-        const { type, id, username, phone_number, pickup_location, dropoff_location, driver_id } = queryParams;
 
         // Add new user to database if not exists,
         // AND add user to websocket connection
@@ -122,24 +130,47 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        riders[uuid] = {
-            type: 'rider',
-            id: id,
-            username: username,  // Use the updated username
-            phone_number: phone_number,
-            pickup_location: pickup_location,
-            dropoff_location: dropoff_location,
-            driver_id: driver_id
-        };
-        console.log(riders[uuid]);
+        const { type, username, phone_number, pickup_location, dropoff_location, driver_id } = queryParams;
 
-        // END TEST CODE
+        console.log(queryParams)
+        
+        addOrUpdateRider(
+            username, 
+            phone_number, 
+            pickup_location, 
+            dropoff_location, 
+            driver_id, // Driver ID
+            uuid, 
+            riders, 
+            (err, rider) => {
+              if (err) {
+                console.error("Error:", err);
+              } else {
+                console.log("Rider returned:", rider);
 
-        setTimeout(() => {
-            broadcastDrivers();
-            broadcastRiders();
+                // create new connection with new/updated user info
+                riders[uuid] = {
+                    type: 'rider',
+                    id: rider.id,
+                    username: rider.username,  
+                    phone_number: rider.phone_number,
+                    pickup_location: rider.pickup_location,
+                    dropoff_location: rider.dropoff_location,
+                    driver_id: rider.driver_id || null,
+                };
+                console.log(riders[uuid]);
+                const riderConnection = connections[uuid];
 
-        }, 100); // Allow time for `addDriver` to complete
+
+                setTimeout(() => {
+                    riderConnection.send(JSON.stringify(rider))
+                    broadcastDrivers();
+                    broadcastRiders();
+
+                }, 100); // Allow time for `addDriver` to complete
+              }
+            }
+          );
 
     }
 
@@ -210,10 +241,8 @@ wsServer.on("connection", (connection, request) => {
                 // TEST MESSASGE
                 console.log("\n\nSTART TEST MESSAGE\n\n");
                 
-                riderConnection.send("I think I have your queue, sir.")
                 const riderString = JSON.stringify(riderFound)
                 console.log(riderString);
-                driverConnection.send("I think I have your queue, sir.")
                 const driverString = JSON.stringify(driverFound);
                 console.log(driverString);
 
@@ -499,6 +528,87 @@ wsServer.on("connection", (connection, request) => {
               });
             }
           }
+
+          if (data.action === "getDriverByPhoneNumber") {
+            const { driverId, riderId } = data;
+        
+            console.log(`Fetching driver information for Driver ID: ${driverId}, Rider ID: ${riderId}`);
+        
+            // Validate the provided driverId
+            if (!driverId) {
+                console.error("Invalid driver ID received.");
+                return;
+            }
+        
+            // Use the database function to retrieve the driver's information
+            getDriverById(driverId, (err, driver) => {
+
+                let riderFound = null;
+                let riderConnection = null;
+            
+                for (let riderUuid in riders) {
+                    if (Number(riders[riderUuid].id) === Number(riderId)) {
+                        riderFound = riders[riderUuid];
+                        riderConnection = connections[riderUuid];
+                        console.log("Rider found");
+                        break;
+                    }
+                }
+
+                if (err) {
+                    console.error("Failed to retrieve driver information:", err);
+        
+                    // Optionally, send an error response back to the client
+                    const errorMessage = {
+                        type: "error",
+                        message: "Failed to retrieve driver information.",
+                    };
+                    if (riderConnection?.readyState === WebSocket.OPEN) {
+                        riderConnection.send(JSON.stringify(errorMessage));
+                    }
+                    return;
+                }
+        
+                if (!driver) {
+                    console.error("No driver found with the given ID.");
+        
+                    // Send a "not found" response
+                    const notFoundMessage = {
+                        type: "driver",
+                        data: null, // No driver data available
+                    };
+                    if (riderConnection?.readyState === WebSocket.OPEN) {
+                        riderConnection.send(JSON.stringify(notFoundMessage));
+                    }
+                    return;
+                }
+        
+                console.log("Driver information retrieved successfully:", driver);
+        
+                // Send the driver's information back to the rider
+                const driverMessage = {
+                    type: "driver",
+                    data: driver,
+                };
+                
+                // Check if driverMessage.data is already an array and wrap it accordingly
+                if (Array.isArray(driverMessage.data)) {
+                    driverMessage.data = driverMessage.data[0]; // Take the first element if it is an array
+                }
+
+                try {
+                    setTimeout(() => {
+                        riderConnection.send(JSON.stringify(driverMessage));
+                    }, 100);
+                    console.log("Sent message:", driverMessage);
+                } catch (err) {
+                    console.error("Failed to send driver object", err);
+                }
+        
+                
+            });
+        }
+        
           
 
 

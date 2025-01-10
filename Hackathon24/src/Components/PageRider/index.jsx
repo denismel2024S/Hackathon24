@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import DriverInfoCardContainer from "../DriverInfoCardContainer";
-import axios from "axios";
 import CurrentQueueDriverInfoCard from "../CurrentQueueDriverInfoCard";
 
 
@@ -12,27 +11,6 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     const [driver, setDriver] = useState(null); // Start as null for better checks
     const [queue, setQueue] = useState(null); // Queue status 
 
-    //axios.defaults.baseURL = 'http://localhost:5433'; // Replace with your server's base URL if necessary
-    axios.defaults.baseURL = 'http://192.168.1.45:5433'; // Replace with your server's base URL if necessary
-
-    const fetchDriverInfoById = async (driverId) => {
-        try {
-            const response = await axios.get(`/api/driver/by-id/${driverId}`);
-            if (response.data) {
-                setDriver({
-                    id: response.data.id,
-                    username: response.data.username,
-                    phone_number: response.data.phone_number,
-                    queue_length: response.data.queue_length,
-                });
-            } else {
-                setDriver(null);
-            }
-        } catch (error) {
-            console.error("Error fetching driver data:", error);
-        }
-    };
-    
 
     //queryParams adds ? to the url with the params
     //implement auto reconnection module ; read documentation
@@ -47,12 +25,27 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             driver_id: rider?.driver_id,
         }).toString();
 
-        //const WSURL = `ws://localhost:8080?${queryParams}`
-        const WSURL = `ws://192.168.1.45:8080?${queryParams}`
+        const WSURL = `ws://localhost:8080?${queryParams}`
+        // const WSURL = `ws://192.168.1.45:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
 
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
+
+            if(rider.driver_id){
+                const message = {
+                    driverId: rider.driver_id,  // driver's ID
+                    riderId: rider.id,
+                    action: "getDriverByPhoneNumber",
+                };
+            
+                try {
+                    socketRef.current.send(JSON.stringify(message));
+                    console.log("Sent message:", message);
+                } catch (err) {
+                    console.error("Failed to retrieve rider's current driver", err);
+                }
+            }
         }
 
         socketRef.current.onmessage = (e) => {
@@ -63,16 +56,38 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                 console.log("Parsed message:", parsedMessage); // Debug the parsed message
         
                 // Check if the message is for the current rider
-                if (parsedMessage.type === "rider" && parsedMessage.id === rider.id.toString()) {
+                if (parsedMessage.type === "rider") {
                     console.log("Message is for the current rider.");
         
 
-                    console.log(parsedMessage.driver_id);
+                    console.log(parsedMessage);
                     console.log(rider.driver_id);
 
+
+                    // fix issues where server returns string "null" instead of null
+                    const sanitizedDriverId = parsedMessage.driver_id === "null" ? null : Number(parsedMessage.driver_id);
+                    
                     updateRiderData({
-                        driver_id: parsedMessage.driver_id, // Rider is leaving the queue, so we reset driver_id
+                        driver_id: sanitizedDriverId, // Rider is leaving the queue, so we reset driver_id
+                        id: parsedMessage.id,
                       });
+
+
+                    if (sanitizedDriverId !== null){
+                        const message = {
+                            driverId: sanitizedDriverId,  // driver's ID
+                            riderId: rider.id,
+                            action: "getDriverByPhoneNumber",
+                        };
+                    
+                        try {
+                            socketRef.current.send(JSON.stringify(message));
+                            console.log("Sent message:", message);
+                        } catch (err) {
+                            console.error("Failed to retrieve rider's current driver", err);
+                        }
+
+                    }
 
                     console.log("Rider's driver_id updated:", parsedMessage.driver_id);
 
@@ -89,6 +104,15 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                     }));
         
                     console.log("Updated queue object:", parsedMessage.data);
+                }
+
+                if (parsedMessage.type === "driver") {
+                    console.log("Riders current driver info:", parsedMessage);
+        
+                    // Update the queue state with the new data
+                    setDriver(parsedMessage.data);
+        
+                    console.log("Updated driver object:", parsedMessage.data);
                 }
         
                 // Update the connected users if necessary
@@ -109,15 +133,31 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
         };
     }, [rider?.id, rider?.username, rider?.phone_number, rider?.pickup_location, rider?.dropoff_location,]);
 
+    
 
 
     // FETCH DRIVER INFO FROM DB IF INQUEUE CHANGES TO TRUE AND RIDER.DRIVER_ID IS SET AS NON NULL
     useEffect(() => {
-        if (rider.driver_id) {
-            fetchDriverInfoById(rider.driver_id);
+        if (rider.driver_id && socketRef.current) {
             setInQueue(true);
+            // const message = {
+            //     driverId: rider.driver_id,  // driver's ID
+            //     riderId: rider.id,
+            //     action: "getDriverByPhoneNumber",
+            // };
+        
+            // try {
+            //     setTimeout(() => {
+            //         socketRef.current.send(JSON.stringify(message));
+            //     }, 100);
+            //     console.log("Sent message:", message);
+            // } catch (err) {
+            //     console.error("Failed to retrieve rider's current driver", err);
+            // }
         }else{
             setInQueue(false);
+            setDriver(null);
+
         } 
         window.localStorage.setItem('rider', JSON.stringify(rider));
         window.localStorage.setItem('queue', JSON.stringify(queue));
@@ -155,6 +195,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
             <p><strong>Rider ID:</strong> {rider.id}</p>
             <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
+            <p><strong>inQueue:</strong> {inQueue === true ? "True" : "false"}</p>
+
             {inQueue ? (
                     <div>
                         {!driver?.id || !queue ? (

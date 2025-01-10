@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const QueueTable = ({ filteredUsers }) => {
+const QueueTable = ({ driverQueue }) => {
   return (
     <div className="driver-queue-container">
-      <h1 className="queue-title">Queue: {filteredUsers.length}</h1>
+      <h1 className="queue-title">Queue: {driverQueue.length}</h1>
       <table className="queue-table">
         <thead>
           <tr>
@@ -18,7 +18,7 @@ const QueueTable = ({ filteredUsers }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredUsers.map((user, index) => (
+          {driverQueue.map((user, index) => (
             <tr key={user.queue_id}>
               <td className="queue-number">{index + 1}</td>
               <td>{user.status}</td>
@@ -36,7 +36,7 @@ const QueueTable = ({ filteredUsers }) => {
 };
 
 QueueTable.propTypes = {
-  filteredUsers: PropTypes.arrayOf(
+  driverQueue: PropTypes.arrayOf(
     PropTypes.shape({
       queueId: PropTypes.number.isRequired,
       username: PropTypes.string.isRequired,
