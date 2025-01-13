@@ -60,6 +60,17 @@ const App = () => {
     else {
         return (
             <div>
+                <div
+                style={{
+                    backgroundImage: "url('src/images/fasho.png')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    height: "100vh",
+                    width: "133vh",
+                }}
+                className="flex flex-col items-center justify-center text-center text-white"
+                >  
                 <h1 className = "uppercase font-bold text-4xl sm:text-5xl md:text6xl lg:text7xl">Welcome to <span className = "text-blue-500">Chariot</span></h1>
                 <br></br>
                 <div className = "flex flex-col items-center gap-4">
@@ -79,6 +90,7 @@ const App = () => {
                         {errorMessage && <p style = {{color: 'red'}}>{errorMessage}</p>}
                     </div>
                 )}
+                </div>
                 </div>
 
             </div>
