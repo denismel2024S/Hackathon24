@@ -67,16 +67,16 @@ const App = () => {
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     height: "100vh",
-                    width: "133vh",
+                    width: "100vw",
                 }}
                 className="flex flex-col items-center justify-center text-center text-white"
                 >  
-                <h1 className = "uppercase font-bold text-4xl sm:text-5xl md:text6xl lg:text7xl">Welcome to <span className = "text-blue-500">Chariot</span></h1>
+                <h1 className = "uppercase font-bold text-4xl sm:text-5xl md:text6xl lg:text7xl">Welcome to <span className = "text-yellow-400">Chariot</span></h1>
                 <br></br>
                 <div className = "flex flex-col items-center gap-4">
                 <p className = "text-sm md:text-base font-light">Please Sign in</p>
-                <button className = "w-32 bg-blue-500 text-white py-2 rounded" onClick={handleDriverButtonClick}>Driver</button>
-                <button className = "w-32 bg-blue-500 text-white py-2 rounded" onClick={handlePassengerButtonClick}>Passenger</button>
+                <button className = "w-32 bg-yellow-600 text-white py-2 rounded" onClick={handleDriverButtonClick}>Driver</button>
+                <button className = "w-32 bg-yellow-600 text-white py-2 rounded" onClick={handlePassengerButtonClick}>Passenger</button>
                 {showCodeInput && (
                     <div className = "flex flex-row gap-4">
                     <br></br>
@@ -86,7 +86,7 @@ const App = () => {
                         onChange={(e) => setCode(e.target.value)}   
                         placeholder = "Enter Code"
                         />
-                        <button className = "w-32 bg-blue-500 text-white py-2 rounded" onClick = {handleCodeSubmit}>Submit</button>
+                        <button className = "w-32 bg-yellow-600 text-white py-2 rounded" onClick = {handleCodeSubmit}>Submit</button>
                         {errorMessage && <p style = {{color: 'red'}}>{errorMessage}</p>}
                     </div>
                 )}

@@ -89,7 +89,7 @@ export function DriverLogin({}){
             )
     }
     return (
-        <div>
+        <div className ="">
             <h1>Driver Information</h1>
             <br></br>
             <form onSubmit={handleSubmit}>
