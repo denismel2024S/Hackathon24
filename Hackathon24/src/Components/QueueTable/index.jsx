@@ -4,14 +4,11 @@ import PropTypes from "prop-types";
 const QueueTable = ({ driverQueue }) => {
   return (
     <div className="driver-queue-container">
-      <h1 className="queue-title">Queue: {driverQueue.length}</h1>
       <table className="queue-table">
         <thead>
           <tr>
             <th>Q#</th>
-            <th>Status</th>
-            <th>Username</th>
-            <th>Rider ID</th>
+            <th>Name</th>
             <th>Phone Number</th>
             <th>Pickup Location</th>
             <th>Dropoff Location</th>
@@ -21,9 +18,7 @@ const QueueTable = ({ driverQueue }) => {
           {driverQueue.map((user, index) => (
             <tr key={user.queue_id}>
               <td className="queue-number">{index + 1}</td>
-              <td>{user.status}</td>
               <td>{user.username}</td>
-              <td>{user.riderId}</td>
               <td>{user.phoneNumber}</td>
               <td>{user.pickupLocation}</td>
               <td>{user.dropoffLocation}</td>

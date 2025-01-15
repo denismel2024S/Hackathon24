@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import CurrentQueuePassengerInfoCard from "../CurrentQueuePassengerInfoCard";
 import QueueTable from "../QueueTable";
-import './index.css';
+//import './index.css';
 
 export function PageDriver({formData, driver, setDriver, socket, updateDriverData}) {
     const [connectedUsers, setConnectedUsers] = useState([]);
@@ -139,19 +139,17 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
     // Show loading until the driver data is fetched
     return(
         <>
-            <div>
-                <h1>Driver Information</h1>
-                <p><strong>Name:</strong> {driver.username}</p>
+            <h1 className = "greeting"><strong>Hello, </strong> {driver.username}</h1>
+            <h2 className = "queue"><strong>QUEUE: {filteredUsers.length}</strong></h2>
+            <div className="driverInformation">
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>
                 <p><strong>Real Queue Length:</strong> {filteredUsers.length}</p>
             </div>
-            <h1><strong>QUEUE: {filteredUsers.length}</strong></h1>
-            <br></br>
             <ul>
                 {/* Render the first person in the queue if it exists */}
                 {filteredUsers.length > 0 && (
-                    <div>
+                    <div className = "queueList">
                         <CurrentQueuePassengerInfoCard
                             key={0}
                             name={filteredUsers[0].username}
@@ -162,16 +160,9 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                             riderId={filteredUsers[0].riderId}
                             driverId={driver.id}
                         />
+                        <QueueTable driverQueue={filteredUsers}/>
                     </div>
                 )}
-                {filteredUsers.length > 0 && (
-                    <div>
-                        <QueueTable
-                        driverQueue={filteredUsers}
-                        />
-                    </div>
-                )}
-                
             </ul>
         </>
     );   

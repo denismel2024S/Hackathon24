@@ -1,10 +1,13 @@
-export function Reset({}){
+export function Reset(){
     const handleClear = () => {
-        window.localStorage.clear();
-        window.location.reload();
+        const response = confirm("Are you sure you want to clear all information?")
+        if(response){
+            window.localStorage.clear();
+            window.location.reload();
+        }
     };
     return(
-        <div>
+        <div className = "resetButton">
             <button onClick={handleClear}>Reset</button>
         </div>
     );

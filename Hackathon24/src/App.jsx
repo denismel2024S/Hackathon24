@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import './App.css'
+//import './App.css'
 import './main.jsx'
 import {RiderLogin} from './Components/RiderLogin/index.jsx'
 import {DriverLogin} from './Components/DriverLogin/index.jsx'
@@ -66,19 +66,17 @@ const App = () => {
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
-                    height: "100vh",
-                    width: "100vw",
                 }}
                 className="flex flex-col items-center justify-center text-center text-white"
                 >  
                 <h1 className = "uppercase font-bold text-4xl sm:text-5xl md:text6xl lg:text7xl">Welcome to <span className = "text-yellow-400">Chariot</span></h1>
                 <br></br>
                 <div className = "flex flex-col items-center gap-4">
-                <p className = "text-sm md:text-base font-light">Please Sign in</p>
-                <button className = "w-32 bg-yellow-600 text-white py-2 rounded" onClick={handleDriverButtonClick}>Driver</button>
-                <button className = "w-32 bg-yellow-600 text-white py-2 rounded" onClick={handlePassengerButtonClick}>Passenger</button>
+                <p>Please Sign in</p>
+                <button onClick={handleDriverButtonClick}>Driver</button>
+                <button onClick={handlePassengerButtonClick}>Passenger</button>
                 {showCodeInput && (
-                    <div className = "flex flex-row gap-4">
+                    <div> 
                     <br></br>
                     <input
                         type = "text"

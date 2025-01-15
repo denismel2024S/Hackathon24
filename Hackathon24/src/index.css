@@ -1,30 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/*
+padding: all
+padding: topbottom leftright
+padding: top leftright bottom
+padding: top right bottom left
+
+*/
 :root {
+  --primary: #ca8a04;
+  --secondary: #ca6104;
+  --green: #4caf50;
+  --red: #de6451;
+  --gray: #1a1a1a;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #767840;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #ae254a;
+#root {
+  display: flex;
 }
 
+body{
+  margin: 0;
+  display: flex;
+  display: flex; 
+  justify-content: center;
+  align-items: top;
+  background: rgb(39, 39, 39); 
+}
 
 h1 {
   font-size: 3.2em;
@@ -37,96 +43,103 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-  
-
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    background-color: transparent; /* Black background on hover */
-    color: white; /* White text on hover */
-    border-radius: 5px; /* Rounded corners */
-    border: 5px solid white; /* Optional: Black border */
-  }
-  button {
-    background-color: white; /* White background */
-    color: #bfa355 var(--tw-gradient-from-position); /* Black text */
-    padding: 10px 20px; /* Padding for better size */
-    font-size: 16px; /* Font size */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s, color 0.3s; /* Smooth hover effect */
-  }
-}
-
-.design{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  z-index: 2;
+  background-color: var(--secondary);
 }
 
 label{
   display: flex;
   flex-direction: column;
   font-weight: bold;
-  z-index: 2;
-}
-
-.idLogo{
-  font-size: 10rem;
-  color: #747bff;
-  z-index: 2;
-}
-
-.carLogo{
-  font-size: 5rem;
-  color:#b8bcff;
-  position: absolute;
-  top: 90%; 
-  z-index: 1;
+  padding: 30px 0px 30px 0px;
 }
 
 input{
+  border: 3px solid var(--secondary);
+  background-color: var(--gray);
+  border-radius: 10px;
   color: white; 
+  margin: 10px ;
+  padding: 5px;
+}
+/* Reset Button */
+.resetButton{
+  margin: 50px ;
+  align-self: flex-end;
+  color: red;
+}
+/* Driver Login Page Styles */
+.submit{
+  width: 100%;
+  background-color: #4CAF50;
+}
+    
+/* Driver Main Page */
+.greeting{
+  padding-top: 10px;
+  padding-left: 10px;
+  font-size: 2.8rem;
+}
+.queue{
+  width: 60%;
+  border: 5px solid var(--primary);
+  border-radius: 1px;
+  padding: 10px ;
+  margin: 20px ;
+  font-size: 3rem;
+  justify-self: center;
+}
+.driverInformation{
+  width: 50%;
+  border: 5px solid white; 
+  border-radius: 1px;
+  padding: 10px;
+  justify-self: center;
+}
+.currentPassengerName{
+  text-align: center;
+  line-height: 1.1;
+  font-size: 2.8rem;
+}
+.infoContainer p{
+  padding: 5px;
 }
 
-body{
-        margin: 0;
-        display: flex;
-        place-items: center;
-        min-width: 100vw;
-        min-height: 100vh;
-        display: flex; 
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(to right, #713f12, #7d1111); 
-      }
-      #root {
-        width: 100%;
-        max-width: 100vw;
-        padding: 16px;
+/* Queue Table Component */
+.queueList{
+  height: 50rem;
+  margin: 10rem 0px;
+  border-radius: 50px;
+  background-color: var(--gray);
+  padding: 25px;
+  border: 4px solid transparent;
+  overflow: hidden;
+}
+.driver-queue-container table.queue-table {
+  margin-top: 20px;
+}
 
-      }
-      @media (max-width: 768px) {
-        body {
-          background: linear-gradient(to right, #713f12, #931717);
-        }
+.driver-queue-container table.queue-table th,
+.driver-queue-container table.queue-table td {
+  padding: 5px; /* Add padding to cells for better readability */
+  text-align: left; /* Align text to the left */
+  border: 1px solid #ddd; /* Add borders to cells */
+}
+
+.driver-queue-container table.queue-table th {
+  background-color: rgb(78, 78, 78); /* Add a light background to header cells */
+  font-weight: bold; /* Make header text bold */
+}
+.mapButtons{
+  margin-top: 10px;
+  justify-self: center;
+}
+.google-maps-button{
+  background-color: var(--secondary);
+  margin: 20px;
+  justify-self: center;
+}
+.updateStatus{
+  background-color: var(--primary);
+  margin: 20px;
+  justify-self: center;
 }

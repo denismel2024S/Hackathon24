@@ -1,0 +1,43 @@
+/*
+flex direction column
+main axis top to bottom
+cross axis left to right
+
+justify content controls main axis
+align items controls cross axis
+justify top to bottom
+align left to right
+*/
+.driverInput {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw; /* Change to 100vw to take up the entire width of the viewport */
+}
+
+label {
+    width: 100%;
+}
+
+input {
+    width: 100%;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    height: 2rem;
+}
+
+p {
+    padding-bottom: 20px;
+}
+
+.submit {
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    background-color: #4CAF50; /* Optional: Add a background color */
+    color: white; /* Optional: Add text color */
+    border: none; /* Optional: Remove border */
+    cursor: pointer; /* Optional: Add cursor pointer */
+}

@@ -1,6 +1,17 @@
 import {useState, useEffect} from 'react'
 import {PageDriver} from '../PageDriver'
+//import './index.css'
 
+function formatToPhone(input){
+    // Find all digits in the input string using a regular expression
+    const phone = input.replace(/\D/g, ''); // Remove all non-digit characters
+  
+    // Check if there are exactly 10 digits
+    if (phone.length === 10) {
+      // Format the number as (xxx) - xxx - xxxx
+      return `(${phone.slice(0, 3)}) - ${phone.slice(3, 6)} - ${phone.slice(6)}`;
+    } 
+}
 export function DriverLogin({}){
     const[submitted, setSubmitted] = useState(false)
 
@@ -89,35 +100,33 @@ export function DriverLogin({}){
             )
     }
     return (
-        <div className ="">
+        <div className ="driverInput">
             <h1>Driver Information</h1>
-            <br></br>
             <form onSubmit={handleSubmit}>
                 <label>
-                    Name:
+                    <p className = "nameLabel">Name:</p>
                     <input
                         type="text"
                         name="name"
-                        value={formData.name}
+                        value={(formData.name)}
                         onChange={handleChange}
+                        placeholder='Chris Consigli...'
                         required
                     />
                 </label>
-                <br />
                 <label>
-                    Phone Number:
+                   <p className = "phoneLabel">Phone Number: </p> 
                     <input
-                        //type="tel"
-                        type="number"
+                        type="tel"
+                        //type="number"
                         name="phone"
-                        value={formData.phone}
+                        value={formatToPhone(formData.phone)}
                         onChange={handleChange}
+                        placeholder='123-456-7890...'
                         required
-                        pattern="[0-9]{10}" 
                     />
                 </label>
-                <br></br>
-                <button type="submit">Submit</button>
+                <button className = "submit" type="submit">Submit</button>
             </form>
         </div>
     );

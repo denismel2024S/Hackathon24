@@ -111,8 +111,8 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
     <div>
       {!arrivedAtPickup && (
         <button
+            className = "updateStatus"
             id="arrived-pickup"
-            className="btn btn-primary mt-3"
             onClick={handleArrivedPickup}
         >
             Arrived at Pickup
@@ -121,8 +121,8 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
 
       {arrivedAtPickup && !arrivedAtDestination && (
         <button
+            className = "updateStatus"
             id="arrived-destination"
-            className="btn btn-success mt-3"
             onClick={handleArrivedDestination}
         >
           Arrived at Destination
