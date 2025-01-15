@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react'
 import {PageDriver} from '../PageDriver'
+import {Reset} from '../Reset'
 //import './index.css'
 
 function formatToPhone(input){
@@ -82,29 +83,27 @@ export function DriverLogin({}){
     
     if(submitted){
         return(
-            <div>
-                {driver  ? (
-                    <div>
-                        <PageDriver 
-                        formData = {formData} 
-                        driver={driver} 
-                        setDriver={setDriver}
-                        updateDriverData={updateDriverData}
-                        />
-                    </div>
+            <>
+                {driver ? (
+                    <PageDriver 
+                    formData = {formData} 
+                    driver={driver} 
+                    setDriver={setDriver}
+                    updateDriverData={updateDriverData}
+                    />
                 ) : (
                     <div>Loading....</div>
                 )}
-            </div>
+            </>
             
             )
     }
     return (
         <div className ="driverInput">
-            <h1>Driver Information</h1>
-            <form onSubmit={handleSubmit}>
+            <h1 className = "pageTitle">Driver Information</h1>
+            <form className = "inputsContainer" onSubmit={handleSubmit}>
                 <label>
-                    <p className = "nameLabel">Name:</p>
+                    <p className = "fieldLabel">Name:</p>
                     <input
                         type="text"
                         name="name"
@@ -115,7 +114,7 @@ export function DriverLogin({}){
                     />
                 </label>
                 <label>
-                   <p className = "phoneLabel">Phone Number: </p> 
+                   <p className = "fieldLabel">Phone Number: </p> 
                     <input
                         type="tel"
                         //type="number"
@@ -127,6 +126,7 @@ export function DriverLogin({}){
                     />
                 </label>
                 <button className = "submit" type="submit">Submit</button>
+            <Reset/>
             </form>
         </div>
     );

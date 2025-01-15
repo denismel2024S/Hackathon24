@@ -45,28 +45,19 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
 
   return (
     <div className="card">
-      <div className="card-body">
-        <div className="d-flex align-items-center">
-          <div className="card-icon rounded-circle d-flex align-items-center justify-content-center">
-            <i className="bi bi-cart"></i>
-          </div>
-          <div className="ps-3">
-            <div id="driver-info">
-              <h3 className="card-title" id="driver-name"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
-              <p id="driver-phone"><b>Phone number: </b>{driver.phone_number}</p>
-              {/* <p><b>Queue Length: </b>{Number(driver.queue_length) + 1}</p> */}
-              <p><b>Queue Position: </b>{queuePosition}</p>
-              <p><b>Queue Status: </b>{status}</p>
-            </div>
-            <button 
-              type="button" 
-              onClick={handleLeaveQueue}
-              disabled={!inQueue}
-            >
-              {inQueue ? 'Leave Queue' : 'Leaving...'}
-            </button>
-          </div>
-        </div>
+      <div className="currentDriver">
+        <h3 className="driverName"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
+        <p><b>Phone number: </b>{driver.phone_number}</p>
+        <p><b>Queue Position: </b>{queuePosition}</p>
+        <p><b>Queue Status: </b>{status}</p>
+        <button 
+          className = "leaveQueueButton"
+          type="button" 
+          onClick={handleLeaveQueue}
+          disabled={!inQueue}
+        >
+          {inQueue ? 'Leave Queue' : 'Leaving...'}
+        </button>
       </div>
     </div>
   );

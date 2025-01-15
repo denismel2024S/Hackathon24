@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import DriverInfoCardContainer from "../DriverInfoCardContainer";
 import CurrentQueueDriverInfoCard from "../CurrentQueueDriverInfoCard";
+import {Reset} from "../Reset"
 
 
 export function PageRider({formData, rider, setRider, updateRiderData}){
@@ -25,8 +26,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             driver_id: rider?.driver_id,
         }).toString();
 
-        const WSURL = `ws://localhost:8080?${queryParams}`
-        // const WSURL = `ws://192.168.1.45:8080?${queryParams}`
+        //const WSURL = `ws://localhost:8080?${queryParams}`
+        const WSURL = `ws://192.168.1.45:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
 
         socketRef.current.onopen = () => {
@@ -187,16 +188,17 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     } 
 
     return(
-        <div>
-            <h1>Rider Information Submitted</h1>
-            <p><strong>Name:</strong> {rider.username}</p>
-            <p><strong>Phone Number:</strong> {rider.phone_number}</p>
-            <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
-            <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
-            <p><strong>Rider ID:</strong> {rider.id}</p>
-            <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
-            <p><strong>inQueue:</strong> {inQueue === true ? "True" : "false"}</p>
-
+        <div className = "pageDriver">
+            <h1 className= "greeting">Your ride is on the way, {rider.username}</h1>
+            <h1> insert image here</h1>
+            <div className="riderInformation">
+                <p><strong>Phone Number:</strong> {rider.phone_number}</p>
+                <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
+                <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
+                <p><strong>Rider ID:</strong> {rider.id}</p>
+                <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
+                <p><strong>In Queue:</strong> {inQueue === true ? "True" : "false"}</p>
+            </div>
             {inQueue ? (
                     <div>
                         {!driver?.id || !queue ? (
@@ -231,6 +233,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                     updateRiderData={updateRiderData}
                     />
                 )}
+                <Reset/>
         </div>
     )
 

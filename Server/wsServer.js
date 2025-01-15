@@ -598,7 +598,8 @@ wsServer.on("connection", (connection, request) => {
 
                 try {
                     setTimeout(() => {
-                        riderConnection.send(JSON.stringify(driverMessage));
+                        if(driverMessage)
+                            riderConnection.send(JSON.stringify(driverMessage));
                     }, 100);
                     console.log("Sent message:", driverMessage);
                 } catch (err) {

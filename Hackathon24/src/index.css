@@ -8,32 +8,50 @@ padding: top leftright bottom
 padding: top right bottom left
 
 */
+@font-face {
+  font-family: "Crimson";
+  src: url(./fonts/Crimson/CrimsonText-Regular.ttf) format('ttf');
+  font-weight: 400;
+}
 :root {
   --primary: #ca8a04;
   --secondary: #ca6104;
   --green: #4caf50;
   --red: #de6451;
   --gray: #1a1a1a;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Crimson" ;
   line-height: 1.5;
   color-scheme: light dark;
 }
 
-#root {
-  display: flex;
+html, body{
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  /*overflow: hidden; /*No scrolling*/
 }
 
-body{
-  margin: 0;
-  display: flex;
+#root {
   display: flex; 
   justify-content: center;
   align-items: top;
   background: rgb(39, 39, 39); 
+  width: 100%;
+  height: 100%;
+}
+
+*{
+  box-sizing: border-box;
+  /*outline: 1px solid lime; /* Debugging purposes */
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 4rem;
+  line-height: 1.1;
+}
+h2 {
+  font-size: 3rem;
   line-height: 1.1;
 }
 
@@ -41,9 +59,10 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
+  font-size: 1.25rem;
+  width: 100%;
   background-color: var(--secondary);
+  margin: 20px 0px;
 }
 
 label{
@@ -58,64 +77,114 @@ input{
   background-color: var(--gray);
   border-radius: 10px;
   color: white; 
-  margin: 10px ;
-  padding: 5px;
+  padding: 10px;
+  font-size: 1.2rem;
+  width: 100%;
 }
+
+/* Intro Page */
+.mainPage{
+  display: flex;
+  flex-direction: column;
+}
+.welcome{
+  margin: 20px 20px 0px 20px; 
+}
+.gotACode{
+  margin: 0px 10px 0px 10px;
+}
+.codeContainer{
+  display: flex;
+  flex-direction: column;
+  margin: 10px 10px 0px 10px;
+  gap: 10px; /* Add a gap between all items in the container */
+}
+
+
+
+
+
 /* Reset Button */
 .resetButton{
-  margin: 50px ;
-  align-self: flex-end;
+  display: flex;
+  width: 100%;
   color: red;
+  justify-content: center;
 }
 /* Driver Login Page Styles */
 .submit{
-  width: 100%;
   background-color: #4CAF50;
+}
+.pageTitle{
+  margin: 20px 20px 0px 20px; 
+}
+.inputsContainer{
+  display: flex;
+  flex-direction: column;
+  margin: 6rem 10px 0px 10px;
+  justify-content: center;
+}
+.fieldLabel{
+  font-size: 1.25rem;
 }
     
 /* Driver Main Page */
+.pageDriver{
+  width: 100%;
+}
 .greeting{
-  padding-top: 10px;
-  padding-left: 10px;
-  font-size: 2.8rem;
+  margin: 2rem;
+  font-size: 2.7rem;
+
 }
 .queue{
-  width: 60%;
   border: 5px solid var(--primary);
-  border-radius: 1px;
-  padding: 10px ;
-  margin: 20px ;
+  border-radius: 5px;
+  padding: 10px;
   font-size: 3rem;
-  justify-self: center;
+  margin: 20px ;
 }
 .driverInformation{
-  width: 50%;
+  width: 100%;
   border: 5px solid white; 
   border-radius: 1px;
   padding: 10px;
   justify-self: center;
+  display: none;
 }
 .currentPassengerName{
   text-align: center;
   line-height: 1.1;
   font-size: 2.8rem;
 }
-.infoContainer p{
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px;
+}
+.clickablePhone{
+  display: flex;
+  font-size: 1rem;
   padding: 5px;
+  border: 1px solid transparent;
+  background-color: var(--secondary);
+  border-radius: 10px;
+  width: 30%;
+  justify-content: center;
+  
 }
 
 /* Queue Table Component */
 .queueList{
-  height: 50rem;
-  margin: 10rem 0px;
-  border-radius: 50px;
+  margin: 5rem 0px 10px 0px;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
   background-color: var(--gray);
-  padding: 25px;
+  padding: 20px;
   border: 4px solid transparent;
-  overflow: hidden;
-}
-.driver-queue-container table.queue-table {
-  margin-top: 20px;
+  overflow-y: scroll;
+  max-height: 60vh;
 }
 
 .driver-queue-container table.queue-table th,
@@ -135,11 +204,28 @@ input{
 }
 .google-maps-button{
   background-color: var(--secondary);
-  margin: 20px;
+  margin: 20px 0px;
   justify-self: center;
 }
 .updateStatus{
   background-color: var(--primary);
-  margin: 20px;
+  margin: 20px 0px;
   justify-self: center;
+}
+/* Main Rider Page */
+.riderInformation{
+  display: flex;
+  margin: 20px ;
+
+
+}
+.currentDriver{
+  margin: 20px;
+}
+/* Driver Info card */
+.drivers-container{
+  margin: 20px 0px;
+}
+.driverInfoCard{
+  margin: 20px 10px;
 }

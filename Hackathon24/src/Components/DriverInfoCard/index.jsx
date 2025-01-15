@@ -51,28 +51,22 @@ const DriverInfoCard = ({ driver, riderId, socket, rider, inQueue, setInQueue, u
     //const { username, id, phone_number, queue_length } = driver; // Destructure properties from the `driver` object
 
     return (
-        <div className="col">
-            <div className="card mb-4 rounded-3 shadow-sm">
-                <div className="card-header py-3">
-                    <h4 className="my-0 fw-normal">{driver.username}</h4>
-                    <h4 className="my-0 fw-normal"><b>ID: </b>{driver.id}</h4>
-                    <h4 className="my-0 fw-normal"><b>Phone number: </b>{driver.phone_number}</h4>
-
-
-                </div>
-                <div className="card-body">
-                    <h2 className="card-title pricing-card-title">{driver.queue_length} in Queue</h2>
-
-                    <button
-                        className="btn btn-primary d-inline-flex align-items-center btn-join-queue"
-                        type="button"
-                        onClick={handleQueueAction} // Handle join or leave
-                        disabled={joining}
-                    >
-                        {joining ? 'Processing...' : inQueue ? 'End Queue' : 'Join Queue'}
-                    </button>
-                    {error && <div className="alert alert-danger mt-2">{error}</div>}
-                </div>
+        <div className="driverInfoCard">
+            <div className="drivers">
+                <h4 className = "driverName">{driver.username}</h4>
+                <h4><b>Phone number: </b>{driver.phone_number}</h4>
+            </div>
+            <div className="card-body">
+                <h2>{driver.queue_length} in Queue</h2>
+                <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleQueueAction}
+                    disabled={joining}
+                >
+                    {joining ? 'Processing...' : inQueue ? 'End Queue' : 'Join Queue'}
+                </button>
+                {error && <div className="alert alert-danger mt-2">{error}</div>}
             </div>
         </div>
     );

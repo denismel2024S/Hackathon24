@@ -95,12 +95,12 @@ export function RiderLogin({onSubmit}){
             )
         }
     return (
-        <div className = "design">
-            <h1>Rider Information</h1>
-            <i class="fa-solid fa-user idLogo"></i>
-            <form onSubmit={handleSubmit}>
+        <div className = "riderInput">
+            <h1 className = "pageTitle">Rider Information</h1>
+            <i className="fa-solid fa-user idLogo"></i>
+            <form className = "inputsContainer" onSubmit={handleSubmit}>
                 <label>
-                    Name:
+                    <p className = "fieldLabel">Name:</p>
                     <input
                         type="text"
                         name="name"
@@ -111,7 +111,7 @@ export function RiderLogin({onSubmit}){
                 </label>
                 <br />
                 <label>
-                    Phone Number:
+                    <p className = "fieldLabel">Phone Number:</p>
                     <input
                         //type="tel"
                         type="number"
@@ -124,7 +124,7 @@ export function RiderLogin({onSubmit}){
                 </label>
                 <br />
                 <label>
-                    Pickup Location:
+                    <p className = "fieldLabel">Pickup Location:</p>
                     <input
                         type="text"
                         name="pickup"
@@ -135,7 +135,7 @@ export function RiderLogin({onSubmit}){
                 </label>
                 <br/>
                 <label>
-                    Dropoff Location:
+                    <p className = "fieldLabel" >Dropoff Location:</p>
                     <input
                         type="text"
                         name="dropoff"

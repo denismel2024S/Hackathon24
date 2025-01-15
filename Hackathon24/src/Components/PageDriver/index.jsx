@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import CurrentQueuePassengerInfoCard from "../CurrentQueuePassengerInfoCard";
 import QueueTable from "../QueueTable";
+import {Reset} from "../Reset";
 //import './index.css';
 
 export function PageDriver({formData, driver, setDriver, socket, updateDriverData}) {
@@ -21,8 +22,8 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             queue_length: driver?.queue_length,
         }).toString();
 
-        const WSURL = `ws://localhost:8080?${queryParams}`
-        // const WSURL = `ws://192.168.1.45:8080?${queryParams}`
+        //const WSURL = `ws://localhost:8080?${queryParams}`
+        const WSURL = `ws://192.168.1.45:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
         window.localStorage.setItem('driver', JSON.stringify(driver));
     
@@ -138,7 +139,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
     // Wait until the driver data is available before rendering
     // Show loading until the driver data is fetched
     return(
-        <>
+        <div className = "pageDriver">
             <h1 className = "greeting"><strong>Hello, </strong> {driver.username}</h1>
             <h2 className = "queue"><strong>QUEUE: {filteredUsers.length}</strong></h2>
             <div className="driverInformation">
@@ -159,11 +160,12 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                             socket={socketRef.current}
                             riderId={filteredUsers[0].riderId}
                             driverId={driver.id}
-                        />
+                            />
                         <QueueTable driverQueue={filteredUsers}/>
                     </div>
                 )}
             </ul>
-        </>
+            <Reset/>
+        </div>
     );   
 };
