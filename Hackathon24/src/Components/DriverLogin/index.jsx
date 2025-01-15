@@ -103,27 +103,37 @@ export function DriverLogin({}){
             <h1 className = "pageTitle">Driver Information</h1>
             <form className = "inputsContainer" onSubmit={handleSubmit}>
                 <label>
-                    <p className = "fieldLabel">Name:</p>
-                    <input
-                        type="text"
-                        name="name"
-                        value={(formData.name)}
-                        onChange={handleChange}
-                        placeholder='Chris Consigli...'
-                        required
-                    />
+                    <p className = "fieldLabel">Name</p>
+                    <div className = "inputGroup">
+                        <input
+                            className = "input"
+                            type="text"
+                            name="name"
+                            value={(formData.name)}
+                            onChange={handleChange}
+                            placeholder='Chris Consigli...'
+                            required
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
                 </label>
                 <label>
-                   <p className = "fieldLabel">Phone Number: </p> 
-                    <input
-                        type="tel"
-                        //type="number"
-                        name="phone"
-                        value={formatToPhone(formData.phone)}
-                        onChange={handleChange}
-                        placeholder='123-456-7890...'
-                        required
-                    />
+                   <p className = "fieldLabel">Phone Number </p> 
+                   <div className="inputGroup">
+                        <input
+                            className = "input"
+                            type="tel"
+                            //type="number"
+                            name="phone"
+                            value={formatToPhone(formData.phone)}
+                            onChange={handleChange}
+                            placeholder='123-456-7890...'
+                            required
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                   </div>
                 </label>
                 <button className = "submit" type="submit">Submit</button>
             <Reset/>

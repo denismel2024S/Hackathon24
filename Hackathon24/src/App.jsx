@@ -63,13 +63,18 @@ const App = () => {
             <div>
                 <h2 className="gotACode">Got A Code?</h2>
                 <div className="codeContainer">
-                <input
-                    type="tel"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder={errorMessage ? "Invalid Code" : "Enter Code"}
-                    style={errorMessage ? { borderColor: 'red' } : {}}
-                />
+                    <div className = "inputGroup">
+                        <input
+                            className = "input"
+                            type="tel"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            placeholder={errorMessage ? "Invalid Code" : "Enter Code"}
+                            style={errorMessage ? { borderColor: 'red' } : {}}
+                            />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
                 <button className="submit" onClick={handleCodeSubmit}>Submit</button>
                 <button className="driverButton" onClick={handleDriverButtonClick}>Driver Login</button>
                 </div>

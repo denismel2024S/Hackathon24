@@ -72,9 +72,7 @@ label{
 }
 
 input{
-  border: 3px solid var(--secondary);
   background-color: var(--gray);
-  border-radius: 10px;
   color: white; 
   padding: 10px;
   font-size: 1.2rem;
@@ -99,6 +97,100 @@ input{
   gap: 10px; /* Add a gap between all items in the container */
 }
 
+
+/* From Uiverse.io by G4b413l */ 
+.inputGroup {
+  position: relative;
+ }
+ 
+ .input {
+  font-size: 16px;
+  padding: 10px 10px 10px 5px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  background: transparent;
+  border-radius: 0px !important;
+ }
+ 
+ .input:focus {
+  outline: none;
+ }
+ 
+ .inputGroup label {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 5px;
+  top: 10px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+ }
+ 
+ .input:focus ~ label, .input:valid ~ label {
+  top: -20px;
+  font-size: 14px;
+  color: var(--primary);
+ }
+ 
+ .bar {
+  position: relative;
+  display: block;
+  width: 100%;
+ }
+ 
+ .bar:before, .bar:after {
+  content: '';
+  height: 2px;
+  width: 0;
+  bottom: 1px;
+  position: absolute;
+  background: var(--primary);
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+ }
+ 
+ .bar:before {
+  left: 50%;
+ }
+ 
+ .bar:after {
+  right: 50%;
+ }
+ 
+ .input:focus ~ .bar:before, .input:focus ~ .bar:after {
+  width: 50%;
+ }
+ 
+ .highlight {
+  position: absolute;
+  height: 60%;
+  width: 100%;
+  top: 25%;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.5;
+ }
+ 
+ .input:focus ~ .highlight {
+  animation: inputHighlighter 0.3s ease;
+ }
+ 
+ @keyframes inputHighlighter {
+  from {
+   background: var(--primary);
+  }
+ 
+  to {
+   width: 0;
+   background: transparent;
+  }
+ }
 
 
 
