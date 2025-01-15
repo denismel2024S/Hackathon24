@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'; // Ensure useRef is included
 import {PageRider} from '../PageRider'
+import {Reset} from '../Reset'
 
 export function RiderLogin({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
@@ -147,6 +148,7 @@ export function RiderLogin({onSubmit}){
                 <br />
                 <button type="submit">Submit</button>
             </form>
+            <Reset/>
         </div>
     );
     

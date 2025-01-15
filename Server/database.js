@@ -686,6 +686,20 @@ function getRiderByPhoneNumber(riderPhoneNumber, callback) {
   });
 }
 
+function clearDatabase(){
+  const tables = ['drivers', 'riders', 'queue']
+  db.serialize(() => {
+    tables.forEach((table) => {
+      db.run(`DELETE FROM ${table}`, (err) => {
+        if (err){
+          console.log(`Error clearing ${table} table: `, err)
+        }else{
+          console.log(`All rows deleted ${table}`)
+        }
+      })
+    })
+  })
+}
 
 
 // Export functions for use elsewhere
@@ -703,4 +717,5 @@ module.exports = {
   addOrUpdateDriver, 
   addOrUpdateRider,
   getDriverById,
+  clearDatabase
 };

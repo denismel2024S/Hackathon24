@@ -6,7 +6,19 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId } = require('./database'); // Import the database functions
+const {
+      addDriver,
+      addRider, 
+      getDriverById, 
+      addOrUpdateDriver, 
+      addOrUpdateRider, 
+      updateQueueStatus, 
+      getRiderByPhoneNumber, 
+      addQueue, 
+      getQueuesForDriver, 
+      updateQueueAndResetDriver, 
+      getQueueByRiderId, 
+      clearDatabase } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -267,8 +279,6 @@ wsServer.on("connection", (connection, request) => {
             console.log('Drivers:', drivers);
             console.log('Riders:', riders);
         }
-
-
         // Websocket updated for endQueue
         if (data.action === "endQueue") {
             const { driverId, riderId } = data;
@@ -397,7 +407,6 @@ wsServer.on("connection", (connection, request) => {
             console.log('Drivers:', drivers);
             console.log('Riders:', riders);
         }
-
         if (data.action === "getActiveQueues") {
             const { driverId } = data;
             console.log('Retrieving all active queues with driver_id: ', driverId);
@@ -527,9 +536,8 @@ wsServer.on("connection", (connection, request) => {
                 }
               });
             }
-          }
-
-          if (data.action === "getDriverByPhoneNumber") {
+        }
+        if (data.action === "getDriverByPhoneNumber") {
             const { driverId, riderId } = data;
         
             console.log(`Fetching driver information for Driver ID: ${driverId}, Rider ID: ${riderId}`);
@@ -642,5 +650,6 @@ function broadcastToClients(message) {
   }
 
 server.listen(port, () => {
+    clearDatabase()
     console.log(`Websocket server is running on port ${port}`)
 })
