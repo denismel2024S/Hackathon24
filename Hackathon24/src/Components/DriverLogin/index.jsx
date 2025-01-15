@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import {PageDriver} from '../PageDriver'
 import axios from 'axios';
+import {Reset} from '../Reset'
 
 function formatToPhone(input){
     // Find all digits in the input string using a regular expression
@@ -123,21 +124,18 @@ export function DriverLogin({}){
                 </label>
                 <br />
                 <label>
-                   <p className = "fieldLabel">Phone Number </p> 
-                   <div className="inputGroup">
-                        <input
-                            className = "input"
-                            type="tel"
-                            //type="number"
-                            name="phone"
-                            value={formatToPhone(formData.phone)}
-                            onChange={handleChange}
-                            placeholder='123-456-7890...'
-                            required
-                        />
-                        <span className = "highlight"></span>
-                        <span className = "bar"></span>
-                   </div>
+                    <p className = "fieldLabel">Phone Number: </p> 
+                    <input
+                        //type="number"
+                        type="tel"
+                        name="phone"
+                        // value={formatToPhone(formData.phone)}
+                        value={(formData.phone)}
+                        onChange={handleChange}
+                        placeholder='123-456-7890...'
+                        // required
+                        // pattern="[0-9]{10}" 
+                    />
                 </label>
                 <br></br>
                 <button className = "submit" type="submit">Submit</button>
