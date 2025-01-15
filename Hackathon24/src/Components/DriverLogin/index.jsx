@@ -1,7 +1,6 @@
 import {useState, useEffect} from 'react'
 import {PageDriver} from '../PageDriver'
-import {Reset} from '../Reset'
-//import './index.css'
+import axios from 'axios';
 
 function formatToPhone(input){
     // Find all digits in the input string using a regular expression
@@ -13,6 +12,7 @@ function formatToPhone(input){
       return `(${phone.slice(0, 3)}) - ${phone.slice(3, 6)} - ${phone.slice(6)}`;
     } 
 }
+
 export function DriverLogin({}){
     const[submitted, setSubmitted] = useState(false)
 
@@ -43,6 +43,7 @@ export function DriverLogin({}){
     useEffect(() => {
         console.log('Driver state updated:', driver);
     }, [driver]);  // This will run every time the driver state changes.
+    
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -83,18 +84,20 @@ export function DriverLogin({}){
     
     if(submitted){
         return(
-            <>
-                {driver ? (
-                    <PageDriver 
-                    formData = {formData} 
-                    driver={driver} 
-                    setDriver={setDriver}
-                    updateDriverData={updateDriverData}
-                    />
+            <div>
+                {driver  ? (
+                    <div>
+                        <PageDriver 
+                        formData = {formData} 
+                        driver={driver} 
+                        setDriver={setDriver}
+                        updateDriverData={updateDriverData}
+                        />
+                    </div>
                 ) : (
                     <div>Loading....</div>
                 )}
-            </>
+            </div>
             
             )
     }
@@ -113,21 +116,24 @@ export function DriverLogin({}){
                         required
                     />
                 </label>
+                <br />
                 <label>
-                   <p className = "fieldLabel">Phone Number: </p> 
+                    <p className = "fieldLabel">Phone Number: </p> 
                     <input
-                        type="tel"
                         //type="number"
+                        type="tel"
                         name="phone"
                         value={formatToPhone(formData.phone)}
                         onChange={handleChange}
                         placeholder='123-456-7890...'
                         required
+                        pattern="[0-9]{10}" 
                     />
                 </label>
+                <br></br>
                 <button className = "submit" type="submit">Submit</button>
-            <Reset/>
             </form>
+            <Reset/>
         </div>
     );
     

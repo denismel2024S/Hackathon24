@@ -6,19 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const {
-      addDriver,
-      addRider, 
-      getDriverById, 
-      addOrUpdateDriver, 
-      addOrUpdateRider, 
-      updateQueueStatus, 
-      getRiderByPhoneNumber, 
-      addQueue, 
-      getQueuesForDriver, 
-      updateQueueAndResetDriver, 
-      getQueueByRiderId, 
-      clearDatabase } = require('./database'); // Import the database functions
+const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -39,6 +27,16 @@ const broadcast = () => {
 }
 
 function broadcastRiders(){
+    
+    const length = Object.keys(riders).length
+    console.log("Amounnt of Riders: ", length)
+
+    // if there's no information to be sent, return without sending data
+    // avoids issues when sending null
+    if (length === 0){
+        return;
+    }
+
     console.log("Broadcasting Riders...")
     const riderList = Object.values(riders)
     const riderListString = JSON.stringify(riderList)
@@ -46,10 +44,19 @@ function broadcastRiders(){
         const driverConnection = connections[uuid]
         driverConnection.send(riderListString)
     }
-    const length = Object.keys(riders).length
-    console.log("Amounnt of Riders: ", length)
 }
+
 function broadcastDrivers(){
+    const length = Object.keys(drivers).length
+    console.log("Amounnt of Drivers: ", length)
+
+    // if there's no information to be sent, return without sending data
+    // avoids issues when sending null
+
+    if (length === 0){
+        return;
+    }
+
     console.log("Broadcasting Drivers...")
     const driverList = Object.values(drivers)
     const driverListString = JSON.stringify(driverList)
@@ -57,9 +64,8 @@ function broadcastDrivers(){
         const riderConnection = connections[uuid]
         riderConnection.send(driverListString)
     }
-    const length = Object.keys(drivers).length
-    console.log("Amounnt of Drivers: ", length)
 }
+
 function broadcastUsers(){
     const userList = Object.values(users)
     const userListString = JSON.stringify(userList)
@@ -190,6 +196,88 @@ wsServer.on("connection", (connection, request) => {
     connection.on('message', (message) => {
         const data = JSON.parse(message);
 
+        if (data.action === 'riderLocationUpdate') {
+            const { rider_id, pickup_location, dropoff_location } = data;
+            console.log('Rider is attempting to update their location', data)
+
+            // Step 2: Update rider in database
+            updateRiderLocationsById(
+                rider_id,                             // Rider ID
+                pickup_location,                 // New pickup location
+                dropoff_location,                  // New dropoff location
+                (err, updatedRider) => {       // Callback to handle results
+                  if (err) {
+                    console.error('Error updating rider locations:', err);
+                  } else {
+                    console.log('Rider locations updated successfully:', updatedRider);
+
+                    let riderConnection = null;
+            
+                    for (let riderUuid in riders) {
+                        if (Number(riders[riderUuid].id) === Number(rider_id)) {
+                            riderConnection = connections[riderUuid];
+                            riders[riderUuid] = updatedRider;
+                            console.log("Rider found");
+                            break;
+                        }
+                    }
+
+                    if (riderConnection) {
+                        setTimeout(() => {
+                        riderConnection.send(JSON.stringify(updatedRider))
+                    }, 100);}
+
+                    if (updatedRider.driver_id !== null){
+                        getQueuesForDriver(updatedRider.driver_id, (err, rows) => {
+                            if (err) {
+                                console.error("Failed to fetch queue:", err);
+                            } else {
+                                console.log("Queue details for driver:", rows);
+                    
+                                // Map the queue data with position
+                                const queues = rows.map((row, index) => ({
+                                    position: index + 1,
+                                    riderId: row.rider_id,
+                                    username: row.username,
+                                    phoneNumber: row.phone_number,
+                                    pickupLocation: row.pickup_location,
+                                    dropoffLocation: row.dropoff_location,
+                                    startTime: row.created_at,
+                                    queueId: row.queue_id,
+                                    status: row.status
+                                }));
+                    
+                                // Send full queue data to the driver
+                                let driverFound = null;
+                                let driverConnection = null;
+                    
+                                for (let driverUuid in drivers) {
+                                    if (Number(drivers[driverUuid].id) === Number(updatedRider.driver_id)) {
+                                        driverFound = drivers[driverUuid];
+                                        driverConnection = connections[driverUuid];
+                                        //driverFound.queue_length = rows.length;
+                                        console.log("Driver found");
+                                        break;
+                                    }
+                                }
+                    
+                                if (driverFound) {
+                                    const driverMessage = {
+                                        type: "driver_queue",
+                                        data: queues,
+                                    };
+                    
+                                    setTimeout(() => {
+                                        driverConnection.send(JSON.stringify(driverMessage));
+                                    }, 100);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
         if (data.action === "joinQueue") {
             const { driverId, riderId } = data;
             console.log(`Rider ID: ${riderId} is attepmting to join a queue`);
@@ -297,7 +385,7 @@ wsServer.on("connection", (connection, request) => {
                     console.log('Queue found. Queue ID:', queueId);
                 
                     // Step 3: Call updateQueueEndTime with the queueId to update the end time
-                    updateQueueAndResetDriver(Number(riderId), queueId, (updateErr) => {
+                    endQueueAndResetDriver(Number(riderId), queueId, (updateErr) => {
                     if (updateErr) {
                         console.error('Error updating queue end time:', updateErr);
                     } else {
@@ -465,7 +553,7 @@ wsServer.on("connection", (connection, request) => {
         
                         if (riderUuid && connections[riderUuid]) {
                             const riderConnection = connections[riderUuid];
-                            const riderMessage = {
+                            const riderQueueMessage = {
                                 type: "rider_queue",
                                 data: {
                                     position: index + 1,
@@ -478,13 +566,23 @@ wsServer.on("connection", (connection, request) => {
                                 },
                             };
 
-                            console.log(riderMessage)
-        
+                            
                             setTimeout(() => {
-                                riderConnection.send(JSON.stringify(riderMessage));
+                                riderConnection.send(JSON.stringify(riderQueueMessage));
                                 console.log(
                                     `Rider ${row.rider_id} notified with queue position ${index + 1}.`
                                 );
+
+
+                                // request the current location of the first person in the queue
+                                if (index === 0){
+                                    const currentRiderLocationRequestMessage = {
+                                        type: "riderLocationRequest",
+                                        driver_id: driverId,
+                                    };
+                                    
+                                    riderConnection.send(JSON.stringify(currentRiderLocationRequestMessage))
+                                }
                             }, 100);
                         } else {
                             console.log(`Rider ${row.rider_id} not connected.`);
@@ -492,6 +590,48 @@ wsServer.on("connection", (connection, request) => {
                     });
                 }
             });
+        }
+
+        if (data.action === "sendRiderLocationToDriver"){
+            console.log("Sending location do driver", data);
+
+            const { driverId, pickup_location, pickup_coordinates, dropoff_location, riderId} = data;
+
+            let driverFound = null;
+            let driverConnection = null;
+
+            for (let driverUuid in drivers) {
+                if (Number(drivers[driverUuid].id) === Number(driverId)) {
+                    driverFound = drivers[driverUuid];
+                    driverConnection = connections[driverUuid];
+                    //driverFound.queue_length = rows.length;
+                    console.log("Driver found");
+                    break;
+                }
+            }
+            if (driverFound && driverConnection) {
+                // Prepare the payload for the driver
+                const driverPayload = {
+                    type: "riderLocationUpdate",
+                    rider_id: riderId,
+                    driver_id: driverId,
+                    pickup_location: pickup_location,
+                    pickup_coordinates: pickup_coordinates,
+                    dropoff_location: dropoff_location,
+                };
+        
+                // Send the payload to the driver's connection
+                try {
+                    driverConnection.send(JSON.stringify(driverPayload));
+                    console.log(`Location data sent to driver ${driverId}`);
+                } catch (error) {
+                    console.error(`Error sending data to driver ${driverId}:`, error);
+                }
+            } else {
+                console.error(`Driver with ID ${driverId} not found or not connected`);
+            }
+
+            
         }
         if (data.action === "queueStatusUpdate") {
             const { driverId, riderId, status } = data;
@@ -598,16 +738,19 @@ wsServer.on("connection", (connection, request) => {
                     type: "driver",
                     data: driver,
                 };
-                
+
                 // Check if driverMessage.data is already an array and wrap it accordingly
                 if (Array.isArray(driverMessage.data)) {
                     driverMessage.data = driverMessage.data[0]; // Take the first element if it is an array
                 }
 
                 try {
+                    if (!riderConnection || !driverMessage){
+                        console.log('riderConnection not established or message not initialized correctly')
+                        return;
+                    }
                     setTimeout(() => {
-                        if(driverMessage)
-                            riderConnection.send(JSON.stringify(driverMessage));
+                        riderConnection.send(JSON.stringify(driverMessage));
                     }, 100);
                     console.log("Sent message:", driverMessage);
                 } catch (err) {

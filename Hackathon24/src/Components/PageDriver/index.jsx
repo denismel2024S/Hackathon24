@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import CurrentQueuePassengerInfoCard from "../CurrentQueuePassengerInfoCard";
+import DriverMapTest from "../XUnused/Xdriver_map_test";
 import QueueTable from "../QueueTable";
-import {Reset} from "../Reset";
-//import './index.css';
+import './index.css';
+import {Reset} from "../Reset"
+
 
 export function PageDriver({formData, driver, setDriver, socket, updateDriverData}) {
     const [connectedUsers, setConnectedUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const previousUsers = useRef([])
     const socketRef = useRef(null);
+
+    // Temporary to get map working again.
+    const [currentQueuePickupCoordinates, setCurrentQueuePickupCoordinates] = useState(null);
+    
     
     useEffect(() => {
 
@@ -22,8 +28,8 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             queue_length: driver?.queue_length,
         }).toString();
 
-        //const WSURL = `ws://localhost:8080?${queryParams}`
-        const WSURL = `ws://192.168.1.45:8080?${queryParams}`
+        const WSURL = `ws://localhost:8080?${queryParams}`
+        // const WSURL = `ws://192.168.1.45:8080?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
         window.localStorage.setItem('driver', JSON.stringify(driver));
     
@@ -71,6 +77,11 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
 
                     console.log("Driver's info updated:", driver);
                     
+                }
+
+                if (parsedMessage.type === "riderLocationUpdate") {
+                    console.log("Received rider location data:", parsedMessage);
+                    setCurrentQueuePickupCoordinates(parsedMessage.pickup_coordinates); // Set coordinates for the map
                 }
 
                 if (parsedMessage.type === "driver_queue") {
@@ -143,10 +154,12 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             <h1 className = "greeting"><strong>Hello, </strong> {driver.username}</h1>
             <h2 className = "queue"><strong>QUEUE: {filteredUsers.length}</strong></h2>
             <div className="driverInformation">
+                <p><strong>Name:</strong> {driver.username}</p>
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>
                 <p><strong>Real Queue Length:</strong> {filteredUsers.length}</p>
             </div>
+            
             <ul>
                 {/* Render the first person in the queue if it exists */}
                 {filteredUsers.length > 0 && (
@@ -160,8 +173,14 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                             socket={socketRef.current}
                             riderId={filteredUsers[0].riderId}
                             driverId={driver.id}
-                            />
-                        <QueueTable driverQueue={filteredUsers}/>
+                        />
+                        {/* Render the map component */}
+                        {currentQueuePickupCoordinates && (
+                            <DriverMapTest coordinates={currentQueuePickupCoordinates} />
+                        )}
+                        <QueueTable
+                        driverQueue={filteredUsers}
+                        />
                     </div>
                 )}
             </ul>
