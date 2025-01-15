@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import {PageDriver} from '../PageDriver'
 import axios from 'axios';
+import {Reset} from '../Reset'
 
 function formatToPhone(input){
     // Find all digits in the input string using a regular expression
@@ -123,11 +124,12 @@ export function DriverLogin({}){
                         //type="number"
                         type="tel"
                         name="phone"
-                        value={formatToPhone(formData.phone)}
+                        // value={formatToPhone(formData.phone)}
+                        value={(formData.phone)}
                         onChange={handleChange}
                         placeholder='123-456-7890...'
-                        required
-                        pattern="[0-9]{10}" 
+                        // required
+                        // pattern="[0-9]{10}" 
                     />
                 </label>
                 <br></br>
