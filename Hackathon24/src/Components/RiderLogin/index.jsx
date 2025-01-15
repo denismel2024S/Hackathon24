@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'; // Ensure useRef is included
 import {PageRider} from '../PageRider'
 import {Reset} from '../Reset'
+import PlacesAutocomplete from 'react-places-autocomplete';
 
 export function RiderLogin({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
+    const [location, setLocation] = useState('');
+    const [destination, setDestination] = useState('');
     
     const [rider, setRider] = useState({
         id: null,
@@ -21,6 +24,30 @@ export function RiderLogin({onSubmit}){
         dropoff: '',
     
       });
+
+      const handleLocationChange = (address) => {
+        setFormData((prevData) => ({ ...prevData, pickup: address }));
+      };
+    
+      const handleLocationSelect = async (address) => {
+        setFormData((prevData) => ({ ...prevData, pickup: address }));
+        setRider((prevRider) => ({
+          ...prevRider,
+          pickup_location: address,
+        }));
+      };
+    
+      const handleDestinationChange = (address) => {
+        setFormData((prevData) => ({ ...prevData, dropoff: address }));
+      };
+    
+      const handleDestinationSelect = async (address) => {
+        setFormData((prevData) => ({ ...prevData, dropoff: address }));
+        setRider((prevRider) => ({
+          ...prevRider,
+          dropoff_location: address,
+        }));
+      };
 
 
     const handleChange = (e) => {
@@ -124,28 +151,81 @@ export function RiderLogin({onSubmit}){
                     />
                 </label>
                 <br />
+                
                 <label>
-                    <p className = "fieldLabel">Pickup Location:</p>
-                    <input
-                        type="text"
-                        name="pickup"
-                        value={formData.pickup}
-                        onChange={handleChange}
-                        required
-                    />
+                    Location (Pickup):
+                    <PlacesAutocomplete
+                    value={formData.pickup}
+                    name="pickup"
+                    onChange={handleLocationChange}
+                    onSelect={handleLocationSelect}
+                    required
+                    >
+                    {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                        <div>
+                        <input
+                            {...getInputProps({ placeholder: 'Enter a pickup location' })}
+                            required
+                        />
+                        <div>
+                            {loading && <div>Loading...</div>}
+                            {suggestions.map((suggestion, index) => (
+                            <div
+                                key={index}
+                                {...getSuggestionItemProps(suggestion, {
+                                className: 'suggestion-item',
+                                style: {
+                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#fff',
+                                    cursor: 'pointer',
+                                },
+                                })}
+                            >
+                                {suggestion.description}
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    )}
+                    </PlacesAutocomplete>
                 </label>
-                <br/>
-                <label>
-                    <p className = "fieldLabel" >Dropoff Location:</p>
-                    <input
-                        type="text"
-                        name="dropoff"
-                        value={formData.dropoff}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                
                 <br />
+                <label>
+                    Destination:
+                    <PlacesAutocomplete
+                        value={formData.dropoff}
+                        name="dropoff"
+                        onChange={handleDestinationChange}
+                        onSelect={handleDestinationSelect}
+                        required
+                    >
+                        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                        <div>
+                            <input
+                            {...getInputProps({ placeholder: 'Enter a destination' })}
+                            required
+                            />
+                            <div>
+                            {loading && <div>Loading...</div>}
+                            {suggestions.map((suggestion, index) => (
+                                <div
+                                key={index}
+                                {...getSuggestionItemProps(suggestion, {
+                                    className: 'suggestion-item',
+                                    style: {
+                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#fff',
+                                    cursor: 'pointer',
+                                    },
+                                })}
+                                >
+                                {suggestion.description}
+                                </div>
+                            ))}
+                            </div>
+                        </div>
+                        )}
+                    </PlacesAutocomplete>
+                </label>
                 <button type="submit">Submit</button>
             </form>
             <Reset/>

@@ -336,6 +336,107 @@ function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation
   });
 }
 
+function updateRiderLocationsById(riderId, pickupLocation, dropoffLocation, callback) {
+  console.log(riderId)
+  db.serialize(() => {
+    // Check if a rider with the given ID exists
+    db.get("SELECT * FROM riders WHERE id = ?", [riderId], (err, row) => {
+      if (err) {
+        console.error("Error querying riders table:", err);
+        callback(err, null); // Return error via callback
+        return;
+      }
+
+      if (row) {
+        // Update the existing rider's pickup and dropoff locations
+        const updateStmt = db.prepare(`
+          UPDATE riders 
+          SET pickup_location = ?, dropoff_location = ? 
+          WHERE id = ?
+        `);
+        updateStmt.run(pickupLocation, dropoffLocation, riderId, (updateErr) => {
+          if (updateErr) {
+            console.error("Error updating rider:", updateErr);
+            callback(updateErr, null); // Return error via callback
+          } else {
+            console.log(`Rider with ID ${riderId} updated in database.`);
+
+            // Prepare the updated rider object
+            const updatedRider = {
+              type: 'rider',
+              id: riderId,
+              username: row.username,
+              phone_number: row.phone_number,
+              pickup_location: pickupLocation,
+              dropoff_location: dropoffLocation,
+              driver_id: row.driver_id,
+            };
+
+            callback(null, updatedRider); // Return the updated rider object
+          }
+        });
+        updateStmt.finalize();
+      } else {
+        // If no rider is found with the given ID, return an error
+        const notFoundError = new Error(`Rider with ID ${riderId} not found`);
+        console.error(notFoundError.message);
+        callback(notFoundError, null); // Return error via callback
+      }
+    });
+  });
+}
+
+
+function updateRiderLocationsById(riderId, pickupLocation, dropoffLocation, callback) {
+  console.log(riderId)
+  db.serialize(() => {
+    // Check if a rider with the given ID exists
+    db.get("SELECT * FROM riders WHERE id = ?", [riderId], (err, row) => {
+      if (err) {
+        console.error("Error querying riders table:", err);
+        callback(err, null); // Return error via callback
+        return;
+      }
+
+      if (row) {
+        // Update the existing rider's pickup and dropoff locations
+        const updateStmt = db.prepare(`
+          UPDATE riders 
+          SET pickup_location = ?, dropoff_location = ? 
+          WHERE id = ?
+        `);
+        updateStmt.run(pickupLocation, dropoffLocation, riderId, (updateErr) => {
+          if (updateErr) {
+            console.error("Error updating rider:", updateErr);
+            callback(updateErr, null); // Return error via callback
+          } else {
+            console.log(`Rider with ID ${riderId} updated in database.`);
+
+            // Prepare the updated rider object
+            const updatedRider = {
+              type: 'rider',
+              id: riderId,
+              username: row.username,
+              phone_number: row.phone_number,
+              pickup_location: pickupLocation,
+              dropoff_location: dropoffLocation,
+              driver_id: row.driver_id,
+            };
+
+            callback(null, updatedRider); // Return the updated rider object
+          }
+        });
+        updateStmt.finalize();
+      } else {
+        // If no rider is found with the given ID, return an error
+        const notFoundError = new Error(`Rider with ID ${riderId} not found`);
+        console.error(notFoundError.message);
+        callback(notFoundError, null); // Return error via callback
+      }
+    });
+  });
+}
+
 /**
  * 
  * @param {*} riderId // database id of rider being added
@@ -480,7 +581,7 @@ function updateQueueEndTime(riderId, driverId, callback = () => {}) {
  * @param {*} queueId // Database ID of the queue entry
  * @param {*} callback // Prevents crashing if the update is unsuccessful
  */
-function updateQueueAndResetDriver(riderId, queueId, callback = () => {}) {
+function endQueueAndResetDriver(riderId, queueId, callback = () => {}) {
   const endTime = new Date().toISOString(); // Current timestamp
 
   db.serialize(() => {
@@ -712,10 +813,11 @@ module.exports = {
   getRiderByPhoneNumber,
   getQueueByRiderId,
   getQueuesForDriver,
-  updateQueueAndResetDriver,
+  endQueueAndResetDriver,
   updateQueueStatus, 
   addOrUpdateDriver, 
   addOrUpdateRider,
   getDriverById,
-  clearDatabase
+  updateRiderLocationsById,
+  clearDatabase,
 };
