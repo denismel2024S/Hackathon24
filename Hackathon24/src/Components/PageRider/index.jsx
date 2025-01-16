@@ -246,6 +246,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                         updateRiderData={updateRiderData}
                         setPickupCoordinates={setPickupCoordinates}
                     />
+                    <Reset/>
                 </div>
             ) : (
                 <div>

@@ -85,20 +85,18 @@ export function DriverLogin({}){
     
     if(submitted){
         return(
-            <div>
+            <>
                 {driver  ? (
-                    <div>
                         <PageDriver 
                         formData = {formData} 
                         driver={driver} 
                         setDriver={setDriver}
                         updateDriverData={updateDriverData}
                         />
-                    </div>
                 ) : (
                     <div>Loading....</div>
                 )}
-            </div>
+            </>
             
             )
     }

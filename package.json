@@ -1,9 +1,12 @@
 {
   "dependencies": {
+    "@react-google-maps/api": "^2.20.5",
     "express": "^4.21.2",
+    "lodash": "^4.17.21",
     "lodash.throttle": "^4.1.1",
     "nodemon": "^3.1.4",
     "pg": "^8.13.0",
+    "react-places-autocomplete": "^7.3.0",
     "react-sweetalert2": "^0.6.0",
     "react-use-websocket": "^4.11.1",
     "sweetalert2": "^11.14.0",

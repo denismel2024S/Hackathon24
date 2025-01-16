@@ -106,20 +106,18 @@ export function RiderLogin({onSubmit}){
     console.log("In the RiderLogin")
     if(submitted){
         return(
-            <div>
+            <>
                 {rider ? (
-                    <div>
-                        <PageRider 
-                            formData = {formData} 
-                            rider={rider} 
-                            setRider={setRider}
-                            updateRiderData={updateRiderData}
-                        />
-                    </div>
+                    <PageRider 
+                        formData = {formData} 
+                        rider={rider} 
+                        setRider={setRider}
+                        updateRiderData={updateRiderData}
+                    />
                 ) : (
                     <div>Loading....</div>
                 )}
-            </div>
+            </>
             )
         }
     return (
@@ -175,7 +173,7 @@ export function RiderLogin({onSubmit}){
                                 {...getSuggestionItemProps(suggestion, {
                                 className: 'suggestion-item',
                                 style: {
-                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#fff',
+                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#272727',
                                     cursor: 'pointer',
                                 },
                                 })}
@@ -213,7 +211,7 @@ export function RiderLogin({onSubmit}){
                                 {...getSuggestionItemProps(suggestion, {
                                     className: 'suggestion-item',
                                     style: {
-                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#fff',
+                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#272727',
                                     cursor: 'pointer',
                                     },
                                 })}
