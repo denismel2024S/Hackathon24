@@ -259,7 +259,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             ) : (
                 <div>
                     {/* Render everything else if pickupCoordinates are set */}
-                    <h1 className="greeting">Your ride is on the way, {rider.username}</h1>
+                    <h1 className="greeting">Your ride is on the way, {rider.username} <i class="fa-solid fa-gear spin"></i></h1>
                     <h1>Insert image here</h1>
                     <div className="riderInformation">
                         <p><strong>Phone Number:</strong> {rider.phone_number}</p>

@@ -58,7 +58,8 @@ const App = () => {
     else {
         return (
             <div className="mainPage">
-            <h1 className="welcome">Welcome to <span className="text-yellow-400">Chariot</span></h1>
+            <h1 className="welcome">Welcome to</h1>
+            <h2 className = "welcome">Chariot</h2>
             <img className="mainImage" src="./src/images/fasho.png" />
             <div>
                 <h2 className="gotACode">Got A Code?</h2>

@@ -19,6 +19,7 @@ padding: top right bottom left
   --green: #4caf50;
   --red: #de6451;
   --gray: #1a1a1a;
+  --dark: #7d1111;
   font-family: "Crimson" ;
   line-height: 1.5;
   color-scheme: light dark;
@@ -30,17 +31,33 @@ html, body{
   width: 100vw;
   height: 100vh;
   /*overflow: hidden; /*No scrolling*/
+  --s: 100px; /* Control the size */
+  --c1: #585858;
+  --c2: rgb(39, 39, 39);
+  --c3: rgb(49, 49, 49);
+  
+  background:
+    repeating-conic-gradient(from 30deg,#0000 0 120deg,var(--c3) 0 50%) 
+     calc(var(--s)/2) calc(var(--s)*tan(30deg)/2),
+    repeating-conic-gradient(from 30deg,var(--c1) 0 60deg,var(--c2) 0 120deg,var(--c3) 0 50%);
+  background-size: var(--s) calc(var(--s)*tan(30deg));
 }
 
 #root {
   display: flex; 
   justify-content: center;
   align-items: top;
-  background: rgb(39, 39, 39); 
+  background: transparent;
   width: 100%;
   height: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(14, 14, 14, 0.2);
 }
-
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 *{
   box-sizing: border-box;
   /*outline: 1px solid lime; /* Debugging purposes */
@@ -87,9 +104,20 @@ input{
 }
 .welcome{
   margin: 20px 20px 0px 20px; 
+  text-align: center;
+  color: transparent;
+  background: linear-gradient(#f7be04,#ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
 }
 .gotACode{
   margin: 0px 10px 0px 10px;
+  color: transparent;
+  background: linear-gradient(#f7be04,#ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
 }
 .codeContainer{
   display: flex;
@@ -200,7 +228,7 @@ input{
 .resetButton{
   display: flex;
   width: 100%;
-  color: red;
+  color: rgb(255, 255, 255);
   justify-content: center;
 }
 /* Driver Login Page Styles */
@@ -331,4 +359,18 @@ input{
   color: white;
   padding: 5px;
   z-index: 3;
+}
+
+.spin {
+  font-size: 30px; 
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
