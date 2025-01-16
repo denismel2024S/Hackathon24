@@ -85,6 +85,14 @@ button {
   font-size: 1.25rem;
   width: 100%;
   background-color: var(--secondary);
+  font-size: 1.5rem;
+  color: #fafafa;
+  cursor: pointer;
+}
+
+button:active {
+  box-shadow: none;
+  transform: translate(3px, 3px);
 }
 
 label{
