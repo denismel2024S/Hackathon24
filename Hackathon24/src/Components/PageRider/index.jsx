@@ -4,6 +4,7 @@ import CurrentQueueDriverInfoCard from "../CurrentQueueDriverInfoCard";
 import LocationChangeForm from "../XUnused/Xlocation_form";
 import MapWithMarker from "../XUnused/xmap_with_marker";
 import {Reset} from "../Reset"
+import { pick } from "lodash";
 
 
 export function PageRider({formData, rider, setRider, updateRiderData}){
@@ -112,21 +113,27 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                     // fix issues where server returns string "null" instead of null
                     const sanitizedDriverId = parsedMessage.driver_id === "null" ? null : Number(parsedMessage.driver_id);
                     
-                      
-                    const message = {
-                        action: "sendRiderLocationToDriver",
-                        driverId: sanitizedDriverId,  // driver's ID
-                        pickup_location: rider.pickup_location,
-                        pickup_coordinates: rider.pickupCoordinates, // POTENTIALLY NEEDS TO BE CHANGED TO SOMETHING LIKE rider.pickupCoordinates
-                        dropoff_location: rider.dropoff_location,
-                        riderId: rider.id,
-                    };
-                
-                    try {
-                        socketRef.current.send(JSON.stringify(message));
-                        console.log("User (rider) sent location data:", message);
-                    } catch (err) {
-                        console.error("Failed to send rider's current location data", err);
+                    if (rider.pickupCoordinates !== null){
+                        const message = {
+                            action: "sendRiderLocationToDriver",
+                            driverId: sanitizedDriverId,  // driver's ID
+                            pickup_location: rider.pickup_location,
+                            pickup_coordinates: rider.pickupCoordinates, // POTENTIALLY NEEDS TO BE CHANGED TO SOMETHING LIKE rider.pickupCoordinates
+                            dropoff_location: rider.dropoff_location,
+                            riderId: rider.id,
+                        };
+                    
+                        try {
+                            setTimeout(() => {
+                                socketRef.current.send(JSON.stringify(message));
+                                console.log("User (rider) sent location data:", message);
+                            }, 200);
+                        } catch (err) {
+                            console.error("Failed to send rider's current location data", err);
+                        }
+                    }
+                    else{
+                        console.error("Rider's pickup coordinates are not set, cannot send location data to driver");
                     }
                 }
 
@@ -204,10 +211,11 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     }, [inQueue, rider.driver_id]);
 
     useEffect(() => {
-        
+        setPickupCoordinates(rider.pickupCoordinates)
+
         window.localStorage.setItem('pickupCoordinates', JSON.stringify(pickupCoordinates));
     
-    }, [pickupCoordinates]);
+    }, [rider.pickupCoordinates]);
 
     useEffect(() => {
         const rider = window.localStorage.getItem('rider');
