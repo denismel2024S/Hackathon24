@@ -19,7 +19,6 @@ padding: top right bottom left
   --green: #4caf50;
   --red: #de6451;
   --gray: #1a1a1a;
-  --dark: #7d1111;
   font-family: "Crimson" ;
   line-height: 1.5;
   color-scheme: light dark;
@@ -259,7 +258,9 @@ input{
 }
 .queue{
   border: 5px solid var(--primary);
-  border-radius: 5px;
+  border-radius: 15px;
+  border-style: groove;
+  background-color: rgb(39, 39, 39);
   padding: 10px;
   font-size: 3rem;
   margin: 20px ;
@@ -333,12 +334,18 @@ input{
   justify-self: center;
 }
 /* Main Rider Page */
-.riderInformation{
+.riderInformation {
   display: flex;
   flex-direction: column;
-  margin: 20px ;
-
-
+  margin: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.2); 
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgb(39,39,39), rgb(102, 102, 102));
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 .currentDriver{
   margin: 20px;
