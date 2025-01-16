@@ -124,11 +124,13 @@ export function RiderLogin({onSubmit}){
         }
     return (
         <div className = "riderInput">
-            <h1 className = "pageTitle">Rider Information</h1>
-            <i className="fa-solid fa-user idLogo"></i>
+            <div className="header">
+                <i className="fa-solid fa-user idLogo"></i>
+                <h1 className = "pageTitle">Rider Information</h1>
+            </div>
             <form className = "inputsContainer" onSubmit={handleSubmit}>
                 <label>
-                    <p className = "fieldLabel">Name:</p>
+                    <p className = "fieldLabel">Name</p>
                     <div className="inputGroup">
                         <input
                             className = "input"
@@ -143,9 +145,8 @@ export function RiderLogin({onSubmit}){
                         <span className = "bar"></span>
                     </div>
                 </label>
-                <br />
                 <label>
-                    <p className = "fieldLabel">Phone Number:</p>
+                    <p className = "fieldLabel">Phone Number</p>
                     <div className="inputGroup">
                         <input
                             //type="tel"
@@ -162,10 +163,9 @@ export function RiderLogin({onSubmit}){
                         <span className = "bar"></span>
                     </div>
                 </label>
-                <br />
                 
                 <label>
-                    Location (Pickup):
+                    <p className="fieldLabel">Pickup</p>
                     <PlacesAutocomplete
                     value={formData.pickup}
                     name="pickup"
@@ -176,13 +176,13 @@ export function RiderLogin({onSubmit}){
                     {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
                         <div className = "inputGroup">
                         <input
-                            {...getInputProps({ placeholder: 'Enter a pickup location' })}
+                            {...getInputProps({ placeholder: 'Bennys...' })}
                             required
                             className = "input"
                         />
                             <span className = "highlight"></span>
                             <span className = "bar"></span>
-                        <div>
+                        <div className = "suggestionDiv">
                             {loading && <div>Loading...</div>}
                             {suggestions.map((suggestion, index) => (
                             <div
@@ -203,10 +203,8 @@ export function RiderLogin({onSubmit}){
                     )}
                     </PlacesAutocomplete>
                 </label>
-                
-                <br />
                 <label>
-                    Destination:
+                    <p className="fieldLabel">Destination</p>
                     <PlacesAutocomplete
                         value={formData.dropoff}
                         name="dropoff"
@@ -217,26 +215,27 @@ export function RiderLogin({onSubmit}){
                         {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
                         <div className = "inputGroup">
                             <input
-                            {...getInputProps({ placeholder: 'Enter a destination' })}
+                            {...getInputProps({ placeholder: 'The Retreat' })}
                             required
                             className = "input"
                             />
                             <span className = "highlight"></span>
                             <span className = "bar"></span>
-                        <div>
+                        <div className = "suggestionDiv">
                             {loading && <div>Loading...</div>}
                             {suggestions.map((suggestion, index) => (
-                                <div
-                                key={index}
-                                {...getSuggestionItemProps(suggestion, {
-                                    className: 'suggestion-item',
-                                    style: {
-                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#272727',
-                                    cursor: 'pointer',
-                                    },
-                                })}
-                                >
-                                {suggestion.description}
+                                <div className="">
+                                    <div
+                                    key={index}
+                                    {...getSuggestionItemProps(suggestion, {
+                                        className: 'suggestion-item',
+                                        style: {
+                                        cursor: 'pointer',
+                                        },
+                                    })}
+                                    >
+                                    {suggestion.description}
+                                </div>
                                 </div>
                             ))}
                             </div>
@@ -244,7 +243,7 @@ export function RiderLogin({onSubmit}){
                         )}
                     </PlacesAutocomplete>
                 </label>
-                <button type="submit">Submit</button>
+                <button className = "submit" type="submit">Submit</button>
             </form>
             <Reset/>
         </div>

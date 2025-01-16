@@ -7,6 +7,6 @@ export function Reset(){
         }
     };
     return(
-        <button className = "resetButton" onClick={handleClear}>Reset</button>
+        <button className = "resetButton" onClick={handleClear}>Sign Out</button>
     );
 }

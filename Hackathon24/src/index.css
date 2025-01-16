@@ -18,7 +18,10 @@ padding: top right bottom left
   --secondary: #ca6104;
   --green: #4caf50;
   --red: #de6451;
-  --gray: #1a1a1a;
+  --gray: #212121;
+  --lightGray: #515151;
+  --textGray: #818181;
+  
   font-family: "Crimson" ;
   line-height: 1.5;
   color-scheme: light dark;
@@ -27,30 +30,33 @@ padding: top right bottom left
 html, body{
   margin: 0;
   padding: 0;
+  
   width: 100vw;
   height: 100vh;
   /*overflow: hidden; /*No scrolling*/
-  --s: 100px; /* Control the size */
+/*
+  --s: 100px;  Control the size 
   --c1: #585858;
   --c2: rgb(39, 39, 39);
   --c3: rgb(49, 49, 49);
   
+  /*
   background:
     repeating-conic-gradient(from 30deg,#0000 0 120deg,var(--c3) 0 50%) 
      calc(var(--s)/2) calc(var(--s)*tan(30deg)/2),
     repeating-conic-gradient(from 30deg,var(--c1) 0 60deg,var(--c2) 0 120deg,var(--c3) 0 50%);
   background-size: var(--s) calc(var(--s)*tan(30deg));
+  */
 }
 
 #root {
   display: flex; 
   justify-content: center;
   align-items: top;
-  background: transparent;
+  background: var(--gray); 
   width: 100%;
   height: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(14, 14, 14, 0.2);
+  /*box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);*/
 }
 @keyframes gradientAnimation {
   0% { background-position: 0% 50%; }
@@ -63,7 +69,7 @@ html, body{
 }
 
 h1 {
-  font-size: 3rem;
+  font-size: 2.8rem;
   line-height: 1.1;
 }
 h2 {
@@ -75,7 +81,7 @@ button {
   justify-self: center;
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 10px;
   font-size: 1.25rem;
   width: 100%;
   background-color: var(--secondary);
@@ -85,12 +91,12 @@ label{
   display: flex;
   flex-direction: column;
   font-weight: bold;
-  padding: 20px 0px 20px 0px;
+  padding: 10px 0px 10px 0px;
 }
 
 input{
-  background-color: var(--gray);
-  color: white; 
+  background-color: transparent;
+  color: var(--lightGray); 
   padding: 10px;
   font-size: 1.2rem;
   width: 100%;
@@ -101,22 +107,29 @@ input{
   display: flex;
   flex-direction: column;
 }
+.chariotTitle{
+  color: var(--primary);
+  font-size: 3.5rem;
+  line-height: 1.5;
+}
 .welcome{
   margin: 20px 20px 0px 20px; 
   text-align: center;
-  color: transparent;
+  /*color: transparent;
   background: linear-gradient(#f7be04,#ffffff);
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+  text-shadow: 3px 3px 8px rgba(0,0,0,0.2);*/
 }
 .gotACode{
   margin: 0px 10px 0px 10px;
   color: transparent;
+  color: white; 
+  /*
   background: linear-gradient(#f7be04,#ffffff);
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+  text-shadow: 3px 3px 8px rgba(0,0,0,0.2);*/
 }
 .codeContainer{
   display: flex;
@@ -132,14 +145,17 @@ input{
  }
  
  .input {
-  font-size: 16px;
-  padding: 10px 10px 10px 5px;
+  font-size: 1.15rem;
+  padding: 10px 10px 10px 0px;
   display: block;
   width: 100%;
-  border: none;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid var(--lightGray);
+  color: white; 
   background: transparent;
-  border-radius: 0px !important;
+ }
+ .input::placeholder{
+  color: var(--lightGray);
+  font-size: 1rem;
  }
  
  .input:focus {
@@ -147,8 +163,8 @@ input{
  }
  
  .inputGroup label {
-  color: #ffffff;
-  font-size: 18px;
+  color: var(--lightGray);
+  font-size: 1rem;
   font-weight: normal;
   position: absolute;
   pointer-events: none;
@@ -206,7 +222,7 @@ input{
  }
  
  .input:focus ~ .highlight {
-  animation: inputHighlighter 0.3s ease;
+  animation: inputHighlighter 0.2s ease;
  }
  
  @keyframes inputHighlighter {
@@ -226,13 +242,15 @@ input{
 /* Reset Button */
 .resetButton{
   display: flex;
-  width: 100%;
-  color: rgb(255, 255, 255);
+  width: 30%;
+  color: black; 
   justify-content: center;
+  justify-self: center;
+  background-color: var(--lightGray);
 }
 /* Driver Login Page Styles */
 .submit{
-  background-color: #4CAF50;
+  background-color: var(--green);
 }
 .pageTitle{
   margin: 20px 20px 0px 20px; 
@@ -242,9 +260,13 @@ input{
   flex-direction: column;
   margin: 10px 10px 0px 10px;
   justify-content: center;
+  border: 2px solid var(--lightGray);
+  border-radius: 10px;
+  padding: 10px;
 }
 .fieldLabel{
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+  color: var(--lightGray);
 }
     
 /* Driver Main Page */
@@ -258,16 +280,14 @@ input{
 }
 .queue{
   border: 5px solid var(--primary);
-  border-radius: 15px;
-  border-style: groove;
-  background-color: rgb(39, 39, 39);
+  border-radius: 5px;
   padding: 10px;
   font-size: 3rem;
   margin: 20px ;
 }
 .driverInformation{
   width: 100%;
-  border: 5px solid white; 
+  border: 5px solid var(--lightGray); 
   border-radius: 1px;
   padding: 10px;
   justify-self: center;
@@ -312,11 +332,11 @@ input{
 .driver-queue-container table.queue-table td {
   padding: 5px; /* Add padding to cells for better readability */
   text-align: left; /* Align text to the left */
-  border: 1px solid #ddd; /* Add borders to cells */
+  border: 1px solid var(--lightGray); /* Add borders to cells */
 }
 
 .driver-queue-container table.queue-table th {
-  background-color: rgb(78, 78, 78); /* Add a light background to header cells */
+  background-color: var(--lightGray); /* Add a light background to header cells */
   font-weight: bold; /* Make header text bold */
 }
 .mapButtons{
@@ -334,10 +354,11 @@ input{
   justify-self: center;
 }
 /* Main Rider Page */
-.riderInformation {
+.riderInformation{
   display: flex;
   flex-direction: column;
   margin: 20px;
+  /*
   border: 2px solid rgba(0, 0, 0, 0.2); 
   border-radius: 15px;
   background: linear-gradient(135deg, rgb(39,39,39), rgb(102, 102, 102));
@@ -346,6 +367,21 @@ input{
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
+  */
+}
+.header{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  width: 100%;
+}
+.idLogo{
+  font-size: 7.5rem;
+  justify-self: center;
+  align-items: center;
+
 }
 .currentDriver{
   margin: 20px;
@@ -363,11 +399,14 @@ input{
 /* Suggestion Item */
 
 .suggestion-item{
-  color: white;
+  color: var(--textGray);
   padding: 5px;
-  z-index: 3;
 }
-
+.suggestionDiv{
+  background-color: var(--gray);
+  z-index: 1000 ;
+  position: fixed ;
+}
 .spin {
   font-size: 30px; 
   animation: spin 2s linear infinite;

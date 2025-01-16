@@ -66,11 +66,11 @@ const MapWithMarker = ({ address, initialCoordinates, onCoordinatesChange, socke
   if (!isLoaded) return <div>Loading map...</div>;
 
   return (
-    <div>
+    <>
       <GoogleMap
         center={center}
         zoom={15}
-        mapContainerStyle={{ width: '100%', height: '400px' }}
+        mapContainerStyle={{ width: '100%', height: '40rem' }}
       >
         {markerPosition && (
           <Marker
@@ -88,7 +88,7 @@ const MapWithMarker = ({ address, initialCoordinates, onCoordinatesChange, socke
       >
         {loading ? 'Sending...' : 'Confirm Pickup Location'}
       </button>
-    </div>
+    </>
   );
 };
 

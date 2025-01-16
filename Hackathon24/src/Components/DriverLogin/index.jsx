@@ -102,7 +102,10 @@ export function DriverLogin({}){
     }
     return (
         <div className ="driverInput">
-            <h1 className = "pageTitle">Driver Information</h1>
+            <div className="header">
+                <i className="fa-solid fa-user idLogo"></i>
+                <h1 className = "pageTitle">Driver Information</h1>
+            </div>
             <form className = "inputsContainer" onSubmit={handleSubmit}>
                 <label>
                     <p className = "fieldLabel">Name</p>
