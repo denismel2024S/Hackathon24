@@ -127,26 +127,38 @@ export function RiderLogin({onSubmit}){
             <form className = "inputsContainer" onSubmit={handleSubmit}>
                 <label>
                     <p className = "fieldLabel">Name:</p>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className="inputGroup">
+                        <input
+                            className = "input"
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder='Ella Jane...'
+                            required
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
                 </label>
                 <br />
                 <label>
                     <p className = "fieldLabel">Phone Number:</p>
-                    <input
-                        //type="tel"
-                        type="number"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                        pattern="[0-9]{10}" 
-                    />
+                    <div className="inputGroup">
+                        <input
+                            //type="tel"
+                            className = "input"
+                            type="number"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
+                            pattern="[0-9]{10}" 
+                            placeholder="(123)-456-7890"
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
                 </label>
                 <br />
                 
@@ -160,11 +172,14 @@ export function RiderLogin({onSubmit}){
                     required
                     >
                     {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                        <div>
+                        <div className = "inputGroup">
                         <input
                             {...getInputProps({ placeholder: 'Enter a pickup location' })}
                             required
+                            className = "input"
                         />
+                            <span className = "highlight"></span>
+                            <span className = "bar"></span>
                         <div>
                             {loading && <div>Loading...</div>}
                             {suggestions.map((suggestion, index) => (
@@ -198,12 +213,15 @@ export function RiderLogin({onSubmit}){
                         required
                     >
                         {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                        <div>
+                        <div className = "inputGroup">
                             <input
                             {...getInputProps({ placeholder: 'Enter a destination' })}
                             required
+                            className = "input"
                             />
-                            <div>
+                            <span className = "highlight"></span>
+                            <span className = "bar"></span>
+                        <div>
                             {loading && <div>Loading...</div>}
                             {suggestions.map((suggestion, index) => (
                                 <div

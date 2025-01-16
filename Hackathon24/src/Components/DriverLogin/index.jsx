@@ -123,17 +123,22 @@ export function DriverLogin({}){
                 <br />
                 <label>
                     <p className = "fieldLabel">Phone Number: </p> 
-                    <input
-                        //type="number"
-                        type="tel"
-                        name="phone"
-                        // value={formatToPhone(formData.phone)}
-                        value={(formData.phone)}
-                        onChange={handleChange}
-                        placeholder='123-456-7890...'
-                        // required
-                        // pattern="[0-9]{10}" 
-                    />
+                    <div className = "inputGroup">
+
+                        <input
+                            className = "input"
+                            type="tel"
+                            name="phone"
+                            // value={formatToPhone(formData.phone)}
+                            value={(formData.phone)}
+                            onChange={handleChange}
+                            placeholder='(123)-456-7890...'
+                            // required
+                            // pattern="[0-9]{10}" 
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
                 </label>
                 <br></br>
                 <button className = "submit" type="submit">Submit</button>

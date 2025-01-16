@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, updateQueueAndResetDriver, getQueueByRiderId, clearDatabase } = require('./database'); // Import the database functions
+const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, getQueueByRiderId, updateRiderLocationsById, clearDatabase } = require('./database'); // Import the database functions
 
 
 // Open SQLite database

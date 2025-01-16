@@ -330,4 +330,5 @@ input{
 .suggestion-item{
   color: white;
   padding: 5px;
+  z-index: 3;
 }
