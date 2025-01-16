@@ -279,11 +279,13 @@ input{
 
 }
 .queue{
-  border: 5px solid var(--primary);
-  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  margin: 10px 10px 0px 10px;
+  justify-content: center;
+  border: 2px solid var(--lightGray);
+  border-radius: 10px;
   padding: 10px;
-  font-size: 3rem;
-  margin: 20px ;
 }
 .driverInformation{
   width: 100%;
@@ -326,6 +328,8 @@ input{
   border: 4px solid transparent;
   overflow-y: scroll;
   max-height: 60vh;
+  border: 2px solid var(--lightGray);
+  border-radius: 10px;
 }
 
 .driver-queue-container table.queue-table th,
@@ -357,7 +361,11 @@ input{
 .riderInformation{
   display: flex;
   flex-direction: column;
-  margin: 20px;
+  margin: 10px 10px 0px 10px;
+  justify-content: center;
+  border: 2px solid var(--lightGray);
+  border-radius: 10px;
+  padding: 10px;
   /*
   border: 2px solid rgba(0, 0, 0, 0.2); 
   border-radius: 15px;
@@ -385,10 +393,18 @@ input{
 }
 .currentDriver{
   margin: 20px;
+  border: 2px solid var(--lightGray);
+  border-radius: 10px;
 }
 /* Driver Info card */
 .drivers-container{
-  margin: 20px 0px;
+  display: flex;
+  flex-direction: column;
+  margin: 10px 10px 0px 10px;
+  justify-content: center;
+  border: 2px solid var(--lightGray);
+  border-radius: 10px;
+  padding: 10px;
 }
 .driverInfoCard{
   margin: 20px 10px;

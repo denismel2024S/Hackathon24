@@ -128,7 +128,7 @@ const LocationChangeForm = ({ riderId, socket, pickupCoordinates, setPickupCoord
   };
 
   return (
-    <div>
+    <div className = "inputsContainer">
       {!addressesConfirmed ? (
         // Show the form for entering addresses
         <form>
