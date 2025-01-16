@@ -5,9 +5,10 @@ import MapWithMarker from '../xmap_with_marker';
 import throttle from 'lodash/throttle';
 
 
-const LocationChangeForm = ({ riderId, socket, pickupCoordinates, setPickupCoordinates, updateRiderData }) => {
+const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
   const [location, setLocation] = useState('');
   const [destination, setDestination] = useState('');
+  const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [loading, setLoading] = useState(false);
   const [addressesConfirmed, setAddressesConfirmed] = useState(false); // New state to toggle views
@@ -50,7 +51,7 @@ const LocationChangeForm = ({ riderId, socket, pickupCoordinates, setPickupCoord
         const { lat, lng } = response.data.results[0].geometry.location;
         setPickupCoordinates(response.data.results[0].geometry.location); // Set coordinates for the map
         updateRiderData({
-          pickupCoordinates: { lat, lng }, // Rider is leaving the queue, so we reset driver_id
+          pickup_coordinates: { lat, lng }, // Rider is leaving the queue, so we reset driver_id
         });
       } else {
         console.error('No results found for the selected address.');
@@ -84,6 +85,9 @@ const LocationChangeForm = ({ riderId, socket, pickupCoordinates, setPickupCoord
       if (response.data.results.length > 0) {
         const { lat, lng } = response.data.results[0].geometry.location;
         setDestinationCoordinates({ lat, lng }); // Store destination coordinates
+        updateRiderData({
+          dropoff_coordinates: response.data.results[0].geometry.location,
+        });
       } else {
         console.error('No results found for the selected address.');
       }
@@ -100,29 +104,29 @@ const LocationChangeForm = ({ riderId, socket, pickupCoordinates, setPickupCoord
       alert('Please set both pickup and destination locations before confirming.');
       return;
     }
-    const throttledSendLocationUpdate = throttle(
-      (socket, riderId, pickupCoordinates, location, destination) => {
-        try {
-          const message = {
-            rider_id: riderId,
-            pickup_coordinates: pickupCoordinates,
-            pickup_location: location,
-            dropoff_location: destination,
-            action: 'riderLocationUpdate',
-          };
+    // const throttledSendLocationUpdate = throttle(
+    //   (socket, riderId, pickupCoordinates, location, destination) => {
+    //     try {
+    //       const message = {
+    //         rider_id: riderId,
+    //         pickup_coordinates: pickupCoordinates,
+    //         pickup_location: location,
+    //         dropoff_location: destination,
+    //         action: 'riderLocationUpdate',
+    //       };
 
-          socket.send(JSON.stringify(message));
-          console.log('Rider location updated:', message);
-        } catch (error) {
-          console.error('Error sending location update:', error);
-        }
-      },
-      2000, // Adjust the throttle duration (in milliseconds) as needed
-      { leading: true, trailing: false } // Send immediately on the first call, and ignore trailing events
-    );
+    //       socket.send(JSON.stringify(message));
+    //       console.log('Rider location updated:', message);
+    //     } catch (error) {
+    //       console.error('Error sending location update:', error);
+    //     }
+    //   },
+    //   2000, // Adjust the throttle duration (in milliseconds) as needed
+    //   { leading: true, trailing: false } // Send immediately on the first call, and ignore trailing events
+    // );
 
-    // Use the throttled function (you may need to pass relevant arguments here)
-    throttledSendLocationUpdate(socket, riderId, pickupCoordinates, location, destination);
+    // // Use the throttled function (you may need to pass relevant arguments here)
+    // throttledSendLocationUpdate(socket, riderId, pickupCoordinates, location, destination);
 
     setAddressesConfirmed(true); // Toggle to map view
   };
@@ -213,12 +217,15 @@ const LocationChangeForm = ({ riderId, socket, pickupCoordinates, setPickupCoord
       ) : (
         // Show the map after addresses are confirmed
         <MapWithMarker
+          riderId={riderId}
           address={location}
+          destination={destination}
           initialCoordinates={pickupCoordinates}
           onCoordinatesChange={setPickupCoordinates}
           socket={socket}
           updateRiderData={updateRiderData}
           setPickupCoordinates={setPickupCoordinates}
+          destinationCoordinates={destinationCoordinates}
         />
       )}
     </div>

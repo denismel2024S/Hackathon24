@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import axios from 'axios';
+import { drop } from 'lodash';
 
-const MapWithMarker = ({ address, initialCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates }) => {
+const MapWithMarker = ({ riderId, address, initialCoordinates, destination, destinationCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates }) => {
   const [center, setCenter] = useState(initialCoordinates || { lat: 37.2296, lng: -80.4244 }); // Default coordinates
   const [markerPosition, setMarkerPosition] = useState(initialCoordinates);
   const [loading, setLoading] = useState(false);
@@ -41,27 +42,69 @@ const MapWithMarker = ({ address, initialCoordinates, onCoordinatesChange, socke
     
   };
 
+  // Sending updated coordinates to the server
   const handleSendCoordinates = async () => {
     setLoading(true);
-    try {
-      const message = {
-        action: 'riderPickupCoordinateUpdate',
-        coordinates: markerPosition,
-      };
 
-      socket.send(JSON.stringify(message));
-
-      updateRiderData({
-        pickupCoordinates: markerPosition,
-      })
+    // if user is logged in and has a rider id, send the updated coordinates to the server
+    if (!riderId) {
+        updateRiderData({
+          pickup_coordinates: markerPosition,
+          dropoff_coordinates: destinationCoordinates,
+        })
+        console.log('Pickup Coordinates Updated.');
+        setLoading(false);
+        return
+    }
+    else {
+        try {
+            const message = {
+              action: 'riderLocationUpdate',
+              rider_id: riderId,
+              pickup_address: address,
+              pickup_coordinates: markerPosition,
+              dropoff_address: destination,
+              dropoff_coordinates: destinationCoordinates,
+            };
       
-      console.log('Rider location updated:', message);
-    } catch (error) {
-      console.error('Error sending coordinates:', error);
-    } finally {
-      setLoading(false);
+            socket.send(JSON.stringify(message));
+            console.log('Rider location update sent to server:', message);
+      
+            updateRiderData({
+              pickup_coordinates: markerPosition,
+              dropoff_coordinates: destinationCoordinates,
+            })
+            
+          } catch (error) {
+            console.error('Error sending coordinates:', error);
+          } finally {
+            setLoading(false);
+          }
     }
   };
+
+//   // Sending updated coordinates to the server
+//   const handleSendCoordinates = async () => {
+//     setLoading(true);
+//     try {
+//       const message = {
+//         action: 'riderPickupCoordinateUpdate',
+//         coordinates: markerPosition,
+//       };
+
+//       socket.send(JSON.stringify(message));
+
+//       updateRiderData({
+//         pickupCoordinates: markerPosition,
+//       })
+      
+//       console.log('Rider location updated:', message);
+//     } catch (error) {
+//       console.error('Error sending coordinates:', error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
   if (!isLoaded) return <div>Loading map...</div>;
 

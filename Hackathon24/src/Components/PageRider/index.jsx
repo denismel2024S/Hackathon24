@@ -118,7 +118,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                             action: "sendRiderLocationToDriver",
                             driverId: sanitizedDriverId,  // driver's ID
                             pickup_location: rider.pickup_location,
-                            pickup_coordinates: rider.pickupCoordinates, // POTENTIALLY NEEDS TO BE CHANGED TO SOMETHING LIKE rider.pickupCoordinates
+                            pickup_coordinates: rider.pickup_coordinates, // POTENTIALLY NEEDS TO BE CHANGED TO SOMETHING LIKE rider.pickupCoordinates
                             dropoff_location: rider.dropoff_location,
                             riderId: rider.id,
                         };
@@ -140,24 +140,23 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
 
                 // Check if the message is for the current rider's queue
                 if (parsedMessage.type === "rider_queue" && parsedMessage.data) {
-                    console.log("Queue update for current rider:", parsedMessage.data);
+                    console.log("Recieved new queue update for current rider:", parsedMessage.data);
         
                     // Update the queue state with the new data
                     setQueue((prevQueue) => ({
                     ...prevQueue,
                     ...parsedMessage.data, // Merge the new data with existing queue data
                     }));
-        
-                    console.log("Updated queue object:", parsedMessage.data);
-                }
+                    }
 
                 if (parsedMessage.type === "driver") {
-                    console.log("Riders current driver info:", parsedMessage);
+                    console.log("Recieved new current driver info:", parsedMessage);
         
                     // Update the queue state with the new data
                     setDriver(parsedMessage.data);
-        
-                    console.log("Updated driver object:", parsedMessage.data);
+
+                    // Update user's local storage with the new driver info
+                    window.localStorage.setItem('driver', (e));
                 }
         
                 // Update the connected users if necessary
@@ -168,6 +167,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                         previousUsers.current = userList;
                     }
                 }
+
             } catch (error) {
                 console.error("Error processing WebSocket message:", error);
             }
@@ -176,7 +176,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
         return () => {
             socketRef.current.close();
         };
-    }, [rider?.id, rider?.username, rider?.phone_number]);
+    }, [rider?.id, rider?.username, rider?.phone_number, rider?.driver_id]);
 
     
 
@@ -243,12 +243,14 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
 
     return (
         <div className="pageDriver">
-            {!rider.pickupCoordinates ? (
+            {!rider.pickup_coordinates ? (
                 <div>
                     {/* Render only the map when pickupCoordinates are not set */}
                     <MapWithMarker
                         address={rider.pickup_location}
+                        destination={rider.dropoff_location}
                         initialCoordinates={null}
+                        destinationCoordinates={rider.destinationCoordinates}
                         onCoordinatesChange={setPickupCoordinates}
                         socket={socketRef.current}
                         updateRiderData={updateRiderData}
@@ -265,7 +267,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                         <p><strong>Phone Number:</strong> {rider.phone_number}</p>
                         <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
                         <p><strong>Pickup Coordinates:</strong> Lat: {pickupCoordinates?.lat === null ? "N/A" : pickupCoordinates?.lat}, Long: {pickupCoordinates?.lng === null ? "N/A" : pickupCoordinates?.lng}</p>
-                        <p><strong>Rider Object's Pickup Coordinates:</strong> Lat: {rider.pickupCoordinates?.lat === null ? "N/A" : rider.pickupCoordinates?.lat}, Long: {rider.pickupCoordinates?.lng === null ? "N/A" : rider.pickupCoordinates?.lng}</p>
+                        <p><strong>Rider Object's Pickup Coordinates:</strong> Lat: {rider.pickup_coordinates?.lat === null ? "N/A" : rider.pickup_coordinates?.lat}, Long: {rider.pickup_coordinates?.lng === null ? "N/A" : rider.pickup_coordinates?.lng}</p>
                         <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
                         <p><strong>Rider ID:</strong> {rider.id}</p>
                         <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>

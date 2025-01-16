@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, getQueueByRiderId, updateRiderLocationsById, clearDatabase } = require('./database'); // Import the database functions
+const { addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, getRiderCoordinates, updateRiderCoordinates, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, getQueueByRiderId, updateRiderLocationAddressById, clearDatabase } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -197,11 +197,100 @@ wsServer.on("connection", (connection, request) => {
         const data = JSON.parse(message);
 
         if (data.action === 'riderLocationUpdate') {
+            const { rider_id, pickup_coordinates, dropoff_coordinates } = data;
+            console.log('Rider is attempting to update their coordinates:', data);
+          
+            // Step 2: Update rider coordinates in the database
+            updateRiderCoordinates(
+              rider_id,
+              pickup_coordinates.lat,  // { lat } for pickup
+              pickup_coordinates.lng,  // { lng } for pickup
+              dropoff_coordinates.lat, // { lat } for dropoff
+              dropoff_coordinates.lng, // { lng } for dropoff
+              (err, updatedRider) => { // Callback to handle results
+                if (err) {
+                  console.error('Error updating rider coordinates:', err);
+                } else {
+                  console.log('Rider coordinates updated successfully:', updatedRider);
+          
+                  let riderConnection = null;
+          
+                  // Update the `riders` object and find the connection for this rider
+                  for (let riderUuid in riders) {
+                    if (Number(riders[riderUuid].id) === Number(rider_id)) {
+                      riderConnection = connections[riderUuid];
+                      riders[riderUuid] = { ...riders[riderUuid], ...updatedRider };
+                      console.log("Rider found and updated.");
+                      break;
+                    }
+                  }
+          
+                  // Send the updated rider information to the rider
+                  if (riderConnection) {
+                    setTimeout(() => {
+                      riderConnection.send(JSON.stringify(updatedRider));
+                    }, 100);
+                  }
+          
+                  // If the rider has a driver assigned, update the driver's queue
+                  if (updatedRider.driver_id !== null) {
+                    getQueuesForDriver(updatedRider.driver_id, (err, rows) => {
+                      if (err) {
+                        console.error("Failed to fetch queue for driver:", err);
+                      } else {
+                        console.log("Queue details for driver:", rows);
+          
+                        // Map the queue data with position
+                        const queues = rows.map((row, index) => ({
+                          position: index + 1,
+                          riderId: row.rider_id,
+                          username: row.username,
+                          phoneNumber: row.phone_number,
+                          pickupLocation: row.pickup_location,
+                          dropoffLocation: row.dropoff_location,
+                          startTime: row.created_at,
+                          queueId: row.queue_id,
+                          status: row.status,
+                        }));
+          
+                        // Find the driver connection
+                        let driverFound = null;
+                        let driverConnection = null;
+          
+                        for (let driverUuid in drivers) {
+                          if (Number(drivers[driverUuid].id) === Number(updatedRider.driver_id)) {
+                            driverFound = drivers[driverUuid];
+                            driverConnection = connections[driverUuid];
+                            console.log("Driver found and updated.");
+                            break;
+                          }
+                        }
+          
+                        // Send the updated queue to the driver
+                        if (driverFound) {
+                          const driverMessage = {
+                            type: "driver_queue",
+                            data: queues,
+                          };
+          
+                          setTimeout(() => {
+                            driverConnection.send(JSON.stringify(driverMessage));
+                          }, 100);
+                        }
+                      }
+                    });
+                  }
+                }
+              }
+            );
+          }
+          
+        if (data.action === 'riderLocationUpdate') {
             const { rider_id, pickup_location, dropoff_location } = data;
             console.log('Rider is attempting to update their location', data)
 
             // Step 2: Update rider in database
-            updateRiderLocationsById(
+            updateRiderLocationAddressById(
                 rider_id,                             // Rider ID
                 pickup_location,                 // New pickup location
                 dropoff_location,                  // New dropoff location

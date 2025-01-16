@@ -24,33 +24,37 @@ db.serialize(() => {
     );
   `);
 
-  // Create riders table
+  // // Create riders table
+  // db.run(`
+  //   CREATE TABLE IF NOT EXISTS riders (
+  //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //     username TEXT,
+  //     phone_number TEXT UNIQUE,
+  //     pickup_location TEXT,
+  //     dropoff_location TEXT,
+  //     driver_id INTEGER,
+  //     FOREIGN KEY (driver_id) REFERENCES drivers(id)
+  //   );
+  // `);
+
+  // Create TEST riders table
+
   db.run(`
     CREATE TABLE IF NOT EXISTS riders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT,
       phone_number TEXT UNIQUE,
-      pickup_location TEXT,
-      dropoff_location TEXT,
+      pickup_location TEXT, -- Optional: Retain this if you still want to store the address as text
+      dropoff_location TEXT, -- Optional: Retain this if you still want to store the address as text
+      pickup_lat REAL,
+      pickup_lng REAL,
+      dropoff_lat REAL,
+      dropoff_lng REAL,
       driver_id INTEGER,
       FOREIGN KEY (driver_id) REFERENCES drivers(id)
     );
   `);
-
-  // // Create queue table
-  // db.run(`
-  //   CREATE TABLE IF NOT EXISTS queue (
-  //   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  //   rider_id INTEGER NOT NULL,
-  //   driver_id INTEGER NOT NULL,
-  //   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  //   ended_at DATETIME,
-  //   FOREIGN KEY (rider_id) REFERENCES riders(id),
-  //   FOREIGN KEY (driver_id) REFERENCES drivers(id)
-  //   );
-  // `);
-
-  // TEST QUEUE DATABASE
+  
 
   // Create queue table with status column
 db.run(`
@@ -336,7 +340,41 @@ function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation
   });
 }
 
-function updateRiderLocationsById(riderId, pickupLocation, dropoffLocation, callback) {
+/**
+ * Retrieve a rider's coordinates and return the result.
+ * 
+ * @param {*} riderId - The ID of the rider.
+ * @param {*} callback - Callback to handle the result (err, coordinates).
+ */
+function getRiderCoordinates(riderId, callback = () => {}) {
+  db.serialize(() => {
+    const selectStmt = db.prepare(`
+      SELECT 
+        id, 
+        pickup_lat, 
+        pickup_lng, 
+        dropoff_lat, 
+        dropoff_lng
+      FROM riders
+      WHERE id = ?
+    `);
+
+    selectStmt.get([riderId], (err, row) => {
+      if (err) {
+        console.error("Error retrieving rider coordinates:", err);
+        callback(err, null);
+      } else {
+        console.log("Rider coordinates retrieved successfully:", row);
+        callback(null, row); // Return the rider's coordinates
+      }
+    });
+
+    selectStmt.finalize();
+  });
+}
+
+
+function updateRiderLocationAddressById(riderId, pickupLocation, dropoffLocation, callback) {
   console.log(riderId)
   db.serialize(() => {
     // Check if a rider with the given ID exists
@@ -386,8 +424,46 @@ function updateRiderLocationsById(riderId, pickupLocation, dropoffLocation, call
   });
 }
 
+/**
+ * Update the rider's coordinates and return the updated rider object.
+ * 
+ * @param {*} riderId - The ID of the rider.
+ * @param {*} pickup - An object containing { lat, lng } for the pickup location.
+ * @param {*} dropoff - An object containing { lat, lng } for the dropoff location.
+ * @param {*} callback - Callback to handle the result (err, rider).
+ */
+function updateRiderCoordinates(riderId, pickup_lat, pickup_lng, dropoff_lat, dropoff_lng, callback = () => {}) {
+  db.serialize(() => {
+    const updateStmt = db.prepare(`
+      UPDATE riders
+      SET 
+        pickup_lat = ?, 
+        pickup_lng = ?, 
+        dropoff_lat = ?, 
+        dropoff_lng = ?
+      WHERE id = ?
+      RETURNING id, username, phone_number, pickup_lat, pickup_lng, dropoff_lat, dropoff_lng
+    `);
 
-function updateRiderLocationsById(riderId, pickupLocation, dropoffLocation, callback) {
+    updateStmt.get(
+      [pickup_lat, pickup_lng, dropoff_lat, dropoff_lng, riderId],
+      (err, row) => {
+        if (err) {
+          console.error("Error updating rider coordinates:", err);
+          callback(err, null);
+        } else {
+          console.log("Rider coordinates updated successfully:", row);
+          callback(null, row); // Return the updated rider object
+        }
+      }
+    );
+
+    updateStmt.finalize();
+  });
+}
+
+
+function updateRiderLocationAddressById(riderId, pickupLocation, dropoffLocation, callback) {
   console.log(riderId)
   db.serialize(() => {
     // Check if a rider with the given ID exists
@@ -818,6 +894,8 @@ module.exports = {
   addOrUpdateDriver, 
   addOrUpdateRider,
   getDriverById,
-  updateRiderLocationsById,
+  updateRiderLocationAddressById,
   clearDatabase,
+  getRiderCoordinates,
+  updateRiderCoordinates,
 };

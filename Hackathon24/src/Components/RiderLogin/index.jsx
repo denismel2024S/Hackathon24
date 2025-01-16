@@ -67,6 +67,19 @@ export function RiderLogin({onSubmit}){
         e.preventDefault();
         console.log('Rider Information:', formData);
         setSubmitted(true);
+
+        let dropoff_coordinates = null;
+        try {
+            const response = await axios.get(
+              `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+                address
+              )}&key=AIzaSyClpAbZE9jOntj_O-zuSrujl4F6d_Om_Yc` // Replace with your API key
+            );
+            const location = response.data.results[0].geometry.location;
+            dropoff_coordinates = location;
+          } catch (error) {
+            console.error('Error geocoding address:', error);
+          }
     
         // Prepare form data for the rider
         const formRiderData = {
@@ -76,7 +89,8 @@ export function RiderLogin({onSubmit}){
             pickup_location: formData.pickup || rider.pickup_location,
             dropoff_location: formData.dropoff || rider.dropoff_location,
             driver_id: rider.driver_id || null,
-            pickupCoordinates: rider.pickupCoordinates || null,
+            pickup_coordinates: null,
+            dropoff_coordinates: dropoff_coordinates,
         };
     
         // Update rider state
@@ -93,16 +107,18 @@ export function RiderLogin({onSubmit}){
         const submitted = window.localStorage.getItem('submitted');
         if (rider) {
             setRider(JSON.parse(rider));
-            setSubmitted(submitted);
         }
     }, []);
+
+
     useEffect(() => {
             if (rider.id !== null) {
                 console.log('Rider logged in', rider);
+                setSubmitted(true);
             }
             window.localStorage.setItem('rider', JSON.stringify(rider));
             window.localStorage.setItem('submitted', submitted);
-        }, [rider]); // This will log the driver when state changes and is not null
+        }, [rider]); // This will log when user submits form data
 
 
     console.log("In the RiderLogin")
