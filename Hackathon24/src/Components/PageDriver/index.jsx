@@ -82,6 +82,8 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                 if (parsedMessage.type === "riderLocationUpdate") {
                     console.log("Received rider location data:", parsedMessage);
                     setCurrentQueuePickupCoordinates(parsedMessage.pickup_coordinates); // Set coordinates for the map
+                    window.localStorage.setItem('pickupCoordinates', parsedMessage.pickup_coordinates);
+
                 }
 
                 if (parsedMessage.type === "driver_queue") {
@@ -146,6 +148,23 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
       // Optionally, you could retry sending the message after a delay, or queue it for later
     }
   }, [driver.queue_length, connectedUsers]);
+
+
+    useEffect(() => {
+            
+        window.localStorage.setItem('currentQueuePickupCoordinates', JSON.stringify(currentQueuePickupCoordinates));
+    
+    }, [currentQueuePickupCoordinates]);
+
+    useEffect(() => {
+        
+        const currentQueuePickupCoordinates = window.localStorage.getItem('currentQueuePickupCoordinates');
+        if (currentQueuePickupCoordinates) {
+            setCurrentQueuePickupCoordinates(currentQueuePickupCoordinates);
+        }
+    }, []);
+
+
 
     // Wait until the driver data is available before rendering
     // Show loading until the driver data is fetched

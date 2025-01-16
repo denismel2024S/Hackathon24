@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'; // Ensure useRef is included
 import {PageRider} from '../PageRider'
 import {Reset} from '../Reset'
 import PlacesAutocomplete from 'react-places-autocomplete';
+import { pick } from 'lodash';
 
 export function RiderLogin({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
@@ -75,6 +76,7 @@ export function RiderLogin({onSubmit}){
             pickup_location: formData.pickup || rider.pickup_location,
             dropoff_location: formData.dropoff || rider.dropoff_location,
             driver_id: rider.driver_id || null,
+            pickupCoordinates: rider.pickupCoordinates || null,
         };
     
         // Update rider state
