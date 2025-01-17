@@ -70,16 +70,18 @@ html, body{
 h1, h2, h3, h4, h5, h6, p, strong, span, div, label, input {
   color: var(--secondary);
   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  line-height: 1.1;
 }
 
 
 h1 {
   font-size: 2.8rem;
-  line-height: 1.1;
 }
 h2 {
+  font-size: 2rem;
+}
+h3{
   font-size: 1.5rem;
-  line-height: 1.1;
 }
 
 button {
@@ -122,6 +124,7 @@ input{
 .mainPage{
   display: flex;
   flex-direction: column;
+  margin: 10px;
 }
 .chariotTitle{
   color: var(--primary);
@@ -339,12 +342,11 @@ input{
 
 /* Queue Table Component */
 .scrollableList{
-  margin: 10px 0px 10px 0px;
   background-color: var(--gray);
-  padding: 20px;
+  padding: 15px;
   border: 4px solid transparent;
   overflow-y: scroll;
-  max-height: 50vh;
+  max-height: 60vh;
   border: 2px solid var(--lightGray);
   border-radius: 10px;
 }
@@ -405,6 +407,24 @@ input{
   justify-self: center;
   align-items: center;
 
+}
+.queueNumber{
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+.queueNumber[data="0"],
+.queueNumber[data="1"]
+{
+  color: green;
+}
+.queueNumber[data="2"],
+.queueNumber[data="3"]
+{
+  color: yellow
+}
+.queueNumber[data="4"]
+{
+  color: red
 }
 /* Driver Info card */
 .drivers-container{

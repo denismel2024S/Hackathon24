@@ -232,9 +232,6 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
                 </label>
           </div>
 
-          <button onClick={handleConfirmAddresses}>
-            Confirm Addresses
-          </button>
         </form>
         <button onClick = {() => setChngLocStep(chngLocStep+1)}>Next</button>
         </>
