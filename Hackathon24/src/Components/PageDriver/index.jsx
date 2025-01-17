@@ -81,8 +81,13 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
 
                 if (parsedMessage.type === "riderLocationUpdate") {
                     console.log("Received rider location data:", parsedMessage);
-                    setCurrentQueuePickupCoordinates(parsedMessage.pickup_coordinates); // Set coordinates for the map
-                    window.localStorage.setItem('pickupCoordinates', parsedMessage.pickup_coordinates);
+                    console.log("Received rider location data:", parsedMessage.pickup_coordinates);
+                    const {lat, lng} = parsedMessage.pickup_coordinates;
+                    window.localStorage.setItem('currentQueuePickupCoordinates', JSON.stringify({lat, lng}));
+
+                    setCurrentQueuePickupCoordinates({lat, lng}); // Set coordinates for the map
+                    console.log("lat, lng:", {lat, lng});
+
 
                 }
 

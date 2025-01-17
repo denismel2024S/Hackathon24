@@ -4,6 +4,8 @@ import CurrentQueueDriverInfoCard from "../CurrentQueueDriverInfoCard";
 import LocationChangeForm from "../XUnused/Xlocation_form";
 import MapWithMarker from "../XUnused/xmap_with_marker";
 import {Reset} from "../Reset"
+import './index.css';
+
 import { pick } from "lodash";
 
 
@@ -242,7 +244,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     } 
 
     return (
-        <div className="pageDriver">
+        <div className="pageRider">
             {!rider.pickup_coordinates ? (
                 <div>
                     {/* Render only the map when pickupCoordinates are not set */}
@@ -281,15 +283,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                 </div>
                             ) : (
                                 <div>
-                                    {queue.position > 1 && (
-                                        <LocationChangeForm
-                                            riderId={rider.id}
-                                            socket={socketRef.current}
-                                            updateRiderData={updateRiderData}
-                                            pickupCoordinates={pickupCoordinates}
-                                            setPickupCoordinates={setPickupCoordinates}
-                                        />
-                                    )}
+
                                     <CurrentQueueDriverInfoCard
                                         rider={rider}
                                         driver={driver}
@@ -302,6 +296,16 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                         queuePosition={queue ? queue.position : "Loading..."}
                                         status={queue ? queue.status : "Loading..."}
                                     />
+                                    {queue.position > 1 && (
+                                            <LocationChangeForm
+                                            riderId={rider.id}
+                                            socket={socketRef.current}
+                                            updateRiderData={updateRiderData}
+                                            pickupCoordinates={pickupCoordinates}
+                                            setPickupCoordinates={setPickupCoordinates}
+                                        />
+                                        
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -316,13 +320,14 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                 setRider={setRider}
                                 updateRiderData={updateRiderData}
                             />
-                            <LocationChangeForm
-                                riderId={rider.id}
-                                socket={socketRef.current}
-                                updateRiderData={updateRiderData}
-                                pickupCoordinates={pickupCoordinates}
-                                setPickupCoordinates={setPickupCoordinates}
-                            />
+                                <LocationChangeForm
+                                    riderId={rider.id}
+                                    socket={socketRef.current}
+                                    updateRiderData={updateRiderData}
+                                    pickupCoordinates={pickupCoordinates}
+                                    setPickupCoordinates={setPickupCoordinates}
+                                />
+                            
                         </div>
                     )}
                     <Reset />

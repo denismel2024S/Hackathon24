@@ -286,14 +286,14 @@ wsServer.on("connection", (connection, request) => {
           }
           
         if (data.action === 'riderLocationUpdate') {
-            const { rider_id, pickup_location, dropoff_location } = data;
+            const { rider_id, pickup_address, dropoff_address } = data;
             console.log('Rider is attempting to update their location', data)
 
             // Step 2: Update rider in database
             updateRiderLocationAddressById(
                 rider_id,                             // Rider ID
-                pickup_location,                 // New pickup location
-                dropoff_location,                  // New dropoff location
+                pickup_address,                 // New pickup location
+                dropoff_address,                  // New dropoff location
                 (err, updatedRider) => {       // Callback to handle results
                   if (err) {
                     console.error('Error updating rider locations:', err);

@@ -210,7 +210,7 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
             </label>
           </div>
 
-          <button onClick={handleConfirmAddresses} style={{ marginTop: '10px' }}>
+          <button onClick={handleConfirmAddresses}>
             Confirm Addresses
           </button>
         </form>

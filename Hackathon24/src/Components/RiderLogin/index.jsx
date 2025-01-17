@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react'; // Ensure useRef is included
 import {PageRider} from '../PageRider'
 import {Reset} from '../Reset'
 import PlacesAutocomplete from 'react-places-autocomplete';
-import { pick } from 'lodash';
+import { pick, set } from 'lodash';
 
 export function RiderLogin({onSubmit}){
     const[submitted, setSubmitted] = useState(false)
     const [location, setLocation] = useState('');
     const [destination, setDestination] = useState('');
+    const [driver, setDriver] = useState(null); // Start as null for better checks
     
     const [rider, setRider] = useState({
         id: null,
@@ -104,10 +105,14 @@ export function RiderLogin({onSubmit}){
         
     useEffect(() => {
         const rider = window.localStorage.getItem('rider');
+        // const driver = window.localStorage.getItem('driver');
         const submitted = window.localStorage.getItem('submitted');
         if (rider) {
             setRider(JSON.parse(rider));
         }
+        // if (driver){
+        //     setDriver(JSON.parse(driver));
+        // }
     }, []);
 
 
@@ -130,6 +135,8 @@ export function RiderLogin({onSubmit}){
                         formData = {formData} 
                         rider={rider} 
                         setRider={setRider}
+                        driver={driver}
+                        setDriver={setDriver}
                         updateRiderData={updateRiderData}
                     />
                 ) : (

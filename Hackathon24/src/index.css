@@ -14,14 +14,12 @@ padding: top right bottom left
   font-weight: 400;
 }
 :root {
-  --primary: #ca8a04;
-  --secondary: #ca6104;
+  --primary: #515151;
+  --secondary: hsl(32, 34%, 85%);
   --green: #4caf50;
   --red: #de6451;
   --gray: #212121;
-  --lightGray: #515151;
-  --textGray: #818181;
-  
+  --lightGray: #515151;  
   font-family: "Crimson" ;
   line-height: 1.5;
   color-scheme: light dark;
@@ -68,6 +66,13 @@ html, body{
   /*outline: 1px solid lime; /* Debugging purposes */
 }
 
+
+h1, h2, h3, h4, h5, h6, p, strong, span, div, label, input {
+  color: var(--secondary);
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+
 h1 {
   font-size: 2.8rem;
   line-height: 1.1;
@@ -82,11 +87,12 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 10px;
+  margin: 10px 0px 10px 0px;
   font-size: 1.25rem;
   width: 100%;
   background-color: var(--secondary);
   font-size: 1.5rem;
-  color: #fafafa;
+  color: var(--primary);
   cursor: pointer;
 }
 
@@ -262,6 +268,8 @@ input{
 }
 .pageTitle{
   margin: 20px 20px 0px 20px; 
+  color: var(--secondary);
+
 }
 .inputsContainer{
   display: flex;
@@ -274,7 +282,7 @@ input{
 }
 .fieldLabel{
   font-size: 1.2rem;
-  color: var(--lightGray);
+  color: var(--secondary);
 }
     
 /* Driver Main Page */
@@ -328,7 +336,7 @@ input{
 
 /* Queue Table Component */
 .queueList{
-  margin: 5rem 0px 10px 0px;
+  margin: 10px;
   border-top-left-radius: 50px;
   border-top-right-radius: 50px;
   background-color: var(--gray);
@@ -353,16 +361,6 @@ input{
 }
 .mapButtons{
   margin-top: 10px;
-  justify-self: center;
-}
-.google-maps-button{
-  background-color: var(--secondary);
-  margin: 20px 0px;
-  justify-self: center;
-}
-.updateStatus{
-  background-color: var(--primary);
-  margin: 20px 0px;
   justify-self: center;
 }
 /* Main Rider Page */
@@ -399,11 +397,6 @@ input{
   align-items: center;
 
 }
-.currentDriver{
-  margin: 20px;
-  border: 2px solid var(--lightGray);
-  border-radius: 10px;
-}
 /* Driver Info card */
 .drivers-container{
   display: flex;
@@ -423,7 +416,6 @@ input{
 /* Suggestion Item */
 
 .suggestion-item{
-  color: var(--textGray);
   padding: 5px;
 }
 .suggestionDiv{

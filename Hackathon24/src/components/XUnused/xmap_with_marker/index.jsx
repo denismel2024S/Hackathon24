@@ -186,7 +186,6 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
 
       <button
         onClick={handleSendCoordinates}
-        style={{ marginTop: '10px' }}
         disabled={loading}
       >
         {loading ? 'Sending...' : 'Confirm Pickup Location'}

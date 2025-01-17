@@ -5,3 +5,34 @@
     border: 5px solid black;
     border-radius: 10px;
 }
+.greeting{
+    color: var(--secondary);
+}
+
+.queue{
+    border: 5px solid black;
+    border-radius: 10px;
+    margin: 20px;
+    color: var(--secondary);
+}
+
+.pageDriver{
+position: relative; /* Establish positioning context */
+  width: 100%; /* Full viewport width */
+  height: 100%; /* Full viewport height */
+  box-sizing: border-box; /* Include padding and border in size */
+}
+
+.riderInformation {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 10px 10px 10px;
+    padding: 10px;
+}
+
+.queueList {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 10px 10px 10px;
+    padding: 10px;
+}

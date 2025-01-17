@@ -1,0 +1,10 @@
+
+.google-maps-button{
+    background-color: var(--secondary);
+    margin: 20px 0px;
+    justify-self: center;
+  }
+  .updateStatus{
+    margin: 20px 0px;
+    justify-self: center;
+  }

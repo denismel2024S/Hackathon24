@@ -44,7 +44,6 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
   };
 
   return (
-    <div className="card">
       <div className="currentDriver">
         <h3 className="driverName"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
         <p><b>Phone number: </b>{driver.phone_number}</p>
@@ -59,7 +58,6 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
           {inQueue ? 'Leave Queue' : 'Leaving...'}
         </button>
       </div>
-    </div>
   );
 }
 

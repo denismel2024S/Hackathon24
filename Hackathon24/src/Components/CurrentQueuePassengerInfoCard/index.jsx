@@ -35,12 +35,7 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
             </div>
             {/* Buttons */}
             <div className="mapButtons">
-                <button
-                    id="google-maps-button"
-                    className="btn btn-success"
-                    onClick={() => handleButtonClick(googleMapsUrl)}>
-                    Google Maps
-                </button>
+                
                 {/* Arrived at Pickup and Arrived at Destination Buttons */}
                 <ButtonContainer
                     key={riderId}
@@ -48,13 +43,9 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
                     driverId={driverId}
                     socket={socket}
                     arrivedAtPickup={arrivedAtPickup}
+                    googleMapsUrl={googleMapsUrl}
                     setArrivedAtPickup={setArrivedAtPickup}>
-                    <button
-                        id="google-maps-button"
-                        className="btn btn-success"
-                        onClick={() => handleButtonClick(googleMapsUrl)}>
-                       Google Maps
-                    </button>
+                    
                 </ButtonContainer>
             </div>
         </div>

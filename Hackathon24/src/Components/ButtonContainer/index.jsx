@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Swal from 'sweetalert2';
+import './index.css';
 
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedAtPickup}) => {
+const ButtonContainer = ({googleMapsUrl, riderId, driverId, socket,arrivedAtPickup, setArrivedAtPickup}) => {
   const [arrivedAtDestination, setArrivedAtDestination] = useState(false);
 
   const currentPassenger = { name: 'John Doe' }; // Example passenger data
@@ -29,6 +30,10 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
       console.error("Failed to send status update on component load:", err);
     }
   }, [driverId, riderId, socket]); // Run this effect when these values change
+
+  const handleButtonClick = (url) => {
+    window.open(url, '_blank');
+  };
 
   const handleArrivedPickup = () => {
     MySwal.fire({
@@ -109,6 +114,12 @@ const ButtonContainer = ({riderId, driverId, socket,arrivedAtPickup, setArrivedA
 
   return (
     <div>
+      <button
+        id="google-maps-button"
+        className="google-maps-button"
+        onClick={() => handleButtonClick(googleMapsUrl)}>
+        Google Maps
+    </button>
       {!arrivedAtPickup && (
         <button
             className = "updateStatus"
