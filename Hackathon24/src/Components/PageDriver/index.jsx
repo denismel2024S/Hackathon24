@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import CurrentQueuePassengerInfoCard from "../CurrentQueuePassengerInfoCard";
 import DriverMapTest from "../XUnused/Xdriver_map_test";
 import QueueTable from "../QueueTable";
@@ -187,7 +188,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             <ul>
                 {/* Render the first person in the queue if it exists */}
                 {filteredUsers.length > 0 && (
-                    <div className = "queueList">
+                    <div className = "scrollableList">
                         <CurrentQueuePassengerInfoCard
                             key={0}
                             name={filteredUsers[0].username}

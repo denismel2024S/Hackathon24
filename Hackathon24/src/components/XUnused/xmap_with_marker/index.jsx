@@ -3,7 +3,7 @@ import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import axios from 'axios';
 import { drop } from 'lodash';
 
-const MapWithMarker = ({ riderId, address, initialCoordinates, destination, destinationCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates }) => {
+const MapWithMarker = ({ riderId, address, initialCoordinates, destination, destinationCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates, onComplete , showButton}) => {
   const [center, setCenter] = useState(initialCoordinates || { lat: 37.2296, lng: -80.4244 }); // Default coordinates
   const [markerPosition, setMarkerPosition] = useState(initialCoordinates);
   const [loading, setLoading] = useState(false);
@@ -13,6 +13,7 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
   });
 
   useEffect(() => {
+
     if (address && !initialCoordinates) {
       const geocodeAddress = async () => {
         try {
@@ -54,6 +55,7 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
         })
         console.log('Pickup Coordinates Updated.');
         setLoading(false);
+        onComplete();
         return
     }
     else {
@@ -74,6 +76,7 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
               pickup_coordinates: markerPosition,
               dropoff_coordinates: destinationCoordinates,
             })
+          onComplete();
             
           } catch (error) {
             console.error('Error sending coordinates:', error);
@@ -184,12 +187,14 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
         )}
       </GoogleMap>
 
-      <button
+      {showButton && <button
+        className = "confirmPickUpButton"
         onClick={handleSendCoordinates}
         disabled={loading}
       >
         {loading ? 'Sending...' : 'Confirm Pickup Location'}
       </button>
+      }
     </>
   );
 };

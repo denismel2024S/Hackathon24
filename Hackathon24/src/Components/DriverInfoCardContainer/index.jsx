@@ -28,30 +28,33 @@ function DriverInfoCardContainer({ inQueue, setInQueue, connectedUsers, socket, 
 
 
     return (
-        <div className="drivers-container">
+        <>
+        <div className="scrollableList">
             {drivers.length === 0 ? (
-                <p>No active drivers</p>
+                <h2>No Active Drivers</h2>
             ) : (
-                drivers.map((user, index) => (
-                    
-                    <>
-                    <DriverInfoCard 
-                        driver={user}
-                        key={index}
-                        socket={socket}
-                        onAddQueue={() => addToQueue(index)}
-                        rider={rider}
-                        setRider={setRider}
-                        riderId={riderId}
-                        driverId={user.id}
-                        inQueue={inQueue}
-                        setInQueue={setInQueue}
-                        updateRiderData={updateRiderData}
-                    />
-                    </>
-                ))
+                <>
+                    <h1>Current Drivers:</h1>
+                    {drivers.map((user, index) => (
+                        <DriverInfoCard 
+                            driver={user}
+                            key={index}
+                            socket={socket}
+                            onAddQueue={() => addToQueue(index)}
+                            rider={rider}
+                            setRider={setRider}
+                            riderId={riderId}
+                            driverId={user.id}
+                            inQueue={inQueue}
+                            setInQueue={setInQueue}
+                            updateRiderData={updateRiderData}
+                        />
+                    ))}
+                </>
             )}
         </div>
+        
+        </>
     );
 };
 

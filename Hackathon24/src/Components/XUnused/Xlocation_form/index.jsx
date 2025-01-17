@@ -12,6 +12,10 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [loading, setLoading] = useState(false);
   const [addressesConfirmed, setAddressesConfirmed] = useState(false); // New state to toggle views
+  const [changeLocation, setChangeLocation] = useState(false);
+  const [showingConfirmation, setShowingConfirmation] = useState(false);
+
+  const [chngLocStep, setChngLocStep] = useState(1);
 
   const handleLocationChange = (newLocation) => {
     setLocation(newLocation);
@@ -128,105 +132,131 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
     // // Use the throttled function (you may need to pass relevant arguments here)
     // throttledSendLocationUpdate(socket, riderId, pickupCoordinates, location, destination);
 
+    alert('New Locations set');
+    setChangeLocation(false);
     setAddressesConfirmed(true); // Toggle to map view
   };
+  const resetChngLocation = () => {
+    setChngLocStep(1);
+  }
 
   return (
-    <div className = "inputsContainer">
-      {!addressesConfirmed ? (
-        // Show the form for entering addresses
+    <div className = "locationForm">
+      {chngLocStep === 1 && (
+        <button onClick = {() => setChngLocStep(chngLocStep+1)}>Change Location</button>
+      )}
+
+
+      {chngLocStep === 2 && (
+        <>
         <form>
           <div>
             <label>
-              Location (Pickup):
-              <PlacesAutocomplete
-                value={location}
-                onChange={handleLocationChange}
-                onSelect={handleLocationSelect}
-              >
-                {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                  <div>
-                    <input
-                      {...getInputProps({ placeholder: 'Enter a pickup location' })}
-                      required
-                    />
-                    <div>
-                      {loading && <div>Loading...</div>}
-                      {suggestions.map((suggestion, index) => (
-                        <div
-                          key={index}
-                          {...getSuggestionItemProps(suggestion, {
-                            className: 'suggestion-item',
-                            style: {
-                              backgroundColor: suggestion.active ? '#d3d3d3' : '#fff',
-                              cursor: 'pointer',
-                            },
-                          })}
-                        >
-                          {suggestion.description}
+                    <p className="fieldLabel">Pickup</p>
+                    <PlacesAutocomplete
+                    value={location}
+                    name="pickup"
+                    onChange={handleLocationChange}
+                    onSelect={handleLocationSelect}
+                    required
+                    >
+                    {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                        <div className = "inputGroup">
+                        <input
+                            {...getInputProps({ placeholder: 'Bennys...' })}
+                            required
+                            className = "input"
+                        />
+                            <span className = "highlight"></span>
+                            <span className = "bar"></span>
+                        <div className = "suggestionDiv">
+                            {loading && <div>Loading...</div>}
+                            {suggestions.map((suggestion, index) => (
+                            <div
+                                key={index}
+                                {...getSuggestionItemProps(suggestion, {
+                                className: 'suggestion-item',
+                                style: {
+                                    backgroundColor: suggestion.active ? '#d3d3d3' : '#272727',
+                                    cursor: 'pointer',
+                                },
+                                })}
+                            >
+                                {suggestion.description}
+                            </div>
+                            ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </PlacesAutocomplete>
-            </label>
-          </div>
-
-          <div>
-            <label>
-              Destination:
-              <PlacesAutocomplete
-                value={destination}
-                onChange={handleDestinationChange}
-                onSelect={handleDestinationSelect}
-              >
-                {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                  <div>
-                    <input
-                      {...getInputProps({ placeholder: 'Enter a destination' })}
-                      required
-                    />
-                    <div>
-                      {loading && <div>Loading...</div>}
-                      {suggestions.map((suggestion, index) => (
-                        <div
-                          key={index}
-                          {...getSuggestionItemProps(suggestion, {
-                            className: 'suggestion-item',
-                            style: {
-                              backgroundColor: suggestion.active ? '#d3d3d3' : '#fff',
-                              cursor: 'pointer',
-                            },
-                          })}
-                        >
-                          {suggestion.description}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </PlacesAutocomplete>
-            </label>
+                    )}
+                    </PlacesAutocomplete>
+                </label>
+                <label>
+                    <p className="fieldLabel">Destination</p>
+                    <PlacesAutocomplete
+                        value={destination}
+                        name="dropoff"
+                        onChange={handleDestinationChange}
+                        onSelect={handleDestinationSelect}
+                        required
+                    >
+                        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                        <div className = "inputGroup">
+                            <input
+                            {...getInputProps({ placeholder: 'The Retreat' })}
+                            required
+                            className = "input"
+                            />
+                            <span className = "highlight"></span>
+                            <span className = "bar"></span>
+                        <div className = "suggestionDiv">
+                            {loading && <div>Loading...</div>}
+                            {suggestions.map((suggestion, index) => (
+                                <div className="">
+                                    <div
+                                    key={index}
+                                    {...getSuggestionItemProps(suggestion, {
+                                        className: 'suggestion-item',
+                                        style: {
+                                        cursor: 'pointer',
+                                        },
+                                    })}
+                                    >
+                                    {suggestion.description}
+                                </div>
+                                </div>
+                            ))}
+                            </div>
+                        </div>
+                        )}
+                    </PlacesAutocomplete>
+                </label>
           </div>
 
           <button onClick={handleConfirmAddresses}>
             Confirm Addresses
           </button>
         </form>
-      ) : (
-        // Show the map after addresses are confirmed
-        <MapWithMarker
-          riderId={riderId}
-          address={location}
-          destination={destination}
-          initialCoordinates={pickupCoordinates}
-          onCoordinatesChange={setPickupCoordinates}
-          socket={socket}
-          updateRiderData={updateRiderData}
-          setPickupCoordinates={setPickupCoordinates}
-          destinationCoordinates={destinationCoordinates}
-        />
+        <button onClick = {() => setChngLocStep(chngLocStep+1)}>Next</button>
+        </>
+      )}
+
+      {chngLocStep === 3 && (
+        <>
+          <MapWithMarker
+              riderId={riderId}
+              address={location}
+              destination={destination}
+              initialCoordinates={pickupCoordinates}
+              onCoordinatesChange={setPickupCoordinates}
+              socket={socket}
+              updateRiderData={updateRiderData}
+              setPickupCoordinates={setPickupCoordinates}
+              destinationCoordinates={destinationCoordinates}
+              showButton={(true)}
+              onComplete = {resetChngLocation}
+            />
+        </>
+
       )}
     </div>
   );

@@ -7,6 +7,7 @@ import {Reset} from "../Reset"
 import './index.css';
 
 import { pick } from "lodash";
+import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 
 
 export function PageRider({formData, rider, setRider, updateRiderData}){
@@ -17,6 +18,33 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     const [driver, setDriver] = useState(null); // Start as null for better checks
     const [queue, setQueue] = useState(null); // Queue status 
     const [pickupCoordinates, setPickupCoordinates] = useState(null);
+    const {isLoaded} = useLoadScript({
+        googleMapsApiKey: 'AIzaSyClpAbZE9jOntj_O-zuSrujl4F6d_Om_Yc', // Replace with your API key
+    })
+    /*
+    useEffect(() => {
+        if (address && !initialCoordinates) {
+        const geocodeAddress = async () => {
+            try {
+            const response = await axios.get(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+                address
+                )}&key=AIzaSyClpAbZE9jOntj_O-zuSrujl4F6d_Om_Yc` // Replace with your API key
+            );
+            const location = response.data.results[0].geometry.location;
+            setCenter(location);
+            setMarkerPosition(location);
+            onCoordinatesChange(location); // Notify parent about initial coordinates
+            
+            } catch (error) {
+            console.error('Error geocoding address:', error);
+            }
+        };
+
+        geocodeAddress();
+        }
+    }, [address, initialCoordinates, onCoordinatesChange]);
+    */
 
 
 
@@ -257,6 +285,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                         socket={socketRef.current}
                         updateRiderData={updateRiderData}
                         setPickupCoordinates={setPickupCoordinates}
+                        showButton={true}
                     />
                     <Reset/>
                 </div>
@@ -264,7 +293,20 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                 <div>
                     {/* Render everything else if pickupCoordinates are set */}
                     <h1 className="greeting">Your ride is on the way, {rider.username} <i class="fa-solid fa-gear spin"></i></h1>
-                    <h1>Insert image here</h1>
+                    <div className="riderMap" style={{display: 'none'}}>
+                        <MapWithMarker
+                            address={rider.pickup_location}
+                            destination={rider.dropoff_location}
+                            initialCoordinates={null}
+                            destinationCoordinates={rider.destinationCoordinates}
+                            onCoordinatesChange={setPickupCoordinates}
+                            socket={socketRef.current}
+                            updateRiderData={updateRiderData}
+                            setPickupCoordinates={setPickupCoordinates}
+                            showButton={false} // Hide the confirmPickUpButton
+                        />
+                    </div>
+
                     <div className="riderInformation">
                         <p><strong>Phone Number:</strong> {rider.phone_number}</p>
                         <p><strong>Pickup Location:</strong> {rider.pickup_location}</p>
@@ -310,7 +352,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                             )}
                         </div>
                     ) : (
-                        <div>
+                            <div className="infoContainer">
+
                             <DriverInfoCardContainer
                                 connectedUsers={connectedUsers}
                                 socket={socketRef.current}
