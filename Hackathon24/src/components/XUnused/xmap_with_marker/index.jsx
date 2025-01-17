@@ -3,7 +3,7 @@ import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import axios from 'axios';
 import { drop } from 'lodash';
 
-const MapWithMarker = ({ riderId, address, initialCoordinates, destination, destinationCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates, onComplete , showButton}) => {
+const MapWithMarker = ({ setUpdatingLocation, riderId, address, initialCoordinates, destination, destinationCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates, onComplete , showButton}) => {
   const [center, setCenter] = useState(initialCoordinates || { lat: 37.2296, lng: -80.4244 }); // Default coordinates
   const [markerPosition, setMarkerPosition] = useState(initialCoordinates);
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,8 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
         })
         console.log('Pickup Coordinates Updated.');
         setLoading(false);
-        onComplete();
+        setUpdatingLocation(false);
+
         return
     }
     else {
@@ -174,7 +175,7 @@ const MapWithMarker = ({ riderId, address, initialCoordinates, destination, dest
     <>
       <GoogleMap
         center={center}
-        zoom={15}
+        zoom={17}
         mapContainerStyle={{ width: '100%', height: '40rem' }}
         options={{ styles: isDark ? darkMode : lightMode }}
         >

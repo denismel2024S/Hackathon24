@@ -178,7 +178,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
         <div className = "pageDriver">
             <h1 className = "greeting"><strong>Hello, </strong> {driver.username}</h1>
             <h2 className = "queue"><strong>QUEUE: {filteredUsers.length}</strong></h2>
-            <div className="driverInformation">
+            <div className="driverInformation" style={{ display:'none' }}>
                 <p><strong>Name:</strong> {driver.username}</p>
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>

@@ -3,6 +3,7 @@ import DriverInfoCardContainer from "../DriverInfoCardContainer";
 import CurrentQueueDriverInfoCard from "../CurrentQueueDriverInfoCard";
 import LocationChangeForm from "../XUnused/Xlocation_form";
 import MapWithMarker from "../XUnused/xmap_with_marker";
+import MapWithDirectionsTest from "../XUnused/Xmap_with_directions_test";
 import {Reset} from "../Reset"
 import './index.css';
 
@@ -13,6 +14,7 @@ import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 export function PageRider({formData, rider, setRider, updateRiderData}){
     const socketRef = useRef(null);
     const previousUsers = useRef([])
+    const [updatingLocation, setUpdatingLocation] = useState(false);
     const [connectedUsers, setConnectedUsers] = useState([])
     const [inQueue, setInQueue] = useState(false);  // State to store rider's state
     const [driver, setDriver] = useState(null); // Start as null for better checks
@@ -209,6 +211,9 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     }, [rider?.id, rider?.username, rider?.phone_number, rider?.driver_id]);
 
     
+    useEffect(() => {
+        
+    }, [updatingLocation]);
 
 
     // FETCH DRIVER INFO FROM DB IF INQUEUE CHANGES TO TRUE AND RIDER.DRIVER_ID IS SET AS NON NULL
@@ -274,7 +279,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     return (
         <div className="pageRider">
             {!rider.pickup_coordinates ? (
-                <div>
+                <div className="riderMap">
                     {/* Render only the map when pickupCoordinates are not set */}
                     <MapWithMarker
                         address={rider.pickup_location}
@@ -292,20 +297,9 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             ) : (
                 <div>
                     {/* Render everything else if pickupCoordinates are set */}
-                    <h1 className="greeting">Your ride is on the way, {rider.username} <i class="fa-solid fa-gear spin"></i></h1>
-                    <div className="riderMap" style={{display: 'none'}}>
-                        <MapWithMarker
-                            address={rider.pickup_location}
-                            destination={rider.dropoff_location}
-                            initialCoordinates={null}
-                            destinationCoordinates={rider.destinationCoordinates}
-                            onCoordinatesChange={setPickupCoordinates}
-                            socket={socketRef.current}
-                            updateRiderData={updateRiderData}
-                            setPickupCoordinates={setPickupCoordinates}
-                            showButton={false} // Hide the confirmPickUpButton
-                        />
-                    </div>
+
+                    {/* <h1 className="greeting">Your ride is on the way, {rider.username} <i class="fa-solid fa-gear spin"></i></h1> */}
+                    
 
                     <div className="riderInformation">
                         <p><strong>Phone Number:</strong> {rider.phone_number}</p>
@@ -325,7 +319,30 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                 </div>
                             ) : (
                                 <div>
+                                    <h1 className="greeting">Your ride is on the way, {rider.username} <i class="fa-solid fa-gear spin"></i></h1>
 
+                                    {/* <div className="riderMap" style={{display: 'none'}}>
+                                        <MapWithMarker
+                                            address={rider.pickup_location}
+                                            destination={rider.dropoff_location}
+                                            initialCoordinates={null}
+                                            destinationCoordinates={rider.destinationCoordinates}
+                                            onCoordinatesChange={setPickupCoordinates}
+                                            socket={socketRef.current}
+                                            updateRiderData={updateRiderData}
+                                            setPickupCoordinates={setPickupCoordinates}
+                                            showButton={false} // Hide the confirmPickUpButton
+                                        />
+                                    </div> */}
+
+                                    {!updatingLocation && (
+                                        <div className="mapWithDirections">
+                                            <MapWithDirectionsTest
+                                                pickupCoordinates={rider.pickup_coordinates}
+                                                destinationCoordinates={rider.dropoff_coordinates}
+                                            />
+                                        </div>
+                                    )}
                                     <CurrentQueueDriverInfoCard
                                         rider={rider}
                                         driver={driver}
@@ -345,6 +362,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                             updateRiderData={updateRiderData}
                                             pickupCoordinates={pickupCoordinates}
                                             setPickupCoordinates={setPickupCoordinates}
+                                            queuePosition={queue.position}
                                         />
                                         
                                     )}
@@ -352,26 +370,41 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                             )}
                         </div>
                     ) : (
+                        <div className="UserNotInQueuePage">
+                            {!updatingLocation && (
+                                <div className="mapWithDirections">
+                                    <MapWithDirectionsTest
+                                        pickupCoordinates={rider.pickup_coordinates}
+                                        destinationCoordinates={rider.dropoff_coordinates}
+                                        updatingLocation={updatingLocation}
+                                    />
+                                </div>
+                            )}
+                            
                             <div className="infoContainer">
-
-                            <DriverInfoCardContainer
-                                connectedUsers={connectedUsers}
-                                socket={socketRef.current}
-                                rider={rider === null ? 0 : rider}
-                                inQueue={inQueue}
-                                setInQueue={setInQueue}
-                                setRider={setRider}
-                                updateRiderData={updateRiderData}
-                            />
+                                <DriverInfoCardContainer
+                                    connectedUsers={connectedUsers}
+                                    socket={socketRef.current}
+                                    rider={rider === null ? 0 : rider}
+                                    inQueue={inQueue}
+                                    setInQueue={setInQueue}
+                                    setRider={setRider}
+                                    updateRiderData={updateRiderData}
+                                />
                                 <LocationChangeForm
                                     riderId={rider.id}
                                     socket={socketRef.current}
                                     updateRiderData={updateRiderData}
                                     pickupCoordinates={pickupCoordinates}
                                     setPickupCoordinates={setPickupCoordinates}
+                                    updatingLocation={updatingLocation}
+                                    setUpdatingLocation={setUpdatingLocation}
                                 />
-                            
+                            </div>
                         </div>
+                        
+
+                            
                     )}
                     <Reset />
                 </div>

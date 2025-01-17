@@ -5,7 +5,7 @@ import MapWithMarker from '../xmap_with_marker';
 import throttle from 'lodash/throttle';
 
 
-const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
+const LocationChangeForm = ({ riderId, socket,  updateRiderData, changingLocation, queuePosition, updatingLocation, setUpdatingLocation }) => {
   const [location, setLocation] = useState('');
   const [destination, setDestination] = useState('');
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
@@ -22,7 +22,6 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
     updateRiderData({
       pickup_location: newLocation, // Rider is leaving the queue, so we reset driver_id
     });
-
   };
 
   const handleDestinationChange = (newDestination) => {
@@ -104,6 +103,7 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
 
   const handleConfirmAddresses = (e) => {
     e.preventDefault();
+    
     if (!pickupCoordinates || !destinationCoordinates) {
       alert('Please set both pickup and destination locations before confirming.');
       return;
@@ -131,6 +131,9 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
 
     // // Use the throttled function (you may need to pass relevant arguments here)
     // throttledSendLocationUpdate(socket, riderId, pickupCoordinates, location, destination);
+
+    // update parent rider page that location is being updated
+    setUpdatingLocation(true);
 
     alert('New Locations set');
     setChangeLocation(false);
@@ -251,6 +254,7 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData }) => {
               destinationCoordinates={destinationCoordinates}
               showButton={(true)}
               onComplete = {resetChngLocation}
+              setUpdatingLocation = {setUpdatingLocation}
             />
         </>
 
