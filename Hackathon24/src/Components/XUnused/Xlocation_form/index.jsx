@@ -3,9 +3,10 @@ import PlacesAutocomplete from 'react-places-autocomplete';
 import axios from 'axios';
 import MapWithMarker from '../xmap_with_marker';
 import throttle from 'lodash/throttle';
+import { update } from 'lodash';
 
 
-const LocationChangeForm = ({ riderId, socket,  updateRiderData, changingLocation, queuePosition, updatingLocation, setUpdatingLocation }) => {
+const LocationChangeForm = ({ riderId, socket,  updateRiderData, changingLocation, queuePosition, updatingLocation, setUpdatingLocation, updateParent }) => {
   const [location, setLocation] = useState('');
   const [destination, setDestination] = useState('');
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
@@ -141,12 +142,17 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData, changingLocatio
   };
   const resetChngLocation = () => {
     setChngLocStep(1);
+    updateParent(false);
+  }
+  const handleStepChange = () =>{
+    setChngLocStep(chngLocStep+1);
+    updateParent(true);
   }
 
   return (
     <div className = "locationForm">
       {chngLocStep === 1 && (
-        <button onClick = {() => setChngLocStep(chngLocStep+1)}>Change Location</button>
+        <button onClick = {() => handleStepChange()}>Change Location</button>
       )}
 
 
@@ -236,13 +242,14 @@ const LocationChangeForm = ({ riderId, socket,  updateRiderData, changingLocatio
           </div>
 
         </form>
-        <button onClick = {() => setChngLocStep(chngLocStep+1)}>Next</button>
+        <button onClick = {() => handleStepChange()}>Next</button>
         </>
       )}
 
       {chngLocStep === 3 && (
         <>
           <MapWithMarker
+              className = "mapWithDirections"
               riderId={riderId}
               address={location}
               destination={destination}

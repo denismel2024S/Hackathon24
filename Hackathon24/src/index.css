@@ -75,7 +75,7 @@ h1, h2, h3, h4, h5, h6, p, strong, span, div, label, input {
 
 
 h1 {
-  font-size: 2.8rem;
+  font-size: 2.5rem;
 }
 h2 {
   font-size: 2rem;
@@ -91,7 +91,7 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 10px;
-  margin: 10px;
+  margin: 10px 0px;
   font-size: 1.25rem;
   width: 100%;
   background-color: var(--secondary);
@@ -261,7 +261,7 @@ input{
 /* Reset Button */
 .resetButton{
   display: flex;
-  width: 30%;
+  width: 35%;
   color: black; 
   justify-content: center;
   justify-self: center;
@@ -296,9 +296,7 @@ input{
   width: 100%;
 }
 .greeting{
-  margin: 2rem;
-  font-size: 2.7rem;
-
+  margin: 20px;
 }
 .queue{
   display: flex;
@@ -336,6 +334,7 @@ input{
   border-radius: 10px;
   width: 30%;
   justify-content: center;
+  color: var(--primary)
   
 }
 
@@ -345,7 +344,7 @@ input{
   padding: 15px;
   border: 4px solid transparent;
   overflow-y: scroll;
-  max-height: 60vh;
+  max-height: 45vh;
   border: 2px solid var(--lightGray);
   border-radius: 10px;
 }
@@ -364,6 +363,10 @@ input{
 .mapButtons{
   margin-top: 10px;
   justify-self: center;
+}
+/* Rider Input */
+.riderInput {
+  margin: 10px;
 }
 /* Main Rider Page */
 .pageRider{
@@ -398,7 +401,7 @@ input{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 10px;
   width: 100%;
 }
 .idLogo{
@@ -463,4 +466,8 @@ input{
   to {
     transform: rotate(360deg);
   }
+}
+.mapWithDirections{
+  border-radius: 10px;
+  margin: 10px;
 }

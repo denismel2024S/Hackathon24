@@ -20,9 +20,6 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     const [driver, setDriver] = useState(null); // Start as null for better checks
     const [queue, setQueue] = useState(null); // Queue status 
     const [pickupCoordinates, setPickupCoordinates] = useState(null);
-    const {isLoaded} = useLoadScript({
-        googleMapsApiKey: 'AIzaSyClpAbZE9jOntj_O-zuSrujl4F6d_Om_Yc', // Replace with your API key
-    })
     /*
     useEffect(() => {
         if (address && !initialCoordinates) {
@@ -271,6 +268,10 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
     console.log('Form Data:', formData);
     console.log('In the PageRider component');
     console.log(inQueue)
+    const handleLocationCallback = (message) => {
+        setUpdatingLocation(message);
+        console.log(message);
+    }
 
     if (inQueue === null) {
         return <p>Loading...</p>; // Show loading state until `inQueue` is determined
@@ -278,7 +279,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
 
     return (
         <div className="pageRider">
-            {!rider.pickup_coordinates ? (
+            {(!rider.pickup_coordinates ) ? (
                 <div className="riderMap">
                     {/* Render only the map when pickupCoordinates are not set */}
                     <MapWithMarker
@@ -319,7 +320,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                 </div>
                             ) : (
                                 <div>
-                                    <h1 className="greeting">Your ride is on the way, {rider.username} <i class="fa-solid fa-gear spin"></i></h1>
+                                    <h1 className="greeting">Your ride is on the way, {rider.username} <i className="fa-solid fa-gear spin"></i></h1>
 
                                     {/* <div className="riderMap" style={{display: 'none'}}>
                                         <MapWithMarker
@@ -343,6 +344,9 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                             />
                                         </div>
                                     )}
+                                    <>
+                                    <div className = "inputsContainer">
+
                                     <CurrentQueueDriverInfoCard
                                         rider={rider}
                                         driver={driver}
@@ -363,15 +367,18 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                             pickupCoordinates={pickupCoordinates}
                                             setPickupCoordinates={setPickupCoordinates}
                                             queuePosition={queue.position}
+                                            updateParent={handleLocationCallback}
                                         />
                                         
                                     )}
+                                    </div>
+                                    </>
                                 </div>
                             )}
                         </div>
                     ) : (
                         <div className="UserNotInQueuePage">
-                            {!updatingLocation && (
+                            {(!updatingLocation) && (
                                 <div className="mapWithDirections">
                                     <MapWithDirectionsTest
                                         pickupCoordinates={rider.pickup_coordinates}
@@ -381,7 +388,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                 </div>
                             )}
                             
-                            <div className="infoContainer">
+                            <div className="inputsContainer">
                                 <DriverInfoCardContainer
                                     connectedUsers={connectedUsers}
                                     socket={socketRef.current}
@@ -399,6 +406,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                     setPickupCoordinates={setPickupCoordinates}
                                     updatingLocation={updatingLocation}
                                     setUpdatingLocation={setUpdatingLocation}
+                                    updateParent = {handleLocationCallback}
                                 />
                             </div>
                         </div>
