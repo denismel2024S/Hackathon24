@@ -11,6 +11,8 @@ const App = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [driverOrRider, setDriverOrRider] = useState('');
     const correctCode = '1';
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const handlePassengerButtonClick = () => {
         setShowCodeInput(true);
@@ -41,7 +43,23 @@ const App = () => {
         console.log('driverOrRider:', driverOrRider);
         window.localStorage.setItem('driverOrRider', driverOrRider);
     }, [driverOrRider]);
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
+    if (isLoading){
+        return (
+            <div className="wrapper">
+                <div className="circle"></div>
+                <div className="circle"></div>
+                <div className="circle"></div>
+                <div className="shadow"></div>
+                <div className="shadow"></div>
+                <div className="shadow"></div>
+            </div>)
+            ;
+    }
     if(driverOrRider === 'rider'){
         return(
                 <>

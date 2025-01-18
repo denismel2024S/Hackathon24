@@ -47,7 +47,7 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
       <div className="currentDriver">
         <h3 className="driverName"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
         <p><b>Phone number: </b>{driver.phone_number}</p>
-        <a className = "clickablePhone" href={`tel:${driver.phone}`}>Call</a>
+        <a className = "clickablePhone" href={`tel:${driver.phone}`}><i class="fa-solid fa-phone"></i></a>
         <p><b>Queue Position: </b>{queuePosition}</p>
         <p><b>Queue Status: </b>{status}</p>
         <button 
