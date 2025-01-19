@@ -86,7 +86,7 @@ const DriverMapTest = ({ coordinates }) => {
     <GoogleMap
       center={center}
       zoom={15}
-      mapContainerStyle={{ width: "100%", height: "400px", borderRadius: '8px' }}
+      mapContainerStyle={{ width: "100%", height: "20rem", borderRadius: '8px' }}
       options={{ styles: isDark ? darkMode : lightMode }}
 
     >

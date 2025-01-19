@@ -28,8 +28,8 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
         <div className="card">
             <div className = "infoContainer">
                 <p className = "currentPassengerName"><strong>{name}</strong></p>
-                <p>Phone: {phone}</p>
-                <a className = "clickablePhone" href={`tel:${phone}`}><i class="fa-solid fa-phone"></i></a>
+                {/* <p>Phone: {phone}</p> */}
+                <a className = "clickablePhone" href={`tel:${phone}`}><i class="fa-solid fa-phone"></i>{phone}</a>
                 <p>Pickup From: {location}</p>
                 <p>Going to: {destination}</p>
             </div>

@@ -114,12 +114,12 @@ const ButtonContainer = ({googleMapsUrl, riderId, driverId, socket,arrivedAtPick
 
   return (
     <div>
-      <button
+      {/* <button
         id="google-maps-button"
         className="google-maps-button"
         onClick={() => handleButtonClick(googleMapsUrl)}>
         Google Maps
-    </button>
+    </button> */}
       {!arrivedAtPickup && (
         <button
             className = "updateStatus"

@@ -10,6 +10,7 @@ import {Reset} from "../Reset"
 export function PageDriver({formData, driver, setDriver, socket, updateDriverData}) {
     const [connectedUsers, setConnectedUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const [showMap, setShowMap] = useState(false);
     const previousUsers = useRef([])
     const socketRef = useRef(null);
 
@@ -178,13 +179,19 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
         <div className = "pageDriver">
             <h1 className = "greeting"><strong>Hello, </strong> {driver.username}</h1>
             <h2 className = "queue"><strong>QUEUE: {filteredUsers.length}</strong></h2>
+            <button className = "showMap" onClick = {() => setShowMap(!showMap)}>Show Map</button>
             <div className="driverInformation" style={{ display:'none' }}>
                 <p><strong>Name:</strong> {driver.username}</p>
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>
                 <p><strong>Real Queue Length:</strong> {filteredUsers.length}</p>
             </div>
+            {currentQueuePickupCoordinates && showMap && (
+                <DriverMapTest coordinates={currentQueuePickupCoordinates} />
+            )}
             
+            <div className="infoContainer">
+
             <ul>
                 {/* Render the first person in the queue if it exists */}
                 {filteredUsers.length > 0 && (
@@ -198,17 +205,15 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                             socket={socketRef.current}
                             riderId={filteredUsers[0].riderId}
                             driverId={driver.id}
-                        />
+                            />
                         {/* Render the map component */}
-                        {currentQueuePickupCoordinates && (
-                            <DriverMapTest coordinates={currentQueuePickupCoordinates} />
-                        )}
                         <QueueTable
                         driverQueue={filteredUsers}
                         />
                     </div>
                 )}
             </ul>
+                </div>
             <Reset/>
         </div>
     );   

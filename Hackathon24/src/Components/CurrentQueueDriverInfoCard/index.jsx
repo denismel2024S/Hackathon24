@@ -43,13 +43,25 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
     });
   };
 
+  function getOrdinalSuffix(num) {
+    const suffixes = ["th", "st", "nd", "rd"];
+    const lastDigit = num % 10;
+
+    // Determine the appropriate suffix based on the last digit and handle exceptions
+    const suffix = (num > 3 && num < 21) ? suffixes[0] : suffixes[lastDigit] || suffixes[0];
+
+    return `${num}${suffix} `;
+  }
+
   return (
       <div className="currentDriver">
-        <h3 className="driverName"><b>Your Driver: </b>{driver.username} <b>(ID: {driver.id})</b></h3>
-        <p><b>Phone number: </b>{driver.phone_number}</p>
-        <a className = "clickablePhone" href={`tel:${driver.phone}`}><i class="fa-solid fa-phone"></i></a>
-        <p><b>Queue Position: </b>{queuePosition}</p>
+        <h3>Your Driver: {driver.username} (ID: {driver.id})</h3>
+        {/* <p><b>Phone number: </b>{driver.phone_number}</p> */}
+        <h3>You are <span className = "queueNumber" data={queuePosition}>{getOrdinalSuffix(queuePosition)}</span> in queue</h3>
         <p><b>Queue Status: </b>{status}</p>
+        <a className = "clickablePhone" href={`tel:${driver.phone}`}>
+          <i class="fa-solid fa-phone"></i>
+          <b>{driver.phone_number}</b></a>
         <button 
           className = "leaveQueueButton"
           type="button" 

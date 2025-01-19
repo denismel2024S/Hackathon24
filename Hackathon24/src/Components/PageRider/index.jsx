@@ -345,7 +345,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                                         </div>
                                     )}
                                     <>
-                                    <div className = "inputsContainer">
+                                    <div className = "infoContainer">
 
                                     <CurrentQueueDriverInfoCard
                                         rider={rider}
