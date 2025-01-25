@@ -22,11 +22,13 @@ export function DriverLogin({}){
         username: '',
         phone_number: '',
         queue_length: 0,
+        capacity: 0,
     });
 
     const [formData, setFormData] = useState({  
         name: '',
         phone: '',
+        capacity: '',
     });
     
     const handleChange = (e) => {
@@ -56,6 +58,7 @@ export function DriverLogin({}){
             username: formData.name,
             phone_number: formData.phone,
             queue_length: 0,
+            capacity: Number(formData.capacity),
         };
 
         setDriver(formDriverData);
@@ -144,6 +147,23 @@ export function DriverLogin({}){
                     </div>
                 </label>
                 <br></br>
+                <label>
+                    <p className = "fieldLabel">Capacity: </p> 
+                    <div className = "inputGroup">
+
+                        <input
+                            className = "input"
+                            type="number"
+                            name="capacity"
+                            value={(formData.capacity)}
+                            onChange={handleChange}
+                            placeholder='0-15'
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
+                </label>
+                <br />
                 <button className = "submit" type="submit">Submit</button>
             </form>
             <Reset/>

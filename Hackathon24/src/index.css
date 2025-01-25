@@ -313,7 +313,7 @@ input{
   border: 0.125rem solid var(--lightGray);
   border-radius: 0.625rem;
   position: relative;
-  height: calc(100vh - 20rem);
+  max-height: 60vh;
 }
 
 .driver-queue-container table.queue-table th,

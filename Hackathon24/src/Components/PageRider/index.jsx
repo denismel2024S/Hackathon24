@@ -57,6 +57,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
             phone_number: rider?.phone_number,
             pickup_location: rider?.pickup_location,
             dropoff_location: rider?.dropoff_location,
+            numRiders: rider?.numRiders,
             driver_id: rider?.driver_id,
         }).toString();
 
@@ -113,7 +114,6 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                             dropoff_location: parsedMessage.dropoff_location,
                         });
                     }
-
 
                     if (sanitizedDriverId !== null){
                         const message = {
@@ -287,6 +287,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                         destination={rider.dropoff_location}
                         initialCoordinates={null}
                         destinationCoordinates={rider.destinationCoordinates}
+                        setUpdatingLocation={setUpdatingLocation}
                         onCoordinatesChange={setPickupCoordinates}
                         socket={socketRef.current}
                         updateRiderData={updateRiderData}
@@ -308,6 +309,7 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
                         <p><strong>Pickup Coordinates:</strong> Lat: {pickupCoordinates?.lat === null ? "N/A" : pickupCoordinates?.lat}, Long: {pickupCoordinates?.lng === null ? "N/A" : pickupCoordinates?.lng}</p>
                         <p><strong>Rider Object's Pickup Coordinates:</strong> Lat: {rider.pickup_coordinates?.lat === null ? "N/A" : rider.pickup_coordinates?.lat}, Long: {rider.pickup_coordinates?.lng === null ? "N/A" : rider.pickup_coordinates?.lng}</p>
                         <p><strong>Dropoff Location:</strong> {rider.dropoff_location}</p>
+                        <p><strong>Number of Passengers:</strong> {rider.numRiders}</p>
                         <p><strong>Rider ID:</strong> {rider.id}</p>
                         <p><strong>Driver ID:</strong> {rider.driver_id === null ? "No driver id" : rider?.driver_id}</p>
                         <p><strong>In Queue:</strong> {inQueue === true ? "True" : "False"}</p>

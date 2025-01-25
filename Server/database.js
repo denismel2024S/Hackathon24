@@ -20,6 +20,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT,
       phone_number TEXT UNIQUE,
+      capacity INTEGER,
       queue_length INTEGER DEFAULT 0
     );
   `);
@@ -51,6 +52,7 @@ db.serialize(() => {
       dropoff_lat REAL,
       dropoff_lng REAL,
       driver_id INTEGER,
+      numRiders INTEGER,
       FOREIGN KEY (driver_id) REFERENCES drivers(id)
     );
   `);
@@ -76,120 +78,7 @@ db.run(`
 
 console.log("Database and tables are ready.");
 
-function addDriver(username, phoneNumber, queueLength = 0, uuid, drivers) {
-  db.serialize(() => {
-    db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
-      if (err) {
-        console.error("Error querying drivers table:", err);
-        return;
-      }
-
-      if (row) {
-        // Update only the username, leave queue_length unchanged
-        const updateStmt = db.prepare("UPDATE drivers SET username = ? WHERE phone_number = ?");
-        updateStmt.run(username, phoneNumber, (err) => {
-          if (err) {
-            console.error("Error updating driver:", err);
-          } else {
-            console.log(`Driver with phone number ${phoneNumber} updated.`);
-
-            // Update the drivers object with the existing driver's details
-            drivers[uuid] = {
-              type: 'driver',
-              id: row.id,
-              username: username,  // Use the updated username
-              phone_number: phoneNumber,
-              queue_length: row.queue_length // Leave the queue length unchanged
-            };
-            console.log(drivers[uuid]);
-          }
-        });
-        updateStmt.finalize();
-      } else {
-        // Insert a new driver
-        const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, queue_length) VALUES (?, ?, ?)");
-        insertStmt.run(username, phoneNumber, queueLength, function (err) {
-          if (err) {
-            console.error("Error inserting driver:", err);
-          } else {
-            console.log(`Driver added with ID ${this.lastID}`);
-
-            // Add the new driver to the drivers object after insertion
-            drivers[uuid] = {
-              type: 'driver',
-              id: this.lastID, // Use the newly inserted driver's ID
-              username: username,
-              phone_number: phoneNumber,
-              queue_length: queueLength
-            };
-            console.log(drivers[uuid]);
-          }
-        });
-        insertStmt.finalize();
-      }
-    });
-  });
-}
-
-
-function addRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId = null, uuid, riders) {
-  db.serialize(() => {
-    db.get("SELECT * FROM riders WHERE phone_number = ?", [phoneNumber], (err, row) => {
-      if (err) {
-        console.error("Error querying riders table:", err);
-        return;
-      }
-
-      if (row) {
-        // Update existing rider details
-        const updateStmt = db.prepare("UPDATE riders SET username = ?, pickup_location = ?, dropoff_location = ? WHERE phone_number = ?");
-        updateStmt.run(username, pickupLocation, dropoffLocation, phoneNumber, (err) => {
-          if (err) {
-            console.error("Error updating rider:", err);
-          } else {
-            console.log(`Rider with phone number ${phoneNumber} updated.`);
-
-            riders[uuid] = {
-              type: 'rider',
-              id: row.id,
-              username: username,
-              phoneNumber: phoneNumber,
-              pickupLocation: pickupLocation,
-              dropoffLocation: dropoffLocation,
-              driverId: row.driver_id,
-            }
-            
-          }
-        });
-        updateStmt.finalize();
-      } else {
-        // Insert a new rider
-        const insertStmt = db.prepare("INSERT INTO riders (username, phone_number, pickup_location, dropoff_location, driver_id) VALUES (?, ?, ?, ?, ?)");
-        insertStmt.run(username, phoneNumber, pickupLocation, dropoffLocation, driverId, function (err) {
-          if (err) {
-            console.error("Error inserting rider:", err);
-          } else {
-            console.log(`Rider added to database with ID: ${this.lastID}`);
-            riders[uuid] = {
-              type: 'rider',
-              id: this.lastID,
-              username: username, 
-              phoneNumber: phoneNumber,
-              pickupLocation: pickupLocation,
-              dropoffLocation: dropoffLocation,
-              driverId: driverId
-            }
-          }
-        });
-        insertStmt.finalize();
-      }
-    });
-  });
-}
-
-
-
-function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers, callback) {
+function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers, capacity, callback) {
   db.serialize(() => {
     // Check if a driver with the given phone number exists
     db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
@@ -201,8 +90,8 @@ function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers
 
       if (row) {
         // Update the username of the existing driver
-        const updateStmt = db.prepare("UPDATE drivers SET username = ? WHERE phone_number = ?");
-        updateStmt.run(username, phoneNumber, (updateErr) => {
+        const updateStmt = db.prepare("UPDATE drivers SET username = ?, capacity = ? WHERE phone_number = ?");
+        updateStmt.run(username, Number(capacity), phoneNumber, (updateErr) => {
           if (updateErr) {
             console.error("Error updating driver:", updateErr);
             callback(updateErr, null); // Return error via callback
@@ -215,6 +104,7 @@ function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers
               id: row.id,
               username: username, // Updated username
               phone_number: phoneNumber,
+              capacity: capacity,
               queue_length: row.queue_length // Queue length remains unchanged
             };
 
@@ -228,8 +118,8 @@ function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers
         updateStmt.finalize();
       } else {
         // Insert a new driver if no match is found
-        const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, queue_length) VALUES (?, ?, ?)");
-        insertStmt.run(username, phoneNumber, queueLength, function (insertErr) {
+        const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, capacity, queue_length) VALUES (?, ?, ?, ?)");
+        insertStmt.run(username, phoneNumber, queueLength, Number(capacity), function (insertErr) {
           if (insertErr) {
             console.error("Error inserting driver:", insertErr);
             callback(insertErr, null); // Return error via callback
@@ -242,6 +132,7 @@ function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers
               id: this.lastID, // Use the last inserted ID
               username: username,
               phone_number: phoneNumber,
+              capacity: Number(capacity),
               queue_length: queueLength
             };
 
@@ -258,7 +149,7 @@ function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers
   });
 }
 
-function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation, driverId = null, uuid, riders, callback) {
+function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation, numRiders, driverId = null, uuid, riders, callback) {
   db.serialize(() => {
     // Check if a rider with the given phone number exists
     db.get("SELECT * FROM riders WHERE phone_number = ?", [phoneNumber], (err, row) => {
@@ -272,10 +163,10 @@ function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation
         // Update the existing rider's details
         const updateStmt = db.prepare(`
           UPDATE riders 
-          SET username = ?, pickup_location = ?, dropoff_location = ? 
+          SET username = ?, pickup_location = ?, dropoff_location = ?, numRiders = ?
           WHERE phone_number = ?
         `);
-        updateStmt.run(username, pickupLocation, dropoffLocation, phoneNumber, (updateErr) => {
+        updateStmt.run(username, pickupLocation, dropoffLocation, numRiders, phoneNumber, (updateErr) => {
           if (updateErr) {
             console.error("Error updating rider:", updateErr);
             callback(updateErr, null); // Return error via callback
@@ -292,6 +183,7 @@ function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation
               phone_number: phoneNumber,
               pickup_location: pickupLocation,
               dropoff_location: dropoffLocation,
+              numRiders:numRiders,
               driver_id: row.driver_id, // Updated driver ID
             };
 
@@ -306,10 +198,10 @@ function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation
       } else {
         // Insert a new rider if no match is found
         const insertStmt = db.prepare(`
-          INSERT INTO riders (username, phone_number, pickup_location, dropoff_location, driver_id) 
-          VALUES (?, ?, ?, ?, ?)
+          INSERT INTO riders (username, phone_number, pickup_location, dropoff_location, numRiders, driver_id) 
+          VALUES (?, ?, ?, ?, ?, ?)
         `);
-        insertStmt.run(username, phoneNumber, pickupLocation, dropoffLocation, driverId, function (insertErr) {
+        insertStmt.run(username, phoneNumber, pickupLocation, dropoffLocation, numRiders, driverId, function (insertErr) {
           if (insertErr) {
             console.error("Error inserting rider:", insertErr);
             callback(insertErr, null); // Return error via callback
@@ -324,6 +216,7 @@ function addOrUpdateRider(username, phoneNumber, pickupLocation, dropoffLocation
               phone_number: phoneNumber,
               pickup_location: pickupLocation,
               dropoff_location: dropoffLocation,
+              numRiders:numRiders,
               driver_id: driverId,
             };
 
@@ -407,6 +300,7 @@ function updateRiderLocationAddressById(riderId, pickupLocation, dropoffLocation
               phone_number: row.phone_number,
               pickup_location: pickupLocation,
               dropoff_location: dropoffLocation,
+              numRiders: row.numRiders,
               driver_id: row.driver_id,
             };
 
@@ -496,6 +390,7 @@ function updateRiderLocationAddressById(riderId, pickupLocation, dropoffLocation
               phone_number: row.phone_number,
               pickup_location: pickupLocation,
               dropoff_location: dropoffLocation,
+              numRiders:numRiders,
               driver_id: row.driver_id,
             };
 
@@ -768,6 +663,7 @@ function getQueuesForDriver(driverId, callback) {
         q.created_at,
         q.status,
         r.id AS rider_id,
+        r.numRiders as numRiders,
         r.username,
         r.phone_number,
         r.pickup_location,
@@ -881,8 +777,6 @@ function clearDatabase(){
 
 // Export functions for use elsewhere
 module.exports = {
-  addDriver,
-  addRider,
   addQueue,
   updateQueueEndTime,
   getDriverByPhoneNumber,

@@ -28,6 +28,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             username: driver?.username,
             phone_number: driver?.phone_number,
             queue_length: driver?.queue_length,
+            capacity: driver?.capacity,
         }).toString();
 
         const WSURL = `ws://localhost:8080?${queryParams}`
@@ -49,6 +50,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                 // Check if the message is for the current driver
                 if (parsedMessage.type === "driver") {
                     console.log("Message is for the current driver.", parsedMessage);
+
         
                     // POTENTIAL IMPLEMENTATIONS
 
@@ -61,10 +63,12 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                     updateDriverData({
                         queue_length: parsedMessage.queue_length, // Rider is leaving the queue, so we reset driver_id
                         id: parsedMessage.id,
+                        capacity: Number(parsedMessage.capacity),  // Ensure capacity is a number
                     });
 
                     const message = {
                         driverId: Number(driver.id),  // driver's ID
+                        capacity: Number(driver.capacity),  // Ensure it's a number
                         action: "getActiveQueues",
                     };
                 
@@ -130,7 +134,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
         return () => {
             socketRef.current.close();
         };
-    }, [driver?.username, driver?.phone_number]);
+    }, [driver?.username, driver?.phone_number, driver?.capacity]);
 
 
 //     // Send message to WebSocket after driver info or queue length updates
@@ -185,6 +189,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>
                 <p><strong>Real Queue Length:</strong> {filteredUsers.length}</p>
+                <p><strong>Capacity:</strong> {driver.capacity}</p>
             </div>
             {currentQueuePickupCoordinates && showMap && (
                 <DriverMapTest coordinates={currentQueuePickupCoordinates} />
@@ -202,6 +207,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                             phone={filteredUsers[0].phoneNumber}
                             location={filteredUsers[0].pickupLocation}
                             destination={filteredUsers[0].dropoffLocation}
+                            numRiders={filteredUsers[0].numRiders}
                             socket={socketRef.current}
                             riderId={filteredUsers[0].riderId}
                             driverId={driver.id}

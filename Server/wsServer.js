@@ -6,7 +6,7 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const {addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, getRiderCoordinates, updateRiderCoordinates, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, getQueueByRiderId, updateRiderLocationAddressById, clearDatabase } = require('./database'); // Import the database functions
+const {getDriverById, addOrUpdateDriver, addOrUpdateRider, getRiderCoordinates, updateRiderCoordinates, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, getQueueByRiderId, updateRiderLocationAddressById, clearDatabase } = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -100,7 +100,7 @@ wsServer.on("connection", (connection, request) => {
 
     if (queryParams.type == "driver") {
         console.log("A driver has connected");
-        const { type, id, username, phone_number, queue_length } = queryParams; 
+        const { type, id, username, phone_number, capacity, queue_length } = queryParams; 
 
         // ^^^ UPDATE: LOGIN PAGES ALREADY CHECK IF USER EXISTS, AND INSERTS NEW USER IF THEY DON'T
         // UPDATED REQUIREMENTS: 
@@ -109,7 +109,7 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        addOrUpdateDriver(username, phone_number, queue_length, uuid, drivers, (err, driver) => {
+        addOrUpdateDriver(username, phone_number, capacity, queue_length, uuid, drivers, (err, driver) => {
             if (err) {
               console.error("Error:", err);
             } else {
@@ -120,6 +120,7 @@ wsServer.on("connection", (connection, request) => {
                 id: driver.id,
                 username: driver.username,  // Use the updated username
                 phone_number: driver.phone_number,
+                capacity: driver.capacity,
                 queue_length: driver.queue_length // Leave the queue length unchanged
                 };
                 console.log(drivers[uuid]);
@@ -127,6 +128,8 @@ wsServer.on("connection", (connection, request) => {
 
         
                 setTimeout(() => {
+                    console.log("Driver before sending:", driver);
+                    console.log("Object being stringified:", object);
                     driverConnection.send(JSON.stringify(driver))
                     broadcastDrivers();
                     broadcastRiders();
@@ -148,7 +151,7 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        const { type, username, phone_number, pickup_location, dropoff_location, driver_id } = queryParams;
+        const { type, username, phone_number, pickup_location, dropoff_location, numRiders, driver_id } = queryParams;
 
         console.log(queryParams)
         
@@ -157,6 +160,7 @@ wsServer.on("connection", (connection, request) => {
             phone_number, 
             pickup_location, 
             dropoff_location, 
+            numRiders,
             driver_id, // Driver ID
             uuid, 
             riders, 
@@ -174,6 +178,7 @@ wsServer.on("connection", (connection, request) => {
                     phone_number: rider.phone_number,
                     pickup_location: rider.pickup_location,
                     dropoff_location: rider.dropoff_location,
+                    numRiders: rider.numRiders,
                     driver_id: rider.driver_id || null,
                 };
                 console.log(riders[uuid]);
@@ -248,6 +253,7 @@ wsServer.on("connection", (connection, request) => {
                           phoneNumber: row.phone_number,
                           pickupLocation: row.pickup_location,
                           dropoffLocation: row.dropoff_location,
+                          numRiders: row.numRiders,
                           startTime: row.created_at,
                           queueId: row.queue_id,
                           status: row.status,
