@@ -9,18 +9,25 @@
     color: var(--secondary);
 }
 
+
 .queue{
-    border: 5px solid black;
-    border-radius: 10px;
-    margin: 20px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
     color: var(--secondary);
-}
+    justify-content: center;
+    align-items: center;
+    /* border: 2px solid var(--secondary);
+    border-radius: 10px; */
+    padding: 10px;
+  }
 
 .pageDriver{
-position: relative; /* Establish positioning context */
-  width: 100%; /* Full viewport width */
-  height: 100%; /* Full viewport height */
-  box-sizing: border-box; /* Include padding and border in size */
+    position: relative; /* Establish positioning context */
+    width: 100%; /* Full viewport width */
+    height: 100%; /* Full viewport height */
+    box-sizing: border-box; /* Include padding and border in size */
+    padding: 10px;
 }
 
 .riderInformation {

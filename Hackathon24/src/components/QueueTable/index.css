@@ -1,0 +1,21 @@
+
+/* Queue Table Component */
+
+.driver-queue-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.driver-queue-container table.queue-table th,
+.driver-queue-container table.queue-table td {
+  padding: 5px; /* Add padding to cells for better readability */
+  text-align: left; /* Align text to the left */
+  border: 1px solid var(--secondary); /* Add borders to cells */
+}
+
+.driver-queue-container table.queue-table th {
+  background-color: var(--lightGray); /* Add a light background to header cells */
+  font-weight: bold; /* Make header text bold */
+}

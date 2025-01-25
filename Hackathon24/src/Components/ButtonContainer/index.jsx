@@ -43,7 +43,8 @@ const ButtonContainer = ({googleMapsUrl, riderId, driverId, socket,arrivedAtPick
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, arrived!'
+      confirmButtonText: 'Yes, arrived!',
+      heightAuto: false        // Prevent adjusting the body's height
     }).then((result) => {
       if (result.isConfirmed) {
         setArrivedAtPickup(true);
@@ -78,7 +79,8 @@ const ButtonContainer = ({googleMapsUrl, riderId, driverId, socket,arrivedAtPick
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, arrived!'
+        confirmButtonText: 'Yes, arrived!',
+        heightAuto: false        // Prevent adjusting the body's height
     }).then((result) => {
         if (result.isConfirmed) {
             const message = {

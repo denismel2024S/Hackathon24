@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import axios from 'axios';
 import { drop } from 'lodash';
+import './index.css';
+
 
 const MapWithMarker = ({ setUpdatingLocation, riderId, address, initialCoordinates, destination, destinationCoordinates, onCoordinatesChange, socket, updateRiderData, setPickupCoordinates, onComplete , showButton}) => {
   const [center, setCenter] = useState(initialCoordinates || { lat: 37.2296, lng: -80.4244 }); // Default coordinates
@@ -172,11 +174,11 @@ const MapWithMarker = ({ setUpdatingLocation, riderId, address, initialCoordinat
   if (!isLoaded) return <div>Loading map...</div>;
   const isDark = true;
   return (
-    <>
+    <div className='mapWithMarker'>
       <GoogleMap
         center={center}
         zoom={17}
-        mapContainerStyle={{ width: '100%', height: '40rem' }}
+        mapContainerStyle={{ width: '100%', height: '45vh', borderRadius: '6px', border: '4px solid var(--secondary)' }}
         options={{ styles: isDark ? darkMode : lightMode }}
         >
         {markerPosition && (
@@ -196,7 +198,7 @@ const MapWithMarker = ({ setUpdatingLocation, riderId, address, initialCoordinat
         {loading ? 'Sending...' : 'Confirm Pickup Location'}
       </button>
       }
-    </>
+    </div>
   );
 };
 

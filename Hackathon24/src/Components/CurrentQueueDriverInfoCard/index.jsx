@@ -1,6 +1,8 @@
 import React from "react";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import './index.css';
+
 
 const MySwal = withReactContent(Swal);
 
@@ -16,7 +18,8 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, leave!'
+      confirmButtonText: 'Yes, leave!',
+      heightAuto: false        // Prevent adjusting the body's height
     }).then((result) => {
       if (result.isConfirmed) {
         const message = {

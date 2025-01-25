@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PlacesAutocomplete from 'react-places-autocomplete';
 import axios from 'axios';
 import MapWithMarker from '../xmap_with_marker';
+import './index.css';
 import throttle from 'lodash/throttle';
 import { update } from 'lodash';
 

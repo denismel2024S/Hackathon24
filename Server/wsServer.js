@@ -527,10 +527,8 @@ wsServer.on("connection", (connection, request) => {
                 // TEST MESSASGE
                 console.log("\n\nSTART TEST MESSAGE\n\n");
                 
-                riderConnection.send("I think I have your queue, sir.")
                 const riderString = JSON.stringify(riderFound)
                 console.log(riderString);
-                driverConnection.send("I think I have your queue, sir.")
                 const driverString = JSON.stringify(driverFound);
                 console.log(driverString);
 

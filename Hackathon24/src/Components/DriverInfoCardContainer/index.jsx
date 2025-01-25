@@ -1,5 +1,7 @@
 import React, { useEffect, useState} from "react";
 import DriverInfoCard from "../DriverInfoCard";
+import './index.css';
+
 
 function DriverInfoCardContainer({ inQueue, setInQueue, connectedUsers, socket, riderId, rider, setRider, updateRiderData }) {
     const[drivers, setDrivers] = useState([]);

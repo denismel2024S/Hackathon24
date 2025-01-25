@@ -129,7 +129,7 @@ const MapWithDirectionsTest = ({
         center={pickupCoordinates || { lat: 37.2296, lng: -80.4244 }}
         options={{ styles: isDark ? darkMode : lightMode }}
         zoom={13}
-        mapContainerStyle={{ width: '100%', height: '36vh', borderRadius: '8px' }}
+        mapContainerStyle={{ width: '100%', height: '34vh', borderRadius: '6px' }}
       >
         {pickupCoordinates && <Marker position={pickupCoordinates} />}
         {dropoffCoordinates && <Marker position={dropoffCoordinates} />}

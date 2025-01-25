@@ -14,7 +14,7 @@ padding: top right bottom left
   font-weight: 400;
 }
 :root {
-  --primary: #515151;
+  --primary: #212121;
   --secondary: hsl(32, 34%, 85%);
   --green: #4caf50;
   --red: #de6451;
@@ -104,8 +104,17 @@ input{
   flex-direction: column;
   margin: 0.625rem;
 }
+
+
+/* Invert main logo so that it is white not black */
+
+.mainImage {
+  filter: invert(65%);
+}
+
+
 .chariotTitle{
-  color: var(--primary);
+  color: var(--secondary);
   font-size: 3.5rem;
   line-height: 1.5;
 }
@@ -225,19 +234,24 @@ input{
 .resetButton{
   display: flex;
   width: 35%;
-  color: black; 
+  color: var(--secondary); 
   justify-content: center;
   justify-self: center;
-  background-color: var(--lightGray);
+  background-color: var(--primary);
+  border: solid 2px var(--secondary);
+  border-radius: 8px;
 }
 /* Driver Login Page Styles */
 .submit{
+  margin: 0px;
   background-color: var(--green);
+  color: white;
 }
 .pageTitle{
   margin: 1.25rem; 
   color: var(--secondary);
 }
+
 .inputsContainer{
   display: flex;
   flex-direction: column;
@@ -252,10 +266,6 @@ input{
   color: var(--secondary);
 }
     
-/* Driver Main Page */
-.pageDriver{
-  width: 100%;
-}
 .greeting{
   margin: 1.25rem;
 }
@@ -304,17 +314,17 @@ input{
 }
 
 /* Queue Table Component */
-.scrollableList{
+/* .scrollableList{
   background-color: var(--gray);
   flex-grow: 1;
   padding: 0.9375rem;
   border: 0.25rem solid transparent;
-  overflow-y: auto; /* Allow vertical scrolling within the element */
+  overflow-y: auto; 
   border: 0.125rem solid var(--lightGray);
   border-radius: 0.625rem;
   position: relative;
-  height: calc(100vh - 20rem);
-}
+  height: 40vh;
+} */
 
 .driver-queue-container table.queue-table th,
 .driver-queue-container table.queue-table td {
