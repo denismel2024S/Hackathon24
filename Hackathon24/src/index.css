@@ -23,6 +23,9 @@ padding: top right bottom left
   font-family: "Crimson" ;
   line-height: 1.5;
   color-scheme: light dark;
+
+
+
 }
 
 html, body{
@@ -36,7 +39,7 @@ html, body{
 #root {
   display: flex; 
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   background: var(--gray); 
   width: 100%;
   height: 100%;
@@ -45,6 +48,7 @@ html, body{
 
 *{
   box-sizing: border-box;
+  /* border: 1px solid lime; */
 }
 
 h1, h2, h3, h4, h5, h6, p, strong, span, div, label, input {
@@ -67,10 +71,11 @@ button {
   display: flex;
   justify-self: center;
   justify-content: center;
+  align-self: center;
   border-radius: 0.5rem;
   border: 1px solid transparent;
   padding: 0.625rem;
-  margin: 0.625rem 0;
+  margin: 0.625rem ;
   font-size: 1.25rem;
   width: 100%;
   background-color: var(--secondary);
@@ -532,7 +537,14 @@ input{
   animation-delay: .3s;
 }
 .showMap{
-  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  align-self: center;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+  margin: 0.625rem 0;
 }
 .currentDriver{
   width: 100%;

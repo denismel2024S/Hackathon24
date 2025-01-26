@@ -62,7 +62,7 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
         {/* <p><b>Phone number: </b>{driver.phone_number}</p> */}
         <h3>You are <span className = "queueNumber" data={queuePosition}>{getOrdinalSuffix(queuePosition)}</span> in queue</h3>
         <p><b>Queue Status: </b>{status}</p>
-        <a className = "clickablePhone" href={`tel:${driver.phone}`}>
+        <a className = "clickablePhone" href={`tel:+1${driver.phone_number}`}>
           <i class="fa-solid fa-phone"></i>
           <b>{driver.phone_number}</b></a>
         <button 
