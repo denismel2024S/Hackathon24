@@ -847,10 +847,12 @@ wsServer.on("connection", (connection, request) => {
                 
             });
         }
+        if(data.action === "checkQueues"){
+            console.log("CLIENT WANTS TO CHECK QUEUES")
+            broadcastDrivers();
+            broadcastRiders();
+        }
         
-          
-
-
     });
 
     connection.on('close', () => {

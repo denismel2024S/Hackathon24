@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react'
 import './main.jsx'
 import {RiderLogin} from './Components/RiderLogin/index.jsx'
 import {DriverLogin} from './Components/DriverLogin/index.jsx'
+import DriverInfoCardContainer from './Components/DriverInfoCardContainer/index.jsx'
 import {Reset} from './Components/Reset/index.jsx'
+import { PageRider } from './Components/PageRider/index.jsx'
+import CheckQueues from './Components/CheckQueues/index.jsx'
 
 const App = () => {
     const [showCodeInput, setShowCodeInput] = useState(false);
@@ -62,9 +65,9 @@ const App = () => {
     }
     if(driverOrRider === 'rider'){
         return(
-                <>
-                    <RiderLogin/>
-                </>
+            <>
+                <RiderLogin/>
+            </>
         );
     }else if(driverOrRider === 'driver'){
         return (

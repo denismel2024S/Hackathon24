@@ -16,7 +16,9 @@ function DriverInfoCardContainer({ inQueue, setInQueue, connectedUsers, socket, 
     }, [drivers]);
     
     useEffect(() => {
-        setRider(rider);
+        if(rider){
+            setRider(rider);
+        }
     }, [rider]);
 
     const addToQueue = (index) => {
