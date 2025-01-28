@@ -6,7 +6,14 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const {addDriver, addRider, getDriverById, addOrUpdateDriver, addOrUpdateRider, getRiderCoordinates, updateRiderCoordinates, updateQueueStatus, getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, getQueueByRiderId, updateRiderLocationAddressById, clearDatabase } = require('./database'); // Import the database functions
+const {addDriver, addRider, 
+    getDriverById, addOrUpdateDriver,
+     addOrUpdateRider, getRiderCoordinates, 
+     updateRiderCoordinates, updateQueueStatus, 
+     getRiderByPhoneNumber, addQueue, 
+     getQueuesForDriver, endQueueAndResetDriver, 
+     getQueueByRiderId, updateRiderLocationAddressById, 
+     clearDatabase, clearQueues} = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -882,6 +889,6 @@ function broadcastToClients(message) {
   }
 
 server.listen(port, () => {
-    clearDatabase()
+    clearQueues();
     console.log(`Websocket server is running on port ${port}`)
 })

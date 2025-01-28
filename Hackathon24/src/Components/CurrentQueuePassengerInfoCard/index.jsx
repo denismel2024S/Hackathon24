@@ -44,7 +44,8 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
                     socket={socket}
                     arrivedAtPickup={arrivedAtPickup}
                     googleMapsUrl={googleMapsUrl}
-                    setArrivedAtPickup={setArrivedAtPickup}>
+                    setArrivedAtPickup={setArrivedAtPickup}
+                    phone={phone}>
                     
                 </ButtonContainer>
             </div>

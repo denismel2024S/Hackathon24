@@ -863,6 +863,20 @@ function getRiderByPhoneNumber(riderPhoneNumber, callback) {
   });
 }
 
+function clearQueues(){
+  const tables = ['queue']
+  db.serialize(() => {
+    tables.forEach((table) => {
+      db.run(`DELETE FROM ${table}`, (err) => {
+        if (err){
+          console.log(`Error clearing ${table} table: `, err)
+        }else{
+          console.log(`All rows deleted ${table}`)
+        }
+      })
+    })
+  })
+}
 function clearDatabase(){
   const tables = ['drivers', 'riders', 'queue']
   db.serialize(() => {
@@ -898,4 +912,5 @@ module.exports = {
   clearDatabase,
   getRiderCoordinates,
   updateRiderCoordinates,
+  clearQueues
 };

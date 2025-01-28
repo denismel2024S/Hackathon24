@@ -8,3 +8,8 @@
     margin: 20px 0px;
     justify-self: center;
   }
+
+.swal2-timer-progress-bar{
+    background-color: #1e81b0;
+    height: 0.675rem;
+}

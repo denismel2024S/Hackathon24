@@ -61,7 +61,8 @@ export function PageRider({formData, rider, setRider, updateRiderData}){
         }).toString();
 
         // const WSURL = `ws://localhost:8080?${queryParams}`
-        const WSURL = `ws://172.29.235.87:8080?${queryParams}`
+        const WSURL = `ws://100.64.12.2:8080?${queryParams}`
+        // const WSURL = `${process.env.REACT_APP_WS_IP}?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
 
         socketRef.current.onopen = () => {
