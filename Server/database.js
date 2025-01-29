@@ -78,7 +78,7 @@ db.run(`
 
 console.log("Database and tables are ready.");
 
-function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers, capacity, callback) {
+function addOrUpdateDriver(username, phoneNumber, capacity, queueLength = 0, uuid, drivers, callback) {
   db.serialize(() => {
     // Check if a driver with the given phone number exists
     db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
@@ -119,7 +119,7 @@ function addOrUpdateDriver(username, phoneNumber, queueLength = 0, uuid, drivers
       } else {
         // Insert a new driver if no match is found
         const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, capacity, queue_length) VALUES (?, ?, ?, ?)");
-        insertStmt.run(username, phoneNumber, queueLength, Number(capacity), function (insertErr) {
+        insertStmt.run(username, phoneNumber, Number(capacity), queueLength, function (insertErr) {
           if (insertErr) {
             console.error("Error inserting driver:", insertErr);
             callback(insertErr, null); // Return error via callback

@@ -111,26 +111,37 @@ wsServer.on("connection", (connection, request) => {
 
         addOrUpdateDriver(username, phone_number, capacity, queue_length, uuid, drivers, (err, driver) => {
             if (err) {
-              console.error("Error:", err);
+                console.error("Error:", err);
             } else {
-              console.log("Driver returned:", driver);
-
-              drivers[uuid] = {
-                type: 'driver',
-                id: driver.id,
-                username: driver.username,  // Use the updated username
-                phone_number: driver.phone_number,
-                capacity: driver.capacity,
-                queue_length: driver.queue_length // Leave the queue length unchanged
+                // Ensure capacity and queue_length are numbers
+                const capacityNumber = Number(driver.capacity) || 0;
+                const queueLengthNumber = Number(driver.queue_length) || 0;
+        
+                console.log("Driver returned:", driver);
+        
+                // Update driver information in the drivers object
+                drivers[uuid] = {
+                    type: 'driver',
+                    id: driver.id,
+                    username: driver.username,
+                    phone_number: driver.phone_number,
+                    capacity: capacityNumber, // Ensure capacity is a valid number
+                    queue_length: queueLengthNumber // Ensure queue_length is a valid number
                 };
-                console.log(drivers[uuid]);
+        
+                console.log("Updated driver in drivers object:", drivers[uuid]);
+        
                 const driverConnection = connections[uuid];
-
         
                 setTimeout(() => {
-                    console.log("Driver before sending:", driver);
-                    console.log("Object being stringified:", object);
-                    driverConnection.send(JSON.stringify(driver))
+                    // Log the driver data before sending
+                    console.log("Driver before sending:", drivers[uuid]);
+                    console.log("Object being stringified:", drivers[uuid]);
+        
+                    // Send the driver data to the connection
+                    driverConnection.send(JSON.stringify(drivers[uuid]));
+        
+                    // Broadcast updated drivers and riders
                     broadcastDrivers();
                     broadcastRiders();
         

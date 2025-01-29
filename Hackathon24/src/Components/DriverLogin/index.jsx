@@ -53,12 +53,18 @@ export function DriverLogin({}){
         console.log('Driver Information:', formData);
         setSubmitted(true)
         
+        const validCapacity = Number(formData.capacity);
+        if (isNaN(validCapacity)) {
+            console.error("Invalid capacity input:", formData.capacity);
+            return;
+        }
+
         const formDriverData = {
             id: null,
             username: formData.name,
             phone_number: formData.phone,
             queue_length: 0,
-            capacity: Number(formData.capacity),
+            capacity: validCapacity,
         };
 
         setDriver(formDriverData);
@@ -68,12 +74,12 @@ export function DriverLogin({}){
 
     useEffect(() => {
         const cachedDriver = localStorage.getItem('driver');
-        const submitted = localStorage.getItem('submitted');
+        const submitted = localStorage.getItem('submitted') === "true";
         if (cachedDriver) {
             const parsedDriver = JSON.parse(cachedDriver);
             setDriver(parsedDriver);
-            setSubmitted(submitted);
         }
+        setSubmitted(submitted);
     },[]);
 
     useEffect(() => {
