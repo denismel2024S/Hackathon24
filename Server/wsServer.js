@@ -6,14 +6,10 @@ const server = http.createServer()
 const wsServer = new WebSocketServer( {server})
 const port = 8080
 const sqlite3 = require('sqlite3').verbose();
-const {addDriver, addRider, 
-    getDriverById, addOrUpdateDriver,
-     addOrUpdateRider, getRiderCoordinates, 
-     updateRiderCoordinates, updateQueueStatus, 
-     getRiderByPhoneNumber, addQueue, 
-     getQueuesForDriver, endQueueAndResetDriver, 
-     getQueueByRiderId, updateRiderLocationAddressById, 
-     clearDatabase, clearQueues} = require('./database'); // Import the database functions
+const {getDriverById, addOrUpdateDriver, addOrUpdateRider, 
+    getRiderCoordinates, updateRiderCoordinates, updateQueueStatus, 
+    getRiderByPhoneNumber, addQueue, getQueuesForDriver, endQueueAndResetDriver, 
+    getQueueByRiderId, updateRiderLocationAddressById, clearDatabase, clearQueues} = require('./database'); // Import the database functions
 
 
 // Open SQLite database
@@ -107,7 +103,7 @@ wsServer.on("connection", (connection, request) => {
 
     if (queryParams.type == "driver") {
         console.log("A driver has connected");
-        const { type, id, username, phone_number, queue_length } = queryParams; 
+        const { type, id, username, phone_number, capacity, queue_length } = queryParams; 
 
         // ^^^ UPDATE: LOGIN PAGES ALREADY CHECK IF USER EXISTS, AND INSERTS NEW USER IF THEY DON'T
         // UPDATED REQUIREMENTS: 
@@ -116,25 +112,39 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        addOrUpdateDriver(username, phone_number, queue_length, uuid, drivers, (err, driver) => {
+        addOrUpdateDriver(username, phone_number, capacity, queue_length, uuid, drivers, (err, driver) => {
             if (err) {
-              console.error("Error:", err);
+                console.error("Error:", err);
             } else {
-              console.log("Driver returned:", driver);
-
-              drivers[uuid] = {
-                type: 'driver',
-                id: driver.id,
-                username: driver.username,  // Use the updated username
-                phone_number: driver.phone_number,
-                queue_length: driver.queue_length // Leave the queue length unchanged
+                // Ensure capacity and queue_length are numbers
+                const capacityNumber = Number(driver.capacity) || 0;
+                const queueLengthNumber = Number(driver.queue_length) || 0;
+        
+                console.log("Driver returned:", driver);
+        
+                // Update driver information in the drivers object
+                drivers[uuid] = {
+                    type: 'driver',
+                    id: driver.id,
+                    username: driver.username,
+                    phone_number: driver.phone_number,
+                    capacity: capacityNumber, // Ensure capacity is a valid number
+                    queue_length: queueLengthNumber // Ensure queue_length is a valid number
                 };
-                console.log(drivers[uuid]);
+        
+                console.log("Updated driver in drivers object:", drivers[uuid]);
+        
                 const driverConnection = connections[uuid];
-
         
                 setTimeout(() => {
-                    driverConnection.send(JSON.stringify(driver))
+                    // Log the driver data before sending
+                    console.log("Driver before sending:", drivers[uuid]);
+                    console.log("Object being stringified:", drivers[uuid]);
+        
+                    // Send the driver data to the connection
+                    driverConnection.send(JSON.stringify(drivers[uuid]));
+        
+                    // Broadcast updated drivers and riders
                     broadcastDrivers();
                     broadcastRiders();
         
@@ -155,7 +165,7 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        const { type, username, phone_number, pickup_location, dropoff_location, driver_id } = queryParams;
+        const { type, username, phone_number, pickup_location, dropoff_location, numRiders, driver_id } = queryParams;
 
         console.log(queryParams)
         
@@ -164,6 +174,7 @@ wsServer.on("connection", (connection, request) => {
             phone_number, 
             pickup_location, 
             dropoff_location, 
+            numRiders,
             driver_id, // Driver ID
             uuid, 
             riders, 
@@ -181,6 +192,7 @@ wsServer.on("connection", (connection, request) => {
                     phone_number: rider.phone_number,
                     pickup_location: rider.pickup_location,
                     dropoff_location: rider.dropoff_location,
+                    numRiders: rider.numRiders,
                     driver_id: rider.driver_id || null,
                 };
                 console.log(riders[uuid]);
@@ -255,6 +267,7 @@ wsServer.on("connection", (connection, request) => {
                           phoneNumber: row.phone_number,
                           pickupLocation: row.pickup_location,
                           dropoffLocation: row.dropoff_location,
+                          numRiders: row.numRiders,
                           startTime: row.created_at,
                           queueId: row.queue_id,
                           status: row.status,

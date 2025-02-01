@@ -16,6 +16,7 @@ export function RiderLogin({onSubmit}){
         phone_number: '',
         pickup_location: '',
         dropoff_location: '',
+        numRiders: 0,  
         driver_id: null,
     });
 
@@ -24,7 +25,7 @@ export function RiderLogin({onSubmit}){
         phone: '',
         pickup: '',
         dropoff: '',
-    
+        riders: '',
       });
 
       const handleLocationChange = (address) => {
@@ -89,6 +90,7 @@ export function RiderLogin({onSubmit}){
             phone_number: formData.phone || rider.phone_number,
             pickup_location: formData.pickup || rider.pickup_location,
             dropoff_location: formData.dropoff || rider.dropoff_location,
+            numRiders: formData.riders || rider.numRiders,
             driver_id: rider.driver_id || null,
             pickup_coordinates: null,
             dropoff_coordinates: dropoff_coordinates,
@@ -265,6 +267,23 @@ export function RiderLogin({onSubmit}){
                         </div>
                         )}
                     </PlacesAutocomplete>
+                </label>
+                <label>
+                <p className = "fieldLabel">Rider(s)</p>
+                    <div className="inputGroup">
+                        <input
+                            //type="tel"
+                            className = "input"
+                            type="number"
+                            name="riders"
+                            value={formData.riders}
+                            onChange={handleChange}
+                            required
+                            placeholder="1"
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
                 </label>
                 <button className = "submit" type="submit">Submit</button>
             </form>

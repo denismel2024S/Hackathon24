@@ -5,7 +5,7 @@ import ButtonContainer from "../ButtonContainer";
 
 const MySwal = withReactContent(Swal);
 
-const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, riderId, driverId, socket}) => {
+const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, numRiders, riderId, driverId, socket}) => {
     const [arrivedAtPickup, setArrivedAtPickup] = useState(false);
     const [arrivedAtDestination, setArrivedAtDestination] = useState(false);
     const [currentLocation, setCurrentLocation] = useState(location);
@@ -32,6 +32,8 @@ const CurrentQueuePassengerInfoCard = ({ name, phone, location, destination, rid
                 <a className = "clickablePhone" href={`tel:${phone}`}><i class="fa-solid fa-phone"></i>{phone}</a>
                 <p>Pickup From: {location}</p>
                 <p>Going to: {destination}</p>
+                <p>Number of Riders: {numRiders}</p>
+
             </div>
             {/* Buttons */}
             <div className="mapButtons">

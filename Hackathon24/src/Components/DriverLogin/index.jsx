@@ -22,11 +22,13 @@ export function DriverLogin({}){
         username: '',
         phone_number: '',
         queue_length: 0,
+        capacity: 0,
     });
 
     const [formData, setFormData] = useState({  
         name: '',
         phone: '',
+        capacity: '',
     });
     
     const handleChange = (e) => {
@@ -51,11 +53,18 @@ export function DriverLogin({}){
         console.log('Driver Information:', formData);
         setSubmitted(true)
         
+        const validCapacity = Number(formData.capacity);
+        if (isNaN(validCapacity)) {
+            console.error("Invalid capacity input:", formData.capacity);
+            return;
+        }
+
         const formDriverData = {
             id: null,
             username: formData.name,
             phone_number: formData.phone,
             queue_length: 0,
+            capacity: validCapacity,
         };
 
         setDriver(formDriverData);
@@ -65,12 +74,12 @@ export function DriverLogin({}){
 
     useEffect(() => {
         const cachedDriver = localStorage.getItem('driver');
-        const submitted = localStorage.getItem('submitted');
+        const submitted = localStorage.getItem('submitted') === "true";
         if (cachedDriver) {
             const parsedDriver = JSON.parse(cachedDriver);
             setDriver(parsedDriver);
-            setSubmitted(submitted);
         }
+        setSubmitted(submitted);
     },[]);
 
     useEffect(() => {
@@ -144,6 +153,23 @@ export function DriverLogin({}){
                     </div>
                 </label>
                 <br></br>
+                <label>
+                    <p className = "fieldLabel">Capacity: </p> 
+                    <div className = "inputGroup">
+
+                        <input
+                            className = "input"
+                            type="number"
+                            name="capacity"
+                            value={(formData.capacity)}
+                            onChange={handleChange}
+                            placeholder='0-15'
+                        />
+                        <span className = "highlight"></span>
+                        <span className = "bar"></span>
+                    </div>
+                </label>
+                <br />
                 <button className = "submit" type="submit">Submit</button>
             </form>
             <Reset/>
