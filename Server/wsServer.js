@@ -103,7 +103,7 @@ wsServer.on("connection", (connection, request) => {
 
     if (queryParams.type == "driver") {
         console.log("A driver has connected");
-        const { type, id, username, phone_number, capacity, queue_length } = queryParams; 
+        const { type, id, username, phone_number, car_type, queue_length } = queryParams; 
 
         // ^^^ UPDATE: LOGIN PAGES ALREADY CHECK IF USER EXISTS, AND INSERTS NEW USER IF THEY DON'T
         // UPDATED REQUIREMENTS: 
@@ -112,12 +112,10 @@ wsServer.on("connection", (connection, request) => {
 
         //TEST CODE
 
-        addOrUpdateDriver(username, phone_number, capacity, queue_length, uuid, drivers, (err, driver) => {
+        addOrUpdateDriver(username, phone_number, car_type, queue_length, uuid, drivers, (err, driver) => {
             if (err) {
                 console.error("Error:", err);
             } else {
-                // Ensure capacity and queue_length are numbers
-                const capacityNumber = Number(driver.capacity) || 0;
                 const queueLengthNumber = Number(driver.queue_length) || 0;
         
                 console.log("Driver returned:", driver);
@@ -128,7 +126,7 @@ wsServer.on("connection", (connection, request) => {
                     id: driver.id,
                     username: driver.username,
                     phone_number: driver.phone_number,
-                    capacity: capacityNumber, // Ensure capacity is a valid number
+                    car_type: driver.car_type, 
                     queue_length: queueLengthNumber // Ensure queue_length is a valid number
                 };
         

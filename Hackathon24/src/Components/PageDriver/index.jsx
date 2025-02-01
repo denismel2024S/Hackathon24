@@ -28,7 +28,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             username: driver?.username,
             phone_number: driver?.phone_number,
             queue_length: driver?.queue_length,
-            capacity: driver?.capacity,
+            car_type: driver?.car_type,
         }).toString();
 
         const WSURL = `ws://localhost:8080?${queryParams}`
@@ -64,12 +64,12 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                     updateDriverData({
                         queue_length: parsedMessage.queue_length, // Rider is leaving the queue, so we reset driver_id
                         id: parsedMessage.id,
-                        capacity: Number(parsedMessage.capacity),  // Ensure capacity is a number
+                        car_type: parsedMessage.car_type,  
                     });
 
                     const message = {
                         driverId: Number(driver.id),  // driver's ID
-                        capacity: Number(driver.capacity),  // Ensure it's a number
+                        car_type: String(car_type),  // Ensure it's a number
                         action: "getActiveQueues",
                     };
                 
@@ -135,7 +135,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
         return () => {
             socketRef.current.close();
         };
-    }, [driver?.username, driver?.phone_number, driver?.capacity]);
+    }, [driver?.username, driver?.phone_number, driver?.car_type]);
 
 
 //     // Send message to WebSocket after driver info or queue length updates
@@ -190,7 +190,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
                 <p><strong>Phone Number:</strong> {driver.phone_number}</p>
                 <p><strong>Driver ID:</strong> {driver.id}</p>
                 <p><strong>Real Queue Length:</strong> {filteredUsers.length}</p>
-                <p><strong>Capacity:</strong> {driver.capacity}</p>
+                <p><strong>type of car:</strong> {driver.car_type}</p>
             </div>
             {currentQueuePickupCoordinates && showMap && (
                 <DriverMapTest coordinates={currentQueuePickupCoordinates} />

@@ -20,7 +20,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT,
       phone_number TEXT UNIQUE,
-      capacity INTEGER,
+      car_type TEXT,
       queue_length INTEGER DEFAULT 0
     );
   `);
@@ -78,7 +78,7 @@ db.run(`
 
 console.log("Database and tables are ready.");
 
-function addOrUpdateDriver(username, phoneNumber, capacity, queueLength = 0, uuid, drivers, callback) {
+function addOrUpdateDriver(username, phoneNumber, car_type, queueLength = 0, uuid, drivers, callback) {
   db.serialize(() => {
     // Check if a driver with the given phone number exists
     db.get("SELECT * FROM drivers WHERE phone_number = ?", [phoneNumber], (err, row) => {
@@ -90,8 +90,8 @@ function addOrUpdateDriver(username, phoneNumber, capacity, queueLength = 0, uui
 
       if (row) {
         // Update the username of the existing driver
-        const updateStmt = db.prepare("UPDATE drivers SET username = ?, capacity = ? WHERE phone_number = ?");
-        updateStmt.run(username, Number(capacity), phoneNumber, (updateErr) => {
+        const updateStmt = db.prepare("UPDATE drivers SET username = ?, car_type = ? WHERE phone_number = ?");
+        updateStmt.run(username, car_type, phoneNumber, (updateErr) => {
           if (updateErr) {
             console.error("Error updating driver:", updateErr);
             callback(updateErr, null); // Return error via callback
@@ -104,7 +104,7 @@ function addOrUpdateDriver(username, phoneNumber, capacity, queueLength = 0, uui
               id: row.id,
               username: username, // Updated username
               phone_number: phoneNumber,
-              capacity: capacity,
+              car_type: car_type,
               queue_length: row.queue_length // Queue length remains unchanged
             };
 
@@ -118,8 +118,8 @@ function addOrUpdateDriver(username, phoneNumber, capacity, queueLength = 0, uui
         updateStmt.finalize();
       } else {
         // Insert a new driver if no match is found
-        const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, capacity, queue_length) VALUES (?, ?, ?, ?)");
-        insertStmt.run(username, phoneNumber, Number(capacity), queueLength, function (insertErr) {
+        const insertStmt = db.prepare("INSERT INTO drivers (username, phone_number, car_type, queue_length) VALUES (?, ?, ?, ?)");
+        insertStmt.run(username, phoneNumber, car_type, queueLength, function (insertErr) {
           if (insertErr) {
             console.error("Error inserting driver:", insertErr);
             callback(insertErr, null); // Return error via callback
@@ -132,7 +132,7 @@ function addOrUpdateDriver(username, phoneNumber, capacity, queueLength = 0, uui
               id: this.lastID, // Use the last inserted ID
               username: username,
               phone_number: phoneNumber,
-              capacity: Number(capacity),
+              car_type: car_type,
               queue_length: queueLength
             };
 

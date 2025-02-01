@@ -59,6 +59,7 @@ const CurrentQueueDriverInfoCard = ({queuePosition, status, rider, driver, inQue
   return (
       <div className="currentDriver">
         <h3>Your Driver: {driver.username} (ID: {driver.id})</h3>
+        <h3>Car: {driver.car_type}</h3>
         {/* <p><b>Phone number: </b>{driver.phone_number}</p> */}
         <h3>You are <span className = "queueNumber" data={queuePosition}>{getOrdinalSuffix(queuePosition)}</span> in queue</h3>
         <p><b>Queue Status: </b>{status}</p>

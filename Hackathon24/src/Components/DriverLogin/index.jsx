@@ -22,13 +22,13 @@ export function DriverLogin({}){
         username: '',
         phone_number: '',
         queue_length: 0,
-        capacity: 0,
+        car_type: '',
     });
 
     const [formData, setFormData] = useState({  
         name: '',
         phone: '',
-        capacity: '',
+        car_type: '',
     });
     
     const handleChange = (e) => {
@@ -53,18 +53,18 @@ export function DriverLogin({}){
         console.log('Driver Information:', formData);
         setSubmitted(true)
         
-        const validCapacity = Number(formData.capacity);
+        /*const validCapacity = Number(formData.capacity);
         if (isNaN(validCapacity)) {
             console.error("Invalid capacity input:", formData.capacity);
             return;
-        }
+        }*/
 
         const formDriverData = {
             id: null,
             username: formData.name,
             phone_number: formData.phone,
             queue_length: 0,
-            capacity: validCapacity,
+            car_type: formData.car_type,
         };
 
         setDriver(formDriverData);
@@ -154,16 +154,16 @@ export function DriverLogin({}){
                 </label>
                 <br></br>
                 <label>
-                    <p className = "fieldLabel">Capacity: </p> 
+                    <p className = "fieldLabel">Car Type: </p> 
                     <div className = "inputGroup">
 
                         <input
                             className = "input"
-                            type="number"
-                            name="capacity"
-                            value={(formData.capacity)}
+                            type="text"
+                            name="car_type"
+                            value={(formData.car_type)}
                             onChange={handleChange}
-                            placeholder='0-15'
+                            placeholder='blue toyota truck'
                         />
                         <span className = "highlight"></span>
                         <span className = "bar"></span>
