@@ -23,6 +23,7 @@ export function DriverLogin({}){
         phone_number: '',
         queue_length: 0,
         car_type: '',
+        shift: "",
     });
 
     const [formData, setFormData] = useState({  
@@ -64,7 +65,6 @@ export function DriverLogin({}){
             username: formData.name,
             phone_number: formData.phone,
             queue_length: 0,
-            car_type: formData.car_type,
         };
 
         setDriver(formDriverData);
@@ -134,7 +134,7 @@ export function DriverLogin({}){
                 </label>
                 <br />
                 <label>
-                    <p className = "fieldLabel">Phone Number: </p> 
+                    <p className = "fieldLabel">Phone Number </p> 
                     <div className = "inputGroup">
 
                         <input

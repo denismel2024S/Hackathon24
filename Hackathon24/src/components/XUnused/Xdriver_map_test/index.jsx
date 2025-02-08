@@ -78,19 +78,14 @@ const DriverMapTest = ({ coordinates }) => {
   if (!isLoaded) return <div>Loading map...</div>;
   const isDark = true;
 
-
-
-  if (!isLoaded) return <div>Loading map...</div>;
-
   return (
     <GoogleMap
       center={center}
       zoom={15}
-      mapContainerStyle={{ width: "100%", height: "20rem", borderRadius: '8px' }}
+      mapContainerStyle={{ width: "100%", height: "20rem", borderRadius: '10px' }}
       options={{ styles: isDark ? darkMode : lightMode }}
-
     >
-      {center && <Marker position={center} />}
+    {center && <Marker position={center} />}
     </GoogleMap>
   );
 };

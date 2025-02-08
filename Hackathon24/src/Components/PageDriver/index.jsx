@@ -5,12 +5,14 @@ import DriverMapTest from "../XUnused/Xdriver_map_test";
 import QueueTable from "../QueueTable";
 import './index.css';
 import {Reset} from "../Reset"
+import { stringify } from "postcss";
 
 
 export function PageDriver({formData, driver, setDriver, socket, updateDriverData}) {
     const [connectedUsers, setConnectedUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showMap, setShowMap] = useState(false);
+    const [shift, setShift] = useState("");
     const previousUsers = useRef([])
     const socketRef = useRef(null);
 
@@ -29,16 +31,18 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             phone_number: driver?.phone_number,
             queue_length: driver?.queue_length,
             car_type: driver?.car_type,
+            shift: driver?.shift,
         }).toString();
 
-        const WSURL = `ws://localhost:8080?${queryParams}`
-        //const WSURL = `ws://100.64.12.2:8080?${queryParams}`
+        // const WSURL = `ws://localhost:8080?${queryParams}`
+        const WSURL = `ws://100.64.12.2:8080?${queryParams}`
         // const WSURL = `${process.env.REACT_APP_WS_IP}?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
         window.localStorage.setItem('driver', JSON.stringify(driver));
     
         socketRef.current.onopen = () => {
             console.log('Websocket connection established')
+            calculateShift();
         }
         
         socketRef.current.onmessage = (e) => {
@@ -175,6 +179,36 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             setCurrentQueuePickupCoordinates(currentQueuePickupCoordinates);
         }
     }, []);
+    
+    const calculateShift = () => {
+        const storedShift = window.localStorage.getItem('shift');
+        if (shift === "" && !storedShift) {
+            const now = new Date();
+            const startTime = now.getHours();
+            const startMinutes = now.getMinutes();
+            const endTime = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+            const endHours = endTime.getHours();
+            const endMinutes = endTime.getMinutes();
+        
+            const formatTime = (hour, minutes) => {
+                const formattedHour = hour % 12 || 12;
+                const formattedMinutes = minutes.toString().padStart(2, '0');
+                return `${formattedHour}:${formattedMinutes}`;
+            };
+
+            const calculatedShift = formatTime(startTime, startMinutes) + " - " + formatTime(endHours, endMinutes);
+            setShift(calculatedShift);
+            window.localStorage.setItem('shift', calculatedShift);
+            console.log("Shift calculated and stored:", calculatedShift);
+        } else if (storedShift) {
+            setShift(storedShift);
+            console.log("Shift from storage:", storedShift);
+        } else {
+            console.log("Shift already exists:", shift);
+        }
+    };
+
+
 
 
 
@@ -183,6 +217,7 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
     return(
         <div className = "pageDriver">
             <h1 className = "greeting"><strong>Hello, </strong> {driver.username}</h1>
+            <h1 ><strong>Shift: {shift} </strong></h1>
             <h2 className = "queue"><strong>QUEUE: {filteredUsers.length}</strong></h2>
             <button className = "showMap" onClick = {() => setShowMap(!showMap)}>Show Map</button>
             <div className="driverInformation" style={{ display:'none' }}>

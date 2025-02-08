@@ -54,6 +54,7 @@ const DriverInfoCard = ({ driver, riderId, socket, rider, inQueue, setInQueue, u
         <div className="driverInfoCard">
             <h3>{driver.username}: 
                 <span className = "queueNumber" data = {driver.queue_length}> {driver.queue_length} </span>in Queue</h3>
+            <h4>Shift: {driver.shift}</h4>
             <div className="card-body">
                 <button
                     className="btn btn-primary"
