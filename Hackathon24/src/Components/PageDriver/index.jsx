@@ -34,8 +34,8 @@ export function PageDriver({formData, driver, setDriver, socket, updateDriverDat
             shift: driver?.shift,
         }).toString();
 
-        // const WSURL = `ws://localhost:8080?${queryParams}`
-        const WSURL = `ws://100.64.12.2:8080?${queryParams}`
+        const WSURL = `ws://localhost:8080?${queryParams}`
+        // const WSURL = `ws://100.64.12.2:8080?${queryParams}`
         // const WSURL = `${process.env.REACT_APP_WS_IP}?${queryParams}`
         socketRef.current = new WebSocket(WSURL)
         window.localStorage.setItem('driver', JSON.stringify(driver));

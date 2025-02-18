@@ -2,3 +2,4 @@
 Server\app.db
 *.db
 Server/app.db
+*.db
